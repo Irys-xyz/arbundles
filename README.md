@@ -6,8 +6,6 @@ See [ANS-104](https://github.com/joshbenaron/arweave-standards/blob/ans104/ans/A
 
 ## Installing the library
 
-You need to first have NodeJS.
-
 Using npm:
 
 ```npm install ans104```
