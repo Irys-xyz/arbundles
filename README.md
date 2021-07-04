@@ -2,7 +2,7 @@
 
 A library for creating, editing, reading and verifying bundles.
 
-See [ANS-102]() for more details.
+See [ANS-104](https://github.com/joshbenaron/arweave-standards/blob/ans104/ans/ANS-104.md) for more details.
 
 ## Installing the library
 
