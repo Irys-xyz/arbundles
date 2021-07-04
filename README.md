@@ -82,7 +82,7 @@ await arweave.transactions.post(tx);
 ```ts
 import { unbundleData } from "ans104";
 
-const tx = await arweave.get("some_tx_id");
+const tx = await arweave.transactions.get("hKMMPNh_emBf8v_at1tFzNYACisyMQNcKzeeE1QE9p8");
 
 const bundle = unbundleData(tx.data);
 ```
