@@ -29,3 +29,5 @@ build/
 .DS_Store
 
 *.lock
+package-lock.json
+/lib

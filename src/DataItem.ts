@@ -2,10 +2,12 @@ import { byteArrayToLong } from "./utils";
 import { tagsParser } from "./parser";
 import base64url from "base64url";
 import { Buffer } from "buffer";
+import { JWKPublicInterface } from "./interface-jwk";
+import { sign } from "./ar-data-bundle";
 
 export default class DataItem {
-  binary: Uint8Array;
-  id: String = "";
+  private readonly binary: Uint8Array;
+  private id: Uint8Array;
 
   constructor(binary: Uint8Array) {
     this.binary = binary;
@@ -13,6 +15,14 @@ export default class DataItem {
 
   static isDataItem(obj: any): boolean {
     return obj.binary !== undefined;
+  }
+
+  getRawId() {
+    return this.id;
+  }
+
+  getId() {
+    return base64url.encode(Buffer.from(this.id), "hex");
   }
 
   getRawOwner(): Uint8Array {
@@ -70,6 +80,16 @@ export default class DataItem {
    */
   getRaw(): Uint8Array {
     return this.binary;
+  }
+
+  public async sign(jwk: JWKPublicInterface) {
+    this.id = await sign(this, jwk);
+
+    return this.getId();
+  }
+
+  public isSigned() {
+    return (this.id?.length ?? 0) > 0;
   }
 
   /**

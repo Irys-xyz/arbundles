@@ -1,6 +1,8 @@
 import { createData } from "./ar-data-create";
-import { bundleAndSignData } from "./ar-data-bundle";
+import { bundleAndSignData, unbundleData } from "./ar-data-bundle";
+import { verifyData, verifyBundle } from "./ar-data-verify";
 import Bundle from "./Bundle";
+import DataItem from "./DataItem";
 
 // interface ExportInterface {
 //   createData(opts: DataItemCreateOptions, jwk: JWKPublicInterface): Promise<DataItem>;
@@ -20,8 +22,12 @@ import Bundle from "./Bundle";
 
 export {
   Bundle,
+  DataItem,
   createData,
-  bundleAndSignData
+  bundleAndSignData,
+  unbundleData,
+  verifyData,
+  verifyBundle
 };
 
 

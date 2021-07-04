@@ -22,8 +22,8 @@ import Bundle from "./Bundle";
  */
 export async function unbundleData(
   txData: Uint8Array
-): Promise<DataItem[]> {
-  return new Bundle(txData).getAll();
+): Promise<Bundle> {
+  return new Bundle(txData);
 }
 
 /**
@@ -34,13 +34,14 @@ export async function unbundleData(
  * @param jwk
  */
 export async function bundleAndSignData(dataItems: (DataItemCreateOptions | DataItem)[], jwk: JWKPublicInterface): Promise<Bundle> {
-  let headers = new Uint8Array(64 * dataItems.length);
+  const headers = new Uint8Array(64 * dataItems.length);
 
   const binaries = await Promise.all(dataItems.map(async(di, index) => {
     // Create DataItem
     const d = DataItem.isDataItem(di) ? di as DataItem : await createData(di as DataItemCreateOptions, jwk);
     // Sign DataItem
-    const id = await sign(d, jwk);
+
+    const id = d.isSigned() ? d.getRawId() : await sign(d, jwk);
     // Create header array
     const header = new Uint8Array(64);
     // Set offset

@@ -41,6 +41,9 @@ const dataItem = createData(data);
 // Get owner in base64url encoded string
 const owner = dataItem.getOwner();
 
+// Sign a single DataItem
+await dataItem.sign(jwk);
+
 assert(owner == jwk.n);
 ```
 
@@ -62,11 +65,9 @@ const all = bundle.getAll();
 ## Submit a transaction
 
 ```ts
-import Arweave from "arweave";
-
-const arweave = Arweave.init();
-
 const bundle = bundleAndSignData(dataItems, jwk);
+
+// Convert bundle to Arweave transaction
 const tx = await bundle.toTransaction(arweave);
 
 // Add some more tags after creation.

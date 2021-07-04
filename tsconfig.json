@@ -3,9 +3,12 @@
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
+    "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "importHelpers": true,
+    "declaration": true,
+    "outDir": "lib",
     "jsx": "react",
     "lib": [
       "es2019"
@@ -20,7 +23,7 @@
     "noUnusedParameters": true,
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "strictNullChecks": false,
+    "strictNullChecks": false
   },
   "include": [
     "src/**/*",
