@@ -29,6 +29,21 @@ const bundle = bundleAndSignData(dataItems, jwk);
 ```
 It's as simple as that! All the binary encoding is handled for you.
 
+## Creating and using a DataItem
+
+```ts
+import { createData } from "ans104";
+
+const data = { data: "some data" };
+
+const dataItem = createData(data);
+
+// Get owner in base64url encoded string
+const owner = dataItem.getOwner();
+
+assert(owner == jwk.n);
+```
+
 ## Get a DataItem in a bundle
 
 ```ts
