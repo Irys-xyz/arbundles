@@ -50,10 +50,10 @@ assert(owner == jwk.n);
 ```ts
 const bundle = bundleAndSignData(dataItems, jwk);
 
-// Get my index
+// Get by index
 const byIndex = bundle.get(0);
 
-// Get my transaction id
+// Get by transaction id
 const byId = bundle.get("hKMMPNh_emBf8v_at1tFzNYACisyMQNcKzeeE1QE9p8");
 
 // Get all DataItems
