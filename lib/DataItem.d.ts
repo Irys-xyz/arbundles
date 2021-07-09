@@ -8,6 +8,7 @@ export default class DataItem {
     getId(): string;
     getRawOwner(): Uint8Array;
     getOwner(): string;
+    getAddress(): Promise<string>;
     getRawTarget(): Uint8Array;
     getTarget(): Uint8Array;
     getRawAnchor(): Uint8Array;
