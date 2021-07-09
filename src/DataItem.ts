@@ -4,6 +4,7 @@ import base64url from "base64url";
 import { Buffer } from "buffer";
 import { JWKPublicInterface } from "./interface-jwk";
 import { sign } from "./ar-data-bundle";
+import Arweave from "arweave";
 
 export default class DataItem {
   private readonly binary: Uint8Array;
@@ -31,6 +32,11 @@ export default class DataItem {
 
   getOwner(): string {
     return base64url.encode(Buffer.from(this.getRawOwner()), "hex");
+  }
+
+
+  getAddress(): string {
+    return base64url.encode(Buffer.from(await Arweave.crypto.hash(this.getRawOwner(), "SHA-256")), "hex");
   }
 
   getRawTarget(): Uint8Array {
