@@ -30,4 +30,3 @@ build/
 
 *.lock
 package-lock.json
-/lib

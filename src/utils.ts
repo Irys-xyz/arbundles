@@ -69,3 +69,5 @@ export function arraybufferEqual (buf1: Uint8Array, buf2: Uint8Array) {
 
   return true;
 }
+
+export const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';

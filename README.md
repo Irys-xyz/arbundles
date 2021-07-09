@@ -18,7 +18,7 @@ Using yarn:
 
 ## Creating bundles
 ```ts
-import { bundleAndSignData, Bundle } from "ans104";
+import { bundleAndSignData } from "ans104";
 
 const dataItems = [
   { data: "some data" },
@@ -36,7 +36,7 @@ import { createData } from "ans104";
 
 const data = { data: "some data" };
 
-const dataItem = createData(data);
+const dataItem = createData(data, jwk);
 
 // Get owner in base64url encoded string
 const owner = dataItem.getOwner();

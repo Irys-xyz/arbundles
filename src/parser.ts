@@ -13,4 +13,3 @@ export const tagsParser = avro.Type.forSchema({
   type: "array",
   items: tagParser
 });
-

@@ -11,7 +11,8 @@
     "outDir": "lib",
     "jsx": "react",
     "lib": [
-      "es2019"
+      "es2019",
+      "dom"
     ],
     "esModuleInterop": true,
     "alwaysStrict": true,

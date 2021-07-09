@@ -10,7 +10,12 @@ const HEADER_START = 32;
 export default class Bundle {
   readonly binary: Uint8Array;
 
-  constructor(binary: Uint8Array) {
+  constructor(binary: Uint8Array, verify?: boolean) {
+    // TODO: Add some verification
+    if (verify) {
+      if (!Bundle._verify(binary)) throw new Error("Binary not valid bundle");
+    }
+
     this.binary = binary;
   }
 
@@ -61,6 +66,14 @@ export default class Bundle {
         new Tag("Bundle-Version", "2.0.0"),
       ]
     });
+  }
+
+  public verify(): boolean {
+    return Bundle._verify(this.binary);
+  }
+
+  private static _verify(_: Uint8Array): boolean {
+    return true;
   }
 
   private getOffset(id: Uint8Array): { startOffset: number, size: number } {

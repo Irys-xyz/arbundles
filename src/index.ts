@@ -1,8 +1,9 @@
 import { createData } from "./ar-data-create";
 import { bundleAndSignData, unbundleData } from "./ar-data-bundle";
-import { verifyData, verifyBundle } from "./ar-data-verify";
+import { verifyData, verifyBundle, verifyDataStream } from "./ar-data-verify";
 import Bundle from "./Bundle";
 import DataItem from "./DataItem";
+import { tagsParser } from "./parser";
 
 // interface ExportInterface {
 //   createData(opts: DataItemCreateOptions, jwk: JWKPublicInterface): Promise<DataItem>;
@@ -20,6 +21,8 @@ import DataItem from "./DataItem";
 //   unbundleData(d: Uint8Array): Promise<DataItem[]>
 // }
 
+const checkTags = tagsParser.isValid;
+
 export {
   Bundle,
   DataItem,
@@ -27,7 +30,9 @@ export {
   bundleAndSignData,
   unbundleData,
   verifyData,
-  verifyBundle
+  verifyDataStream,
+  verifyBundle,
+  checkTags
 };
 
 

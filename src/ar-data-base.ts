@@ -2,7 +2,7 @@ import * as node from "arweave/node/lib/deepHash";
 import * as web from "arweave/web/lib/deepHash";
 import { stringToBuffer } from "arweave/web/lib/utils";
 import DataItem from "./DataItem";
-import { isBrowser } from "browser-or-node"
+import { isBrowser } from "./utils";
 
 /**
  * Options for creation of a DataItem

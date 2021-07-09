@@ -92,6 +92,10 @@ export default class DataItem {
     return (this.id?.length ?? 0) > 0;
   }
 
+  public verify(): boolean {
+    return true;
+  }
+
   /**
    * Returns the start byte of the tags section (number of tags)
    *
