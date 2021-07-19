@@ -1,7 +1,9 @@
+/// <reference types="node" />
 import { DataItemCreateOptions } from './ar-data-base';
 import { JWKPublicInterface } from './interface-jwk';
 import DataItem from './DataItem';
 import Bundle from './Bundle';
+import { Buffer } from 'buffer';
 /**
  * Unbundles a transaction into an Array of DataItems.
  *
@@ -15,7 +17,7 @@ import Bundle from './Bundle';
  *
  * @param txData
  */
-export declare function unbundleData(txData: Uint8Array): Promise<Bundle>;
+export declare function unbundleData(txData: Buffer): Promise<Bundle>;
 /**
  * Verifies all data items and returns a json object with an items array.
  * Throws if any of the data items fail verification.
@@ -32,8 +34,8 @@ export declare function bundleAndSignData(dataItems: (DataItemCreateOptions | Da
  * @returns signings - signature and id in byte-arrays
  */
 export declare function getSignatureAndId(item: DataItem, jwk: JWKPublicInterface): Promise<{
-    signature: Uint8Array;
-    id: Uint8Array;
+    signature: Buffer;
+    id: Buffer;
 }>;
 /**
  * Signs and returns item id
@@ -41,4 +43,4 @@ export declare function getSignatureAndId(item: DataItem, jwk: JWKPublicInterfac
  * @param item
  * @param jwk
  */
-export declare function sign(item: DataItem, jwk: JWKPublicInterface): Promise<Uint8Array>;
+export declare function sign(item: DataItem, jwk: JWKPublicInterface): Promise<Buffer>;

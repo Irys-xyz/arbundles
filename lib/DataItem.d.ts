@@ -1,39 +1,44 @@
+/// <reference types="node" />
+import { Buffer } from "buffer";
 import { JWKPublicInterface } from "./interface-jwk";
+import Arweave from "arweave";
+import Transaction from 'arweave/node/lib/transaction';
 export default class DataItem {
     private readonly binary;
     private id;
-    constructor(binary: Uint8Array);
+    constructor(binary: Buffer);
     static isDataItem(obj: any): boolean;
     isValid(): boolean;
-    getRawId(): Uint8Array;
+    getRawId(): Buffer;
     getId(): string;
-    getRawOwner(): Uint8Array;
+    getRawOwner(): Buffer;
     getOwner(): string;
     getAddress(): Promise<string>;
-    getRawTarget(): Uint8Array;
-    getTarget(): Uint8Array;
-    getRawAnchor(): Uint8Array;
-    getAnchor(): Uint8Array;
-    getRawTags(): Uint8Array;
+    getRawTarget(): Buffer;
+    getTarget(): string;
+    getRawAnchor(): Buffer;
+    getAnchor(): string;
+    getRawTags(): Buffer;
     getTags(): {
         name: string;
         value: string;
     }[];
-    getData(): Uint8Array;
+    getData(): Buffer;
     /**
      * UNSAFE!!
      * DO NOT MUTATE THE BINARY ARRAY. THIS WILL CAUSE UNDEFINED BEHAVIOUR.
      */
     getRaw(): Uint8Array;
-    sign(jwk: JWKPublicInterface): Promise<string>;
+    sign(jwk: JWKPublicInterface): Promise<Buffer>;
     isSigned(): boolean;
+    toTransaction(arweave: Arweave): Promise<Transaction>;
     /**
      * Verifies a `Buffer` and checks it fits the format of a DataItem
      *
      * A binary is valid iff:
      * - the tags are encoded correctly
      */
-    static verify(buffer: Uint8Array, extras?: {
+    static verify(_: Buffer, __?: {
         id: Uint8Array;
         jwk: JWKPublicInterface;
     }): boolean;

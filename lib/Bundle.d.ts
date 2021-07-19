@@ -1,9 +1,11 @@
+/// <reference types="node" />
+import { Buffer } from "buffer";
 import DataItem from "./DataItem";
 import Transaction from "arweave/node/lib/transaction";
 import Arweave from "arweave";
 export default class Bundle {
-    readonly binary: Uint8Array;
-    constructor(binary: Uint8Array, verify?: boolean);
+    readonly binary: Buffer;
+    constructor(binary: Buffer, verify?: boolean);
     get length(): number;
     /**
      * Get a DataItem by index (`number`) or by txId (`string`)
