@@ -4,6 +4,7 @@ export default class DataItem {
     private id;
     constructor(binary: Uint8Array);
     static isDataItem(obj: any): boolean;
+    isValid(): boolean;
     getRawId(): Uint8Array;
     getId(): string;
     getRawOwner(): Uint8Array;
@@ -26,7 +27,16 @@ export default class DataItem {
     getRaw(): Uint8Array;
     sign(jwk: JWKPublicInterface): Promise<string>;
     isSigned(): boolean;
-    verify(): boolean;
+    /**
+     * Verifies a `Buffer` and checks it fits the format of a DataItem
+     *
+     * A binary is valid iff:
+     * - the tags are encoded correctly
+     */
+    static verify(buffer: Uint8Array, extras?: {
+        id: Uint8Array;
+        jwk: JWKPublicInterface;
+    }): boolean;
     /**
      * Returns the start byte of the tags section (number of tags)
      *

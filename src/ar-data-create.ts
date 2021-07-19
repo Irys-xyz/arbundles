@@ -40,7 +40,7 @@ export async function createData(
   // See [https://github.com/joshbenaron/arweave-standards/blob/ans104/ans/ANS-104.md#13-dataitem-format]
   const length = 512 + OWNER_LENGTH + target_length + anchor_length + tags_length + data_length;
   // Create array with set length
-  const bytes = new Uint8Array(length);
+  const bytes = Buffer.alloc(length);
 
   // Push bytes for `signature`
   bytes.set(EMPTY_ARRAY, 0);

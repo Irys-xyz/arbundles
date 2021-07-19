@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import Bundle from "./Bundle";
 import DataItem from "./DataItem";
 /**
@@ -8,4 +7,4 @@ import DataItem from "./DataItem";
  */
 export declare function verifyBundle(bundle: Bundle): boolean;
 export declare function verifyData(item: DataItem): Promise<boolean>;
-export declare function verifyDataStream(stream: NodeJS.ReadableStream): Promise<boolean>;
+export declare function verifyFile(filename: string): Promise<boolean>;

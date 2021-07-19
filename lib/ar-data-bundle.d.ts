@@ -1,7 +1,7 @@
-import { DataItemCreateOptions } from "./ar-data-base";
-import { JWKPublicInterface } from "./interface-jwk";
-import DataItem from "./DataItem";
-import Bundle from "./Bundle";
+import { DataItemCreateOptions } from './ar-data-base';
+import { JWKPublicInterface } from './interface-jwk';
+import DataItem from './DataItem';
+import Bundle from './Bundle';
 /**
  * Unbundles a transaction into an Array of DataItems.
  *
@@ -26,6 +26,7 @@ export declare function unbundleData(txData: Uint8Array): Promise<Bundle>;
 export declare function bundleAndSignData(dataItems: (DataItemCreateOptions | DataItem)[], jwk: JWKPublicInterface): Promise<Bundle>;
 /**
  * Signs a single
+ *
  * @param item
  * @param jwk
  * @returns signings - signature and id in byte-arrays
@@ -36,6 +37,7 @@ export declare function getSignatureAndId(item: DataItem, jwk: JWKPublicInterfac
 }>;
 /**
  * Signs and returns item id
+ *
  * @param item
  * @param jwk
  */

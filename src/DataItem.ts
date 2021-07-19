@@ -5,12 +5,13 @@ import { Buffer } from "buffer";
 import { JWKPublicInterface } from "./interface-jwk";
 import { sign } from "./ar-data-bundle";
 import Arweave from "arweave";
+import Transaction, { Tag } from 'arweave/node/lib/transaction';
 
 export default class DataItem {
-  private readonly binary: Uint8Array;
-  private id: Uint8Array;
+  private readonly binary: Buffer;
+  private id: Buffer;
 
-  constructor(binary: Uint8Array) {
+  constructor(binary: Buffer) {
     this.binary = binary;
   };
 
@@ -18,15 +19,19 @@ export default class DataItem {
     return obj.binary !== undefined;
   }
 
-  getRawId() {
+  isValid(): boolean {
+    return DataItem.verify(this.binary);
+  }
+
+  getRawId(): Buffer {
     return this.id;
   }
 
-  getId() {
-    return base64url.encode(Buffer.from(this.id), "hex");
+  getId(): string {
+    return base64url.encode(this.id, "hex");
   }
 
-  getRawOwner(): Uint8Array {
+  getRawOwner(): Buffer {
     return this.binary.slice(512, 512 + 512);
   }
 
@@ -35,32 +40,35 @@ export default class DataItem {
   }
 
 
-  getAddress(): string {
+  async getAddress(): Promise<string> {
     return base64url.encode(Buffer.from(await Arweave.crypto.hash(this.getRawOwner(), "SHA-256")), "hex");
   }
 
-  getRawTarget(): Uint8Array {
+  getRawTarget(): Buffer {
     const targetStart = this.getTargetStart();
     const isPresent = this.binary[targetStart] == 1;
-    return isPresent ? this.binary.slice(targetStart + 1, targetStart + 33) : new Uint8Array(0);
+    return isPresent ? this.binary.slice(targetStart + 1, targetStart + 33) : Buffer.alloc(0);
   }
 
-  getTarget(): Uint8Array {
-    return this.getRawTarget();
+  getTarget(): string {
+
+
+    const target = this.getRawTarget();
+    return target.toString();
   }
 
-  getRawAnchor(): Uint8Array {
+  getRawAnchor(): Buffer {
     const anchorStart = this.getAnchorStart();
     const isPresent = this.binary[anchorStart] == 1;
 
-    return isPresent ? this.binary.slice(anchorStart + 1, anchorStart + 33) : new Uint8Array(0);
+    return isPresent ? this.binary.slice(anchorStart + 1, anchorStart + 33) : Buffer.alloc(0);
   }
 
-  getAnchor(): Uint8Array {
-    return this.getRawAnchor();
+  getAnchor(): string {
+    return this.getRawAnchor().toString();
   }
 
-  getRawTags(): Uint8Array {
+  getRawTags(): Buffer {
     const tagsStart = this.getTagsStart();
     const tagsSize = byteArrayToLong(this.binary.slice(tagsStart + 8, tagsStart + 16));
     return this.binary.slice(tagsStart + 16, tagsStart + 16 + tagsSize);
@@ -70,7 +78,7 @@ export default class DataItem {
     return tagsParser.fromBuffer(Buffer.from(this.getRawTags()));
   }
 
-  getData(): Uint8Array {
+  getData(): Buffer {
     const tagsStart = this.getTagsStart();
 
     const numberOfTagBytesArray = this.binary.slice(tagsStart + 8, tagsStart + 16);
@@ -88,17 +96,47 @@ export default class DataItem {
     return this.binary;
   }
 
-  public async sign(jwk: JWKPublicInterface) {
+  public async sign(jwk: JWKPublicInterface): Promise<Buffer> {
     this.id = await sign(this, jwk);
 
-    return this.getId();
+    return this.getRawId();
   }
 
-  public isSigned() {
+  public isSigned(): boolean {
     return (this.id?.length ?? 0) > 0;
   }
 
-  public verify(): boolean {
+  public async toTransaction(arweave: Arweave): Promise<Transaction> {
+    return await arweave.createTransaction({
+      target: this.getTarget(),
+      owner: this.getOwner(),
+      tags: this.getTags().map(t => new Tag(t.name, t.value)),
+      data: this.getData()
+    });
+  }
+
+  /**
+   * Verifies a `Buffer` and checks it fits the format of a DataItem
+   *
+   * A binary is valid iff:
+   * - the tags are encoded correctly
+   */
+  static verify(_: Buffer, __?: { id: Uint8Array, jwk: JWKPublicInterface }): boolean {
+    // const numberOfDataItems = byteArrayToLong(buffer.slice(0, 32));
+
+    // if (extras) {
+    //   // Check if id matches
+    // }
+    //
+    // try {
+    //   let tags: { name: string, value:string }[] = tagsParser.fromBuffer(Buffer.from(buffer.slice(0, 0)));
+    //
+    //   if tags.length
+    //
+    // } catch (e) {
+    //   return false;
+    // }
+
     return true;
   }
 

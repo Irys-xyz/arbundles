@@ -8,9 +8,9 @@ import Arweave from "arweave";
 const HEADER_START = 32;
 
 export default class Bundle {
-  readonly binary: Uint8Array;
+  readonly binary: Buffer;
 
-  constructor(binary: Uint8Array, verify?: boolean) {
+  constructor(binary: Buffer, verify?: boolean) {
     // TODO: Add some verification
     if (verify) {
       if (!Bundle._verify(binary)) throw new Error("Binary not valid bundle");

@@ -1,9 +1,7 @@
 import Bundle from "./Bundle";
 import DataItem from "./DataItem";
-import { Buffer } from "buffer";
-import * as crypto from "crypto";
-import Arweave from "arweave";
-import base64url from "base64url";
+import { promisify } from 'util';
+import * as fs from 'fs';
 
 /**
  * Verifies a bundle and all of its DataItems
@@ -14,24 +12,22 @@ export function verifyBundle(bundle: Bundle): boolean {
   return bundle.verify();
 }
 
-export async function verifyData(item: DataItem): Promise<boolean> {
-  return item.verify();
-}
+const read = promisify(fs.read);
+const readFile = promisify(fs.readFile);
+const open = promisify(fs.open);
+const stat = promisify(fs.stat);
 
-export async function verifyDataStream(stream: NodeJS.ReadableStream): Promise<boolean> {
-  const hasher = crypto.createHash("sha384");
-  console.log(hasher);
+const MAX_SINGLE_FILE_SIZE = 100 * 1028 * 1028;
 
-  const signature = stream.read(512) as Buffer;
-  const owner = stream.read(512) as Buffer;
-
-  // Create hashing context deep hash
-  const hash = Buffer.from("");
-
-  const targetPresent = (stream.read(1) as Buffer)[0];
-  if (targetPresent) {
-
+export async function verifyFile(filename: string): Promise<boolean> {
+  const status = await stat(filename);
+  if (status.size < MAX_SINGLE_FILE_SIZE) {
+    return DataItem.verify(await readFile(filename));
   }
 
-  return await Arweave.crypto.verify(base64url.encode(Buffer.from(owner), "hex"), hash, signature);
+  const fd = await open(filename, 'r');
+  const first = await read(fd, Buffer.alloc(64), 0, 64, null);
+  first.buffer;
+
+  return true;
 }

@@ -20,14 +20,10 @@ describe("Creating and indexing a data item", function() {
     const d = await ArweaveBundles.createData(_d, wallet0);
     expect(Buffer.from(d.getData()).toString()).toBe("tasty");
     expect(d.getOwner()).toBe(wallet0.n);
-    expect(Buffer.from(d.getTarget()).toString()).toBe("Math.randomgng(36).substring(30)");
-    expect(d.getAnchor()).toEqual(Uint8Array.from(Buffer.from("Math.apt'#]gng(36).substring(30)")));
+    expect(d.getTarget()).toBe("Math.randomgng(36).substring(30)");
+    expect(d.getAnchor()).toEqual("Math.apt'#]gng(36).substring(30)");
     expect(d.getTags()).toEqual([{ name: "x", value: "y" }]);
   });
-
-
-  // TODO: Test whole process
-
 
   it("Test Bundle", async function() {
     const _dataItems: DataItemCreateOptions[] = [{
@@ -40,13 +36,12 @@ describe("Creating and indexing a data item", function() {
     const bundle = await ArweaveBundles.bundleAndSignData(_dataItems, wallet0);
     const dataItems = bundle.getAll();
 
-    console.log(bundle.get(0).getOwner());
     expect(bundle.length).toEqual(1);
     expect(dataItems.length).toEqual(1);
     expect(Buffer.from(dataItems[0].getData()).toString()).toBe("tasty");
     expect(dataItems[0].getOwner()).toBe(wallet0.n);
     expect(Buffer.from(dataItems[0].getTarget()).toString()).toBe("Math.randomgng(36).substring(30)");
-    expect(dataItems[0].getAnchor()).toEqual(Uint8Array.from(Buffer.from("Math.randomgng(36).substring(30)")));
+    expect(dataItems[0].getAnchor()).toEqual("Math.randomgng(36).substring(30)");
     expect(dataItems[0].getTags()).toEqual([{ name: "x", value: "y" }]);
   });
 });

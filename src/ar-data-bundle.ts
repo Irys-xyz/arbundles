@@ -1,10 +1,11 @@
-import { DataItemCreateOptions, getSignatureData } from "./ar-data-base";
-import { createData } from "./ar-data-create";
-import { JWKPublicInterface } from "./interface-jwk";
-import { longTo32ByteArray } from "./utils";
-import DataItem from "./DataItem";
-import Arweave from "arweave";
-import Bundle from "./Bundle";
+import { DataItemCreateOptions, getSignatureData } from './ar-data-base';
+import { createData } from './ar-data-create';
+import { JWKPublicInterface } from './interface-jwk';
+import { longTo32ByteArray } from './utils';
+import DataItem from './DataItem';
+import Arweave from 'arweave';
+import Bundle from './Bundle';
+import { Buffer } from 'buffer';
 
 
 /**
@@ -21,7 +22,7 @@ import Bundle from "./Bundle";
  * @param txData
  */
 export async function unbundleData(
-  txData: Uint8Array
+  txData: Buffer,
 ): Promise<Bundle> {
   return new Bundle(txData);
 }
@@ -36,7 +37,7 @@ export async function unbundleData(
 export async function bundleAndSignData(dataItems: (DataItemCreateOptions | DataItem)[], jwk: JWKPublicInterface): Promise<Bundle> {
   const headers = new Uint8Array(64 * dataItems.length);
 
-  const binaries = await Promise.all(dataItems.map(async(di, index) => {
+  const binaries = await Promise.all(dataItems.map(async (di, index) => {
     // Create DataItem
     const d = DataItem.isDataItem(di) ? di as DataItem : await createData(di as DataItemCreateOptions, jwk);
     // Sign DataItem
@@ -47,36 +48,38 @@ export async function bundleAndSignData(dataItems: (DataItemCreateOptions | Data
     // Set offset
     header.set(longTo32ByteArray(d.getRaw().byteLength), 0);
     // Set id
-    header.set(id, 32)
+    header.set(id, 32);
     // Add header to array of headers
     headers.set(header, 64 * index);
     // Convert to array for flattening
     return Array.from(d.getRaw());
   })).then(a => Uint8Array.from(a.flat()));
 
-  return new Bundle(Uint8Array.from([...longTo32ByteArray(dataItems.length), ...headers, ...binaries]));
+  return new Bundle(Buffer.from([...longTo32ByteArray(dataItems.length), ...headers, ...binaries]));
 }
 
 /**
  * Signs a single
+ *
  * @param item
  * @param jwk
  * @returns signings - signature and id in byte-arrays
  */
-export async function getSignatureAndId(item: DataItem, jwk: JWKPublicInterface): Promise<{ signature: Uint8Array, id: Uint8Array }> {
+export async function getSignatureAndId(item: DataItem, jwk: JWKPublicInterface): Promise<{ signature: Buffer, id: Buffer }> {
   const signatureData = await getSignatureData(item);
   const signatureBytes = await Arweave.crypto.sign(jwk, signatureData);
   const idBytes = await Arweave.crypto.hash(signatureBytes);
 
-  return { signature: signatureBytes, id: idBytes };
+  return { signature: Buffer.from(signatureBytes), id: Buffer.from(idBytes) };
 }
 
 /**
  * Signs and returns item id
+ *
  * @param item
  * @param jwk
  */
-export async function sign(item: DataItem, jwk: JWKPublicInterface): Promise<Uint8Array> {
+export async function sign(item: DataItem, jwk: JWKPublicInterface): Promise<Buffer> {
   const { signature, id } = await getSignatureAndId(item, jwk);
   item.getRaw().set(signature, 0);
   return id;
