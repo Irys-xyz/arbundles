@@ -1,5 +1,7 @@
 # ANS-104 Bundler-js
 
+**This is currently in** ***ALPHA*** **so do not use until finalized**
+
 A library for creating, editing, reading and verifying bundles.
 
 See [ANS-104](https://github.com/joshbenaron/arweave-standards/blob/ans104/ans/ANS-104.md) for more details.
