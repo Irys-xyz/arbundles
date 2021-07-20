@@ -4,6 +4,7 @@ import { verifyFile } from './ar-data-verify';
 import Bundle from "./Bundle";
 import DataItem from "./DataItem";
 import { tagsParser } from "./parser";
+import deepHash from './deepHash';
 
 const checkTags = tagsParser.isValid;
 
@@ -14,6 +15,7 @@ export {
   bundleAndSignData,
   unbundleData,
   verifyFile,
+  deepHash
   checkTags
 };
 
