@@ -44,7 +44,7 @@ export default class Bundle {
   public getIds(): string[] {
     const ids = [];
     for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
-      ids.push(this.binary.slice(i + 32, i + 64).toString())
+      ids.push(base64url.encode(this.binary.slice(i + 32, i + 64)))
     }
 
     return ids;
@@ -56,7 +56,7 @@ export default class Bundle {
     }
 
     const start = 64 + (64 * index);
-    return this.binary.slice(start, start + 32).toString();
+    return base64url.encode(this.binary.slice(start, start + 32));
   }
 
   public getAll(): DataItem[] {
