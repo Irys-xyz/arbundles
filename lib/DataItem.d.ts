@@ -35,11 +35,14 @@ export default class DataItem {
      * Returns a JSON representation of a DataItem
      */
     toJSON(): {
+        owner: string;
+        data: string;
         signature: string;
         target: string;
-        owner: string;
-        tags: string;
-        data: string;
+        tags: {
+            name: string;
+            value: string;
+        }[];
     };
     /**
      * Verifies a `Buffer` and checks it fits the format of a DataItem
