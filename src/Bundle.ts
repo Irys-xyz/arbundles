@@ -21,11 +21,15 @@ export default class Bundle {
 
   public get length() { return this.getDataItemCount(); }
 
+  public getRaw(): Buffer {
+    return this.binary;
+  }
+
   /**
    * Get a DataItem by index (`number`) or by txId (`string`)
    * @param index
    */
-  public get(index: number | string) {
+  public get(index: number | string): DataItem {
     if (typeof index === "number") {
       if (index > this.length) {
         throw new RangeError("Index out of range");
@@ -44,6 +48,7 @@ export default class Bundle {
 
     let counter = 0;
     for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
+      console.log();
       const _offset = byteArrayToLong(this.binary.slice(i, i + 32))
 
       const dataItemStart = bundleStart + offset;
@@ -115,9 +120,11 @@ export default class Bundle {
       counter++;
     }
 
+
     const bundleStart = this.getBundleStart();
     const dataItemStart = bundleStart + offset;
-    return new DataItem(this.binary.slice(dataItemStart, dataItemStart + dataItemSize));
+    const slice = this.binary.slice(dataItemStart, dataItemStart + dataItemSize);
+    return new DataItem(slice);
   }
 
   private getById(id: string): DataItem {
