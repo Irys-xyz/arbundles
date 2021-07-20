@@ -5,7 +5,6 @@ import { Buffer } from "buffer";
 import { JWKPublicInterface } from "./interface-jwk";
 import { sign } from "./ar-data-bundle";
 import Arweave from "arweave";
-import Transaction, { Tag } from 'arweave/node/lib/transaction';
 
 export default class DataItem {
   private readonly binary: Buffer;
