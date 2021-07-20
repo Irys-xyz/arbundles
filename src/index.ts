@@ -1,6 +1,6 @@
 import { createData } from "./ar-data-create";
 import { bundleAndSignData, unbundleData } from "./ar-data-bundle";
-import { verifyBundle } from "./ar-data-verify";
+import { verifyFile } from './ar-data-verify';
 import Bundle from "./Bundle";
 import DataItem from "./DataItem";
 import { tagsParser } from "./parser";
@@ -13,7 +13,7 @@ export {
   createData,
   bundleAndSignData,
   unbundleData,
-  verifyBundle,
+  verifyFile,
   checkTags
 };
 
