@@ -5,4 +5,3 @@ import Bundle from "./Bundle";
  * @param bundle
  */
 export declare function verifyBundle(bundle: Bundle): boolean;
-export declare function verifyFile(filename: string): Promise<boolean>;
