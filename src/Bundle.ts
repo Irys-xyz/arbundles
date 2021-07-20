@@ -41,6 +41,24 @@ export default class Bundle {
     }
   }
 
+  public getIds(): string[] {
+    const ids = [];
+    for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
+      ids.push(this.binary.slice(i + 32, i + 64).toString())
+    }
+
+    return ids;
+  }
+
+  public getIdBy(index: number): string {
+    if (index > this.length - 1) {
+      throw new RangeError("Index of bundle out of range");
+    }
+
+    const start = 64 + (64 * index);
+    return this.binary.slice(start, start + 32).toString();
+  }
+
   public getAll(): DataItem[] {
     const items = new Array(this.length);
     let offset = 0;
