@@ -6,6 +6,8 @@ import { JWKPublicInterface } from "./interface-jwk";
 import { sign } from "./ar-data-bundle";
 import Arweave from "arweave";
 
+export const MIN_BINARY_SIZE = 1042;
+
 export default class DataItem {
   private readonly binary: Buffer;
   private id: Buffer;
@@ -139,6 +141,9 @@ export default class DataItem {
    * - the tags are encoded correctly
    */
   static verify(buffer: Buffer, extras?: { id: Uint8Array, jwk: JWKPublicInterface }): boolean {
+    if (buffer.length < MIN_BINARY_SIZE) {
+      return false;
+    }
     let tagsStart = 512 + 512 + 2;
     const targetPresent = (buffer[1024] == 1);
     tagsStart += targetPresent ? 32: 0;

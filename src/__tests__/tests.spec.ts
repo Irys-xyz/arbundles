@@ -56,7 +56,7 @@ describe("Creating and indexing a data item", function() {
 
     console.log(bundle.get(1).getData());
     expect(bundle.get(1).getData()).toEqual(Buffer.from("4242"));
-  })
+  });
 
   it("Test file verification", async function() {
     const _d: DataItemCreateOptions = {
@@ -71,5 +71,12 @@ describe("Creating and indexing a data item", function() {
     expect(fileBinary).toEqual(binary);
     expect(DataItem.verify(fileBinary)).toEqual(true);
     expect(await verifyFile("test")).toEqual(true)
+  });
+
+  it("Test failed file verification", async function() {
+    fs.writeFileSync("test", Buffer.from("hi"));
+    const fileBinary = fs.readFileSync("test");
+    expect(DataItem.verify(fileBinary)).toEqual(false);
+    expect(await verifyFile("test")).toEqual(false)
   });
 });

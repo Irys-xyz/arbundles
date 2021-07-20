@@ -1,5 +1,5 @@
 import Bundle from "./Bundle";
-import DataItem from "./DataItem";
+import DataItem, { MIN_BINARY_SIZE } from './DataItem';
 import { promisify } from 'util';
 import * as fs from 'fs';
 import { byteArrayToLong } from './utils';
@@ -15,33 +15,22 @@ export function verifyBundle(bundle: Bundle): boolean {
   return bundle.verify();
 }
 
-const read = promisify(fs.read);
-const readFile = promisify(fs.readFile);
-const open = promisify(fs.open);
-const stat = promisify(fs.stat);
-
 const MAX_SINGLE_FILE_SIZE = 100 * 1028 * 1028;
 
+const read = promisify(fs.read);
+
 export async function verifyFile(filename: string): Promise<boolean> {
-  const status = await stat(filename);
+  const status = await fs.promises.stat(filename);
+  if (status.size < MIN_BINARY_SIZE) {
+    return false;
+  }
   if (status.size < MAX_SINGLE_FILE_SIZE) {
-    return DataItem.verify(await readFile(filename));
+    return DataItem.verify(await fs.promises.readFile(filename));
   }
 
-  const fd = await open(filename, 'r');
+  const fd = await fs.promises.open(filename, 'r').then(handle => handle.fd);
 
   let tagsStart = 512 + 512 + 2;
-  // const targetPresent = (buffer[1024] == 1);
-  // tagsStart += targetPresent ? 32: 0;
-  // const anchorPresentByte = (targetPresent ? 1057 : 1025);
-  // const anchorPresent = (buffer[anchorPresentByte] == 1);
-  // tagsStart += anchorPresent ? 32: 0;
-  //
-  // const numberOfTags = byteArrayToLong(buffer.slice(tagsStart, tagsStart + 8));
-  // const numberOfTagBytesArray = buffer.slice(tagsStart + 8, tagsStart + 16);
-  // const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
-
-
 
   const targetPresent = await read(fd, Buffer.alloc(1), 1024, 64, null).then(value => value.buffer[0] == 1);
   tagsStart += targetPresent ? 32: 0;
