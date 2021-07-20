@@ -31,6 +31,10 @@ export default class DataItem {
     return base64url.encode(this.id, "hex");
   }
 
+  getRawSignature(): Buffer {
+    return this.binary.slice(0, 512);
+  }
+
   getRawOwner(): Buffer {
     return this.binary.slice(512, 512 + 512);
   }
@@ -51,8 +55,6 @@ export default class DataItem {
   }
 
   getTarget(): string {
-
-
     const target = this.getRawTarget();
     return target.toString();
   }
@@ -106,13 +108,17 @@ export default class DataItem {
     return (this.id?.length ?? 0) > 0;
   }
 
-  public async toTransaction(arweave: Arweave): Promise<Transaction> {
-    return await arweave.createTransaction({
-      target: this.getTarget(),
-      owner: this.getOwner(),
-      tags: this.getTags().map(t => new Tag(t.name, t.value)),
+  /**
+   * Returns a JSON representation of a DataItem
+   */
+  public toJSON(): { signature: Buffer, target: Buffer, owner: Buffer, tags: Buffer, data: Buffer } {
+    return {
+      signature: this.getRawSignature(),
+      owner: this.getRawOwner(),
+      target: this.getRawTarget(),
+      tags: this.getRawTags(),
       data: this.getData()
-    });
+    };
   }
 
   /**
