@@ -10,6 +10,7 @@ export default class DataItem {
     getRawId(): Buffer;
     getId(): string;
     getRawSignature(): Buffer;
+    getSignature(): string;
     getRawOwner(): Buffer;
     getOwner(): string;
     getAddress(): Promise<string>;
@@ -34,11 +35,11 @@ export default class DataItem {
      * Returns a JSON representation of a DataItem
      */
     toJSON(): {
-        signature: Buffer;
-        target: Buffer;
-        owner: Buffer;
-        tags: Buffer;
-        data: Buffer;
+        signature: string;
+        target: string;
+        owner: string;
+        tags: string;
+        data: string;
     };
     /**
      * Verifies a `Buffer` and checks it fits the format of a DataItem
