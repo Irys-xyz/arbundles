@@ -80,7 +80,16 @@ export default class DataItem {
   }
 
   getTags(): { name: string, value: string }[] {
-    return tagsParser.fromBuffer(Buffer.from(this.getRawTags()));
+    const tagsStart = this.getTagsStart();
+    const tagsCount = byteArrayToLong(this.binary.slice(tagsStart, tagsStart + 8));
+    if (tagsCount == 0) {
+      return [];
+    }
+
+    const tagsSize = byteArrayToLong(this.binary.slice(tagsStart + 8, tagsStart + 16));
+
+
+    return tagsParser.fromBuffer(Buffer.from(this.binary.slice(tagsStart + 16, tagsStart + 16 + tagsSize)));
   }
 
   getData(): Buffer {
@@ -139,11 +148,14 @@ export default class DataItem {
     tagsStart += anchorPresent ? 32: 0;
 
     const numberOfTags = byteArrayToLong(buffer.slice(tagsStart, tagsStart + 8));
+    if (numberOfTags == 0) {
+      return true;
+    }
     const numberOfTagBytesArray = buffer.slice(tagsStart + 8, tagsStart + 16);
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
 
     if (extras) {
-      // Check if id matches
+      // TODO: Check if id matches
     }
 
     try {
