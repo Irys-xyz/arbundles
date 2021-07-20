@@ -34,6 +34,10 @@ export default class DataItem {
     return this.binary.slice(0, 512);
   }
 
+  getSignature(): string {
+    return base64url.encode(this.getRawSignature(), "hex");
+  }
+
   getRawOwner(): Buffer {
     return this.binary.slice(512, 512 + 512);
   }
@@ -93,7 +97,7 @@ export default class DataItem {
    * UNSAFE!!
    * DO NOT MUTATE THE BINARY ARRAY. THIS WILL CAUSE UNDEFINED BEHAVIOUR.
    */
-  getRaw(): Uint8Array {
+  getRaw(): Buffer {
     return this.binary;
   }
 
@@ -110,13 +114,13 @@ export default class DataItem {
   /**
    * Returns a JSON representation of a DataItem
    */
-  public toJSON(): { signature: Buffer, target: Buffer, owner: Buffer, tags: Buffer, data: Buffer } {
+  public toJSON(): { signature: string, target: string, owner: string, tags: string, data: string } {
     return {
-      signature: this.getRawSignature(),
-      owner: this.getRawOwner(),
-      target: this.getRawTarget(),
-      tags: this.getRawTags(),
-      data: this.getData()
+      signature: base64url.encode(this.getSignature(), "hex"),
+      owner: base64url.encode(this.getOwner().toString(), "hex"),
+      target: base64url.encode(this.getTarget().toString(), "hex"),
+      tags: base64url.encode(this.getTags().toString(), "hex"),
+      data: base64url.encode(this.getData().toString(), "hex")
     };
   }
 
@@ -126,21 +130,31 @@ export default class DataItem {
    * A binary is valid iff:
    * - the tags are encoded correctly
    */
-  static verify(_: Buffer, __?: { id: Uint8Array, jwk: JWKPublicInterface }): boolean {
-    // const numberOfDataItems = byteArrayToLong(buffer.slice(0, 32));
+  static verify(buffer: Buffer, extras?: { id: Uint8Array, jwk: JWKPublicInterface }): boolean {
+    let tagsStart = 512 + 512 + 2;
+    const targetPresent = (buffer[1024] == 1);
+    tagsStart += targetPresent ? 32: 0;
+    const anchorPresentByte = (targetPresent ? 1057 : 1025);
+    const anchorPresent = (buffer[anchorPresentByte] == 1);
+    tagsStart += anchorPresent ? 32: 0;
 
-    // if (extras) {
-    //   // Check if id matches
-    // }
-    //
-    // try {
-    //   let tags: { name: string, value:string }[] = tagsParser.fromBuffer(Buffer.from(buffer.slice(0, 0)));
-    //
-    //   if tags.length
-    //
-    // } catch (e) {
-    //   return false;
-    // }
+    const numberOfTags = byteArrayToLong(buffer.slice(tagsStart, tagsStart + 8));
+    const numberOfTagBytesArray = buffer.slice(tagsStart + 8, tagsStart + 16);
+    const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
+
+    if (extras) {
+      // Check if id matches
+    }
+
+    try {
+      const tags: { name: string, value:string }[] = tagsParser.fromBuffer(Buffer.from(buffer.slice(tagsStart + 16, tagsStart + 16 + numberOfTagBytes)));
+
+      if (tags.length !== numberOfTags) {
+        return false
+      }
+    } catch (e) {
+      return false;
+    }
 
     return true;
   }
