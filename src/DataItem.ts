@@ -88,7 +88,6 @@ export default class DataItem {
 
     const tagsSize = byteArrayToLong(this.binary.slice(tagsStart + 8, tagsStart + 16));
 
-
     return tagsParser.fromBuffer(Buffer.from(this.binary.slice(tagsStart + 16, tagsStart + 16 + tagsSize)));
   }
 
