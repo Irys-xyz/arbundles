@@ -1,8 +1,6 @@
 /// <reference types="node" />
 import { Buffer } from "buffer";
 import { JWKPublicInterface } from "./interface-jwk";
-import Arweave from "arweave";
-import Transaction from 'arweave/node/lib/transaction';
 export default class DataItem {
     private readonly binary;
     private id;
@@ -11,6 +9,7 @@ export default class DataItem {
     isValid(): boolean;
     getRawId(): Buffer;
     getId(): string;
+    getRawSignature(): Buffer;
     getRawOwner(): Buffer;
     getOwner(): string;
     getAddress(): Promise<string>;
@@ -28,17 +27,26 @@ export default class DataItem {
      * UNSAFE!!
      * DO NOT MUTATE THE BINARY ARRAY. THIS WILL CAUSE UNDEFINED BEHAVIOUR.
      */
-    getRaw(): Uint8Array;
+    getRaw(): Buffer;
     sign(jwk: JWKPublicInterface): Promise<Buffer>;
     isSigned(): boolean;
-    toTransaction(arweave: Arweave): Promise<Transaction>;
+    /**
+     * Returns a JSON representation of a DataItem
+     */
+    toJSON(): {
+        signature: Buffer;
+        target: Buffer;
+        owner: Buffer;
+        tags: Buffer;
+        data: Buffer;
+    };
     /**
      * Verifies a `Buffer` and checks it fits the format of a DataItem
      *
      * A binary is valid iff:
      * - the tags are encoded correctly
      */
-    static verify(_: Buffer, __?: {
+    static verify(buffer: Buffer, extras?: {
         id: Uint8Array;
         jwk: JWKPublicInterface;
     }): boolean;
