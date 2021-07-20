@@ -2,7 +2,7 @@ import * as avro from "avsc";
 
 export const tagParser = avro.Type.forSchema({
   type: "record",
-  name: "x",
+  name: "Tag",
   fields: [
     { name: "name", type: "string" },
     { name: "value", type: "string" }

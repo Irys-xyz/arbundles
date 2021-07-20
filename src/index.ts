@@ -15,7 +15,7 @@ export {
   bundleAndSignData,
   unbundleData,
   verifyFile,
-  deepHash
+  deepHash,
   checkTags
 };
 

@@ -21,9 +21,9 @@ import { Buffer } from 'buffer';
  *
  * @param txData
  */
-export async function unbundleData(
+export function unbundleData(
   txData: Buffer,
-): Promise<Bundle> {
+): Bundle {
   return new Bundle(txData);
 }
 
@@ -41,7 +41,6 @@ export async function bundleAndSignData(dataItems: (DataItemCreateOptions | Data
     // Create DataItem
     const d = DataItem.isDataItem(di) ? di as DataItem : await createData(di as DataItemCreateOptions, jwk);
     // Sign DataItem
-
     const id = d.isSigned() ? d.getRawId() : await sign(d, jwk);
     // Create header array
     const header = new Uint8Array(64);
@@ -52,10 +51,15 @@ export async function bundleAndSignData(dataItems: (DataItemCreateOptions | Data
     // Add header to array of headers
     headers.set(header, 64 * index);
     // Convert to array for flattening
-    return Array.from(d.getRaw());
-  })).then(a => Uint8Array.from(a.flat()));
+    const raw = d.getRaw();
+    return Array.from(raw);
+  })).then(a => {
+    return a.flat();
+  });
 
-  return new Bundle(Buffer.from([...longTo32ByteArray(dataItems.length), ...headers, ...binaries]));
+  const buffer = Buffer.from([...longTo32ByteArray(dataItems.length), ...headers, ...binaries]);
+
+  return new Bundle(buffer);
 }
 
 /**

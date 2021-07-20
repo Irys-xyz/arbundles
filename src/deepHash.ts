@@ -32,8 +32,6 @@ export default async function deepHash(
       Arweave.utils.stringToBuffer(length.toString()),
     ]);
 
-    console.log(await hashStream(_data));
-
     const taggedHash = Arweave.utils.concatBuffers([
       await Arweave.crypto.hash(tag, 'SHA-384'),
       context.digest(),
@@ -58,8 +56,6 @@ export default async function deepHash(
     Arweave.utils.stringToBuffer('blob'),
     Arweave.utils.stringToBuffer(_data.byteLength.toString()),
   ]);
-
-  console.log(await Arweave.crypto.hash(_data, 'SHA-384'));
 
   const taggedHash = Arweave.utils.concatBuffers([
     await Arweave.crypto.hash(tag, 'SHA-384'),
@@ -92,7 +88,6 @@ export async function hashStream(stream: AsyncIterable<Buffer>): Promise<Buffer>
     Transform.from(stream),
     async function(chunkedSource: AsyncIterable<Buffer>) {
       for await (const chunk of chunkedSource) {
-        console.log(chunk);
         context.update(chunk);
       }
     });

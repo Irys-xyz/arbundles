@@ -66,7 +66,6 @@ export default class Bundle {
 
     let counter = 0;
     for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
-      console.log();
       const _offset = byteArrayToLong(this.binary.slice(i, i + 32))
 
       const dataItemStart = bundleStart + offset;

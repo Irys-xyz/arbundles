@@ -1,8 +1,8 @@
-import * as node from "arweave/node/lib/deepHash";
 import * as web from "arweave/web/lib/deepHash";
 import { stringToBuffer } from "arweave/web/lib/utils";
 import DataItem from "./DataItem";
 import { isBrowser } from "./utils";
+import deepHash from './deepHash';
 
 /**
  * Options for creation of a DataItem
@@ -26,7 +26,7 @@ export async function getSignatureData(item: DataItem): Promise<Uint8Array> {
       item.getData()
     ]);
   } else {
-    return node.default([
+    return deepHash([
       stringToBuffer("dataitem"),
       stringToBuffer("1"),
       item.getRawOwner(),
