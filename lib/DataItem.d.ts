@@ -1,6 +1,7 @@
 /// <reference types="node" />
 import { Buffer } from "buffer";
 import { JWKPublicInterface } from "./interface-jwk";
+export declare const MIN_BINARY_SIZE = 1042;
 export default class DataItem {
     private readonly binary;
     private id;
