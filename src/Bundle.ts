@@ -2,7 +2,7 @@ import base64url from "base64url";
 import { Buffer } from "buffer";
 import { arraybufferEqual, byteArrayToLong } from "./utils";
 import DataItem from "./DataItem";
-import Transaction, { Tag } from "arweave/node/lib/transaction";
+import Transaction  from "arweave/node/lib/transaction";
 import Arweave from "arweave";
 
 const HEADER_START = 32;
@@ -58,14 +58,13 @@ export default class Bundle {
     return items;
   }
 
-  public toTransaction(arweave: Arweave): Promise<Transaction> {
-    return arweave.createTransaction({
-      data: this.binary,
-      tags: [
-        new Tag("Bundle-Format", "binary"),
-        new Tag("Bundle-Version", "2.0.0"),
-      ]
+  public async toTransaction(arweave: Arweave): Promise<Transaction> {
+    const tx = await arweave.createTransaction({
+      data: this.binary
     });
+    tx.addTag("Bundle-Format", "binary");
+    tx.addTag("Bundle-Version", "2.0.0");
+    return tx;
   }
 
   public verify(): boolean {
