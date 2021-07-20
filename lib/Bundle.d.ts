@@ -7,6 +7,7 @@ export default class Bundle {
     readonly binary: Buffer;
     constructor(binary: Buffer, verify?: boolean);
     get length(): number;
+    getRaw(): Buffer;
     /**
      * Get a DataItem by index (`number`) or by txId (`string`)
      * @param index
