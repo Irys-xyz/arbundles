@@ -35,7 +35,7 @@ export default class DataItem {
   }
 
   getSignature(): string {
-    return base64url.encode(this.getRawSignature(), "hex");
+    return base64url.encode(this.getRawSignature());
   }
 
   getRawOwner(): Buffer {
@@ -59,7 +59,7 @@ export default class DataItem {
 
   getTarget(): string {
     const target = this.getRawTarget();
-    return target.toString();
+    return base64url.encode(target, "hex");
   }
 
   getRawAnchor(): Buffer {
@@ -122,13 +122,13 @@ export default class DataItem {
   /**
    * Returns a JSON representation of a DataItem
    */
-  public toJSON(): { signature: string, target: string, owner: string, tags: string, data: string } {
+  public toJSON(): { owner: string; data: string; signature: string; target: string; tags: { name: string; value: string }[] } {
     return {
-      signature: base64url.encode(this.getSignature(), "hex"),
-      owner: base64url.encode(this.getOwner().toString(), "hex"),
-      target: base64url.encode(this.getTarget().toString(), "hex"),
-      tags: base64url.encode(this.getTags().toString(), "hex"),
-      data: base64url.encode(this.getData().toString(), "hex")
+      signature: this.getSignature(),
+      owner: this.getOwner(),
+      target: this.getTarget(),
+      tags: this.getTags().map(t => ({ name: base64url.encode(t.name), value: base64url.encode(t.value) })),
+      data: base64url.encode(this.getData())
     };
   }
 
