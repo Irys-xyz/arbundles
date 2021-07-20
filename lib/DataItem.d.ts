@@ -34,7 +34,8 @@ export default class DataItem {
     /**
      * Returns a JSON representation of a DataItem
      */
-    toJSON(): {
+    toJSON(id?: string): {
+        id?: string;
         signature: string;
         target: string;
         owner: string;

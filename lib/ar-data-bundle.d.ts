@@ -17,7 +17,7 @@ import { Buffer } from 'buffer';
  *
  * @param txData
  */
-export declare function unbundleData(txData: Buffer): Promise<Bundle>;
+export declare function unbundleData(txData: Buffer): Bundle;
 /**
  * Verifies all data items and returns a json object with an items array.
  * Throws if any of the data items fail verification.

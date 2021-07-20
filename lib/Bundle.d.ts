@@ -13,6 +13,8 @@ export default class Bundle {
      * @param index
      */
     get(index: number | string): DataItem;
+    getIds(): string[];
+    getIdBy(index: number): string;
     getAll(): DataItem[];
     toTransaction(arweave: Arweave): Promise<Transaction>;
     verify(): boolean;
