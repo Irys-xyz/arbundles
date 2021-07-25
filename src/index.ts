@@ -17,7 +17,8 @@ export {
   unbundleData,
   verifyFile,
   deepHash,
-  checkTags
+  checkTags,
+
 };
 
 
