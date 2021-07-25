@@ -5,4 +5,4 @@ import Bundle from "./Bundle";
 import DataItem, { MIN_BINARY_SIZE } from './DataItem';
 import deepHash from './deepHash';
 declare const checkTags: (val: any, opts?: Partial<import("avsc/types").IsValidOptions>) => boolean;
-export { MIN_BINARY_SIZE, Bundle, DataItem, createData, bundleAndSignData, unbundleData, verifyFile, deepHash, checkTags };
+export { MIN_BINARY_SIZE, Bundle, DataItem, createData, bundleAndSignData, unbundleData, verifyFile, deepHash, checkTags, };
