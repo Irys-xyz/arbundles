@@ -4,5 +4,6 @@ import { verifyFile } from './ar-data-verify';
 import Bundle from "./Bundle";
 import DataItem, { MIN_BINARY_SIZE } from './DataItem';
 import deepHash from './deepHash';
+import { DataItemCreateOptions } from './ar-data-base';
 declare const checkTags: (val: any, opts?: Partial<import("avsc/types").IsValidOptions>) => boolean;
-export { MIN_BINARY_SIZE, Bundle, DataItem, createData, bundleAndSignData, unbundleData, verifyFile, deepHash, checkTags, };
+export { MIN_BINARY_SIZE, Bundle, DataItem, createData, bundleAndSignData, unbundleData, verifyFile, deepHash, checkTags, DataItemCreateOptions };

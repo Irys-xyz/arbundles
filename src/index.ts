@@ -5,8 +5,10 @@ import Bundle from "./Bundle";
 import DataItem, { MIN_BINARY_SIZE } from './DataItem';
 import { tagsParser } from "./parser";
 import deepHash from './deepHash';
+import { DataItemCreateOptions } from './ar-data-base';
 
 const checkTags = tagsParser.isValid;
+
 
 export {
   MIN_BINARY_SIZE,
@@ -18,7 +20,7 @@ export {
   verifyFile,
   deepHash,
   checkTags,
-
+  DataItemCreateOptions
 };
 
 
