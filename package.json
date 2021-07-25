@@ -4,6 +4,10 @@
   "description": "Arweave bundling library",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "files": [
+    "/lib/*.js",
+    "/lib/*.ts"
+  ],
   "devDependencies": {
     "@types/jest": "~26.0.23",
     "@types/node": "^16.3.3",
