@@ -6,9 +6,9 @@ import DataItem, { MIN_BINARY_SIZE } from './DataItem';
 import { tagsParser } from "./parser";
 import deepHash from './deepHash';
 import { DataItemCreateOptions } from './ar-data-base';
+import { getTags } from './file/file';
 
 const checkTags = tagsParser.isValid;
-
 
 export {
   MIN_BINARY_SIZE,
@@ -22,5 +22,11 @@ export {
   checkTags,
   DataItemCreateOptions
 };
+
+
+
+export {
+  getTags
+}
 
 
