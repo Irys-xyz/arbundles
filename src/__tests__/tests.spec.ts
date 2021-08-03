@@ -4,7 +4,7 @@ import { Buffer } from "buffer";
 import { DataItemCreateOptions } from "../ar-data-base";
 import { bundleAndSignData, createData, DataItem } from '..';
 import * as fs from 'fs';
-import { verifyFile } from '../ar-data-verify';
+import { verifyDataItemInFile } from '../ar-data-verify';
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString()
@@ -70,13 +70,13 @@ describe("Creating and indexing a data item", function() {
     const fileBinary = fs.readFileSync("test");
     expect(fileBinary).toEqual(binary);
     expect(DataItem.verify(fileBinary)).toEqual(true);
-    expect(await verifyFile("test")).toEqual(true)
+    expect(await verifyDataItemInFile("test")).toEqual(true)
   });
 
   it("Test failed file verification", async function() {
     fs.writeFileSync("test", Buffer.from("hi"));
     const fileBinary = fs.readFileSync("test");
     expect(DataItem.verify(fileBinary)).toEqual(false);
-    expect(await verifyFile("test")).toEqual(false)
+    expect(await verifyDataItemInFile("test")).toEqual(false)
   });
 });

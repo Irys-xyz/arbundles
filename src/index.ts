@@ -1,6 +1,6 @@
 import { createData } from "./ar-data-create";
 import { bundleAndSignData, unbundleData } from "./ar-data-bundle";
-import { verifyFile } from './ar-data-verify';
+import { verifyDataItemInFile } from './ar-data-verify';
 import Bundle from "./Bundle";
 import DataItem, { MIN_BINARY_SIZE } from './DataItem';
 import { tagsParser } from "./parser";
@@ -17,7 +17,7 @@ export {
   createData,
   bundleAndSignData,
   unbundleData,
-  verifyFile,
+  verifyDataItemInFile,
   deepHash,
   checkTags,
   DataItemCreateOptions
