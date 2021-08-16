@@ -93,6 +93,16 @@ export default class DataItem {
     return tagsParser.fromBuffer(Buffer.from(this.binary.slice(tagsStart + 16, tagsStart + 16 + tagsSize)));
   }
 
+  getStartOfData(): number {
+    const tagsStart = this.getTagsStart();
+
+    const numberOfTagBytesArray = this.binary.slice(tagsStart + 8, tagsStart + 16);
+    const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
+    const dataStart = tagsStart + 16 + numberOfTagBytes;
+
+    return dataStart;
+  }
+
   getData(): Buffer {
     const tagsStart = this.getTagsStart();
 
