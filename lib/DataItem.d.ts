@@ -1,6 +1,6 @@
 /// <reference types="node" />
-import { Buffer } from "buffer";
-import { JWKPublicInterface } from "./interface-jwk";
+import { Buffer } from 'buffer';
+import { JWKPublicInterface } from './interface-jwk';
 export declare const MIN_BINARY_SIZE = 1042;
 export default class DataItem {
     private readonly binary;
@@ -24,6 +24,7 @@ export default class DataItem {
         name: string;
         value: string;
     }[];
+    getStartOfData(): number;
     getData(): Buffer;
     /**
      * UNSAFE!!
