@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import { promisify } from 'util';
 import { Buffer } from 'buffer';
-import { byteArrayToLong } from './utils';
-import { tagsParser } from './parser';
+import { byteArrayToLong } from '../utils';
+import { tagsParser } from '../parser';
 import base64url from 'base64url';
 
 type File = string | number;
