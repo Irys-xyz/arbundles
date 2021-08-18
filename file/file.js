@@ -5,8 +5,8 @@ const tslib_1 = require("tslib");
 const fs = tslib_1.__importStar(require("fs"));
 const util_1 = require("util");
 const buffer_1 = require("buffer");
-const utils_1 = require("../utils");
-const parser_1 = require("../parser");
+const utils_1 = require("../lib/utils");
+const parser_1 = require("../lib/parser");
 const base64url_1 = tslib_1.__importDefault(require("base64url"));
 const read = util_1.promisify(fs.read);
 function getTags(filename) {
