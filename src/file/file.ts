@@ -3,7 +3,9 @@ import { promisify } from 'util';
 import { Buffer } from 'buffer';
 import { byteArrayToLong } from '../utils';
 import { tagsParser } from '../parser';
+import base64url from 'base64url';
 
+type File = string | number;
 const read = promisify(fs.read);
 
 export async function getTags(filename: string): Promise<{ name: string, value: string }[]> {
@@ -78,4 +80,41 @@ export async function fileToJson(filename: string): Promise<Transaction> {
     fee,
     signature
   };
+}
+
+export async function numberOfItems(file: File): Promise<number> {
+  const fd = typeof file === "number"
+    ? file
+    : await fs.promises.open(file, 'r').then(handle => handle.fd);
+
+  const headerBuffer = await read(fd, Buffer.allocUnsafe(64), 0, 32, null).then(v => v.buffer);
+  return byteArrayToLong(headerBuffer);
+}
+
+interface DataItemHeader {
+  offset: number;
+  id: string;
+}
+
+export async function getHeaderAt(file: File | number, index: number): Promise<DataItemHeader> {
+  const fd = typeof file === "number"
+    ? file
+    : await fs.promises.open(file, 'r').then(handle => handle.fd);
+
+  const headerBuffer = await read(fd, Buffer.allocUnsafe(64), 32 + (64 * index), 64, null).then(v => v.buffer);
+  return {
+    offset: byteArrayToLong(headerBuffer.slice(0, 32)),
+    id: base64url.encode(headerBuffer.slice(32, 64))
+  }
+}
+
+export async function* getHeaders(file: File): AsyncGenerator<DataItemHeader> {
+  const fd = typeof file === "number"
+    ? file
+    : await fs.promises.open(file, 'r').then(handle => handle.fd);
+
+  const count =  await numberOfItems(fd);
+  for (let i = 0; i<count; i++) {
+    yield getHeaderAt(fd, i);
+  }
 }

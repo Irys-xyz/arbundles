@@ -6,7 +6,9 @@
   "types": "lib/index.d.ts",
   "files": [
     "/lib/*.js",
-    "/lib/*.ts"
+    "/lib/*.ts",
+    "/file/*.js",
+    "/file/*.ts"
   ],
   "devDependencies": {
     "@types/jest": "~26.0.23",

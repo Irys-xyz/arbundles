@@ -1,10 +1,10 @@
-import { byteArrayToLong } from "./utils";
-import { tagsParser } from "./parser";
-import base64url from "base64url";
-import { Buffer } from "buffer";
-import { JWKPublicInterface } from "./interface-jwk";
-import { sign } from "./ar-data-bundle";
-import Arweave from "arweave";
+import { byteArrayToLong } from './utils';
+import { tagsParser } from './parser';
+import base64url from 'base64url';
+import { Buffer } from 'buffer';
+import { JWKPublicInterface } from './interface-jwk';
+import { sign } from './ar-data-bundle';
+import Arweave from 'arweave';
 
 export const MIN_BINARY_SIZE = 1042;
 
@@ -98,9 +98,7 @@ export default class DataItem {
 
     const numberOfTagBytesArray = this.binary.slice(tagsStart + 8, tagsStart + 16);
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
-    const dataStart = tagsStart + 16 + numberOfTagBytes;
-
-    return dataStart;
+    return tagsStart + 16 + numberOfTagBytes;
   }
 
   getData(): Buffer {

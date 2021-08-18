@@ -79,7 +79,15 @@ export async function verifyDataItemInFile(filename: string, signatureVerificati
       tags,
       data,
     ]);
-    return await Arweave.crypto.verify(n, signatureData, signature);
+
+    // TODO: Test this
+    return await new Promise((resolve, reject) => {
+      setTimeout(function() {
+        reject();
+      }, 5000);
+      const result = Arweave.crypto.verify(n, signatureData, signature);
+      resolve(result);
+    });
   }
 
 
