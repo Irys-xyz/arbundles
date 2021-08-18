@@ -2,8 +2,6 @@
   "name": "ans104",
   "version": "0.2.4",
   "description": "Arweave bundling library",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
   "files": [
     "/lib/*.js",
     "/lib/*.ts",
