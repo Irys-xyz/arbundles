@@ -1,5 +1,6 @@
 /// <reference types="node" />
-declare type File = string | number;
+import { FileHandle } from 'fs/promises';
+declare type File = string | FileHandle;
 interface Transaction {
     id: string;
     owner: string;
@@ -18,8 +19,8 @@ interface DataItemHeader {
     offset: number;
     id: string;
 }
-export declare function getHeaderAt(file: File | number, index: number): Promise<DataItemHeader>;
-export declare function getHeaders(file: File): AsyncGenerator<DataItemHeader>;
+export declare function getHeaderAt(file: File, index: number): Promise<DataItemHeader>;
+export declare function getHeaders(file: string): AsyncGenerator<DataItemHeader>;
 export declare function getSignature(file: File, options?: {
     offset: number;
 }): Promise<Buffer>;
@@ -32,7 +33,9 @@ export declare function getTarget(file: File, options?: {
 export declare function getAnchor(file: File, options?: {
     offset: number;
 }): Promise<string | undefined>;
-export declare function getTags(filename: string): Promise<{
+export declare function getTags(file: File, options?: {
+    offset: number;
+}): Promise<{
     name: string;
     value: string;
 }[]>;

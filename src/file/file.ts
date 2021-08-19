@@ -3,8 +3,9 @@ import { promisify } from 'util';
 import { byteArrayToLong } from '../utils';
 import { tagsParser } from '../parser';
 import base64url from 'base64url';
+import { FileHandle } from 'fs/promises';
 
-type File = string | number;
+type File = string | FileHandle;
 const read = promisify(fs.read);
 
 interface Transaction {
@@ -17,9 +18,9 @@ interface Transaction {
   signature: string
 }
 
-const fileToFd = async (f: File) => typeof f === "number"
-  ? f
-  : await fs.promises.open(f, 'r').then(handle => handle.fd);
+const fileToFd = async (f: File): Promise<FileHandle> => typeof f === "string"
+  ? await fs.promises.open(f, 'r')
+  : f;
 
 export async function fileToJson(filename: string): Promise<Transaction> {
   const fd = await fs.promises.open(filename, 'r').then(handle => handle.fd);
@@ -64,7 +65,8 @@ export async function fileToJson(filename: string): Promise<Transaction> {
 export async function numberOfItems(file: File): Promise<number> {
   const fd = await fileToFd(file);
 
-  const headerBuffer = await read(fd, Buffer.allocUnsafe(64), 0, 32, null).then(v => v.buffer);
+  const headerBuffer = await read(fd.fd, Buffer.allocUnsafe(32), 0, 32, 0).then(v => v.buffer);
+  await fd.close();
   return byteArrayToLong(headerBuffer);
 }
 
@@ -73,22 +75,23 @@ interface DataItemHeader {
   id: string;
 }
 
-export async function getHeaderAt(file: File | number, index: number): Promise<DataItemHeader> {
+export async function getHeaderAt(file: File, index: number): Promise<DataItemHeader> {
   const fd = await fileToFd(file);
 
-  const headerBuffer = await read(fd, Buffer.allocUnsafe(64), 32 + (64 * index), 64, null).then(v => v.buffer);
+  const headerBuffer = await read(fd.fd, Buffer.alloc(64), 0, 64, 32 + (64 * index)).then(v => v.buffer)
+    .catch(_ => console.log("lol")) as Buffer;
   return {
     offset: byteArrayToLong(headerBuffer.slice(0, 32)),
     id: base64url.encode(headerBuffer.slice(32, 64))
   }
 }
 
-export async function* getHeaders(file: File): AsyncGenerator<DataItemHeader> {
-  const fd = await fileToFd(file);
+export async function* getHeaders(file: string): AsyncGenerator<DataItemHeader> {
 
-  const count =  await numberOfItems(fd);
+  const count = await numberOfItems(file);
+  console.log(count);
   for (let i = 0; i<count; i++) {
-    yield getHeaderAt(fd, i);
+    yield getHeaderAt(file, i);
   }
 }
 
@@ -96,14 +99,17 @@ export async function getSignature(file: File, options?: { offset: number }): Pr
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;
 
-  return await read(fd, Buffer.allocUnsafe(512), offset, 512, null).then(r => r.buffer);
+  const buffer = await read(fd.fd, Buffer.allocUnsafe(512), offset, 512, null).then(r => r.buffer);
+  await fd.close();
+  return buffer;
 }
 
 export async function getOwner(file: File, options?: { offset: number }): Promise<string> {
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;
 
-  const buffer = await read(fd, Buffer.allocUnsafe(512), offset + 512, 512, null).then(r => r.buffer);
+  const buffer = await read(fd.fd, Buffer.allocUnsafe(512), offset + 512, 512, null).then(r => r.buffer);
+  await fd.close();
 
   return base64url.encode(buffer, "hex");
 }
@@ -113,12 +119,13 @@ export async function getTarget(file: File, options?: { offset: number }): Promi
   const offset = options.offset ?? 0;
 
   const targetStart = offset + 1024;
-  const targetPresent = await read(fd, Buffer.allocUnsafe(1), targetStart, 1, null).then(value => value.buffer[0] == 1);
+  const targetPresent = await read(fd.fd, Buffer.allocUnsafe(1), targetStart, 1, null).then(value => value.buffer[0] == 1);
   if (!targetPresent) {
     return undefined;
   }
 
-  const buffer = await read(fd, Buffer.allocUnsafe(32), targetStart + 1, 32, null).then(r => r.buffer);
+  const buffer = await read(fd.fd, Buffer.allocUnsafe(32), targetStart + 1, 32, null).then(r => r.buffer);
+  await fd.close();
 
   return base64url.encode(buffer, "hex");
 }
@@ -127,43 +134,50 @@ export async function getAnchor(file: File, options?: { offset: number }): Promi
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;
 
-  const targetPresent = await read(fd, Buffer.allocUnsafe(1), 1024, 1, null).then(value => value.buffer[0] == 1);
+  const targetPresent = await read(fd.fd, Buffer.allocUnsafe(1), 1024, 1, null).then(value => value.buffer[0] == 1);
 
   let anchorStart = offset + 1025;
   if (targetPresent) {
     anchorStart += 32;
   }
 
-  const anchorPresent = await read(fd, Buffer.allocUnsafe(1), anchorStart, 1, null).then(value => value.buffer[0] == 1);
+  const anchorPresent = await read(fd.fd, Buffer.allocUnsafe(1), anchorStart, 1, null).then(value => value.buffer[0] == 1);
   if (!anchorPresent) {
     return undefined;
   }
 
-  const buffer = await read(fd, Buffer.allocUnsafe(32), anchorStart + 1, 32, null).then(r => r.buffer);
+  const buffer = await read(fd.fd, Buffer.allocUnsafe(32), anchorStart + 1, 32, null).then(r => r.buffer);
+  await fd.close();
 
   return base64url.encode(buffer, "hex");
 }
 
-export async function getTags(filename: string): Promise<{ name: string, value: string }[]> {
-  const fd = await fs.promises.open(filename, 'r').then(handle => handle.fd);
+export async function getTags(file: File, options?: { offset: number }): Promise<{ name: string, value: string }[]> {
+  const fd = await fileToFd(file);
 
-  let tagsStart = 512 + 512 + 2;
+  const offset = options?.offset ?? 0;
+  let tagsStart = 512 + 512 + 2 + (options?.offset ?? 0);
 
-  const targetPresent = await read(fd, Buffer.alloc(1), 1024, 64, null).then(value => value.buffer[0] == 1);
+  const targetPresent = await read(fd.fd, Buffer.allocUnsafe(1), 0, 1, offset + 1024).then(value => value.buffer[0] == 1);
   tagsStart += targetPresent ? 32 : 0;
-  const anchorPresentByte = (targetPresent ? 1057 : 1025);
-  const anchorPresent = await read(fd, Buffer.alloc(1), anchorPresentByte, 64, null).then(value => value.buffer[0] == 1);
+  const anchorPresentByte = offset + (targetPresent ? 1057 : 1025);
+  const anchorPresent = await read(fd.fd, Buffer.allocUnsafe(1), 0, 1, anchorPresentByte).then(value => value.buffer[0] == 1);
   tagsStart += anchorPresent ? 32 : 0;
 
-  const numberOfTags = byteArrayToLong(await read(fd, Buffer.alloc(8), tagsStart, 8, 0).then(value => value.buffer));
+  console.log(tagsStart - offset);
+  const numberOfTags = byteArrayToLong(await read(fd.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart).then(value => value.buffer));
 
+  console.log(numberOfTags);
   if (numberOfTags == 0) {
     return [];
   }
 
-  const numberOfTagBytesArray = await read(fd, Buffer.alloc(8), tagsStart + 8, 8, 0).then(value => value.buffer);
+  const numberOfTagBytesArray = await read(fd.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart + 8).then(value => value.buffer);
   const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
 
-  const tagBytes = await read(fd, Buffer.alloc(8), tagsStart + 16, numberOfTagBytes, 0).then(value => value.buffer);
+
+  const tagBytes = await read(fd.fd, Buffer.allocUnsafe(numberOfTagBytes), 0, numberOfTagBytes, tagsStart + 16).then(value => value.buffer);
+  await fd.close();
+
   return tagsParser.fromBuffer(tagBytes);
 }

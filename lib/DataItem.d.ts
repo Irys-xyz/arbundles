@@ -4,28 +4,31 @@ import { JWKPublicInterface } from './interface-jwk';
 export declare const MIN_BINARY_SIZE = 1042;
 export default class DataItem {
     private readonly binary;
-    private id;
+    private _id;
     constructor(binary: Buffer);
     static isDataItem(obj: any): boolean;
     isValid(): boolean;
-    getRawId(): Buffer;
-    getId(): string;
-    getRawSignature(): Buffer;
-    getSignature(): string;
-    getRawOwner(): Buffer;
-    getOwner(): string;
+    get id(): string;
+    set id(id: string);
+    get rawId(): Buffer;
+    set rawId(id: Buffer);
+    get rawSignature(): Buffer;
+    get signature(): string;
+    get rawOwner(): Buffer;
+    get owner(): string;
     getAddress(): Promise<string>;
-    getRawTarget(): Buffer;
-    getTarget(): string;
-    getRawAnchor(): Buffer;
-    getAnchor(): string;
-    getRawTags(): Buffer;
-    getTags(): {
+    get rawTarget(): Buffer;
+    get target(): string;
+    get rawAnchor(): Buffer;
+    get anchor(): string;
+    get rawTags(): Buffer;
+    get tags(): {
         name: string;
         value: string;
     }[];
     getStartOfData(): number;
-    getData(): Buffer;
+    get rawData(): Buffer;
+    get data(): string;
     /**
      * UNSAFE!!
      * DO NOT MUTATE THE BINARY ARRAY. THIS WILL CAUSE UNDEFINED BEHAVIOUR.

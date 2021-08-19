@@ -148,7 +148,7 @@ export default class Bundle {
     const _id = Uint8Array.from(Buffer.from(base64url.decode(id, "hex")));
 
     const offset = this.getOffset(_id);
-    if (offset.startOffset == -1) {
+    if (offset.startOffset === -1) {
       throw new Error("Transaction not found");
     }
 
