@@ -1,5 +1,4 @@
 import base64url from "base64url";
-import { Buffer } from "buffer";
 import { arraybufferEqual, byteArrayToLong } from "./utils";
 import DataItem from "./DataItem";
 import Transaction  from "arweave/node/lib/transaction";
@@ -10,7 +9,7 @@ const HEADER_START = 32;
 export default class Bundle {
   readonly binary: Buffer;
 
-  constructor(binary: Buffer, verify?: boolean) {
+  constructor(binary: Buffer, verify = false) {
     // TODO: Add some verification
     if (verify) {
       if (!Bundle._verify(binary)) throw new Error("Binary not valid bundle");
@@ -93,7 +92,21 @@ export default class Bundle {
     return Bundle._verify(this.binary);
   }
 
-  private static _verify(_: Uint8Array): boolean {
+  private static _verify(binary: Buffer): boolean {
+    const length = byteArrayToLong(binary.slice(0, 32));
+    let offset = 32 + (64 * length);
+    for (let i = HEADER_START; i < (HEADER_START + (64 * length)); i+=64) {
+      const _offset = byteArrayToLong(binary.slice(i, i + 32));
+      console.log(_offset);
+
+      const item = new DataItem(binary.slice(offset, offset + _offset));
+      if (!item.isValid()) {
+        return false;
+      }
+
+      offset += _offset;
+    }
+
     return true;
   }
 

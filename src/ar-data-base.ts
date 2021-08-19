@@ -19,21 +19,21 @@ export async function getSignatureData(item: DataItem): Promise<Uint8Array> {
     return web.default([
       stringToBuffer("dataitem"),
       stringToBuffer("1"),
-      item.getRawOwner(),
-      item.getRawTarget(),
-      item.getRawAnchor(),
-      item.getRawTags(),
-      item.getData()
+      item.rawOwner,
+      item.rawTarget,
+      item.rawAnchor,
+      item.rawTags,
+      item.rawData
     ]);
   } else {
     return deepHash([
       stringToBuffer("dataitem"),
       stringToBuffer("1"),
-      item.getRawOwner(),
-      item.getRawTarget(),
-      item.getRawAnchor(),
-      item.getRawTags(),
-      item.getData()
+      item.rawOwner,
+      item.rawTarget,
+      item.rawAnchor,
+      item.rawTags,
+      item.rawData
     ]);
   }
 

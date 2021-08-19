@@ -41,7 +41,7 @@ export async function bundleAndSignData(dataItems: (DataItemCreateOptions | Data
     // Create DataItem
     const d = DataItem.isDataItem(di) ? di as DataItem : await createData(di as DataItemCreateOptions, jwk);
     // Sign DataItem
-    const id = d.isSigned() ? d.getRawId() : await sign(d, jwk);
+    const id = d.isSigned() ? d.rawId : await sign(d, jwk);
     // Create header array
     const header = new Uint8Array(64);
     // Set offset

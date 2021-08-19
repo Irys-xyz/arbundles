@@ -1,14 +1,14 @@
 {
   "name": "ans104",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "Arweave bundling library",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
   "files": [
-    "/lib/*.js",
-    "/lib/*.ts",
-    "/file/*.js",
-    "/file/*.ts"
+    "/build/src/*.js",
+    "/build/src/*.ts",
+    "/build/file/*.js",
+    "/build/file/*.ts"
   ],
   "devDependencies": {
     "@types/jest": "~26.0.23",

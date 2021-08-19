@@ -20,11 +20,11 @@ describe('Creating and indexing a data item', function() {
     };
 
     const d = await createData(_d, wallet0);
-    expect(Buffer.from(d.getData()).toString()).toBe('tasty');
-    expect(d.getOwner()).toBe(wallet0.n);
-    expect(d.getTarget()).toBe('pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A');
-    expect(d.getAnchor()).toEqual('Math.apt\'#]gng(36).substring(30)');
-    expect(d.getTags()).toEqual([]);
+    expect(Buffer.from(d.rawData).toString()).toBe('tasty');
+    expect(d.owner).toBe(wallet0.n);
+    expect(d.target).toBe('pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A');
+    expect(d.anchor).toEqual('Math.apt\'#]gng(36).substring(30)');
+    expect(d.tags).toEqual([]);
     expect(DataItem.verify(d.getRaw())).toEqual(true);
   });
 
@@ -37,15 +37,15 @@ describe('Creating and indexing a data item', function() {
     }];
 
     const bundle = await bundleAndSignData(_dataItems, wallet0);
-    const dataItems = bundle.getAll();
+    const dataItems = bundle.items;
 
     expect(bundle.length).toEqual(1);
     expect(dataItems.length).toEqual(1);
-    expect(Buffer.from(dataItems[0].getData()).toString()).toBe('tasty');
-    expect(dataItems[0].getOwner()).toBe(wallet0.n);
-    expect(Buffer.from(dataItems[0].getTarget()).toString()).toBe('pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A');
-    expect(dataItems[0].getAnchor()).toEqual('Math.randomgng(36).substring(30)');
-    expect(dataItems[0].getTags()).toEqual([{ name: 'x', value: 'y' }]);
+    expect(Buffer.from(dataItems[0].rawData).toString()).toBe('tasty');
+    expect(dataItems[0].owner).toBe(wallet0.n);
+    expect(Buffer.from(dataItems[0].target).toString()).toBe('pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A');
+    expect(dataItems[0].anchor).toEqual('Math.randomgng(36).substring(30)');
+    expect(dataItems[0].tags).toEqual([{ name: 'x', value: 'y' }]);
     expect(DataItem.verify(dataItems[0].getRaw())).toEqual(true);
   });
 
@@ -55,8 +55,8 @@ describe('Creating and indexing a data item', function() {
       { data: '4242' },
     ], wallet0);
 
-    console.log(bundle.get(1).getData());
-    expect(bundle.get(1).getData()).toEqual(Buffer.from('4242'));
+    console.log(bundle.get(1).rawData);
+    expect(bundle.get(1).rawData).toEqual(Buffer.from('4242'));
   });
 
   it('Test file verification', async function() {
@@ -99,5 +99,14 @@ describe('Creating and indexing a data item', function() {
 
       cumulativeOffset += offset;
     }
+  });
+
+  it('should verify', async function() {
+    const bundle = await bundleAndSignData([
+      { data: '1984', tags: [{ name: "gdf", value: "gfgdf" }] },
+      { data: '4242' },
+    ], wallet0);
+
+    expect(bundle.verify()).toEqual(true);
   });
 });

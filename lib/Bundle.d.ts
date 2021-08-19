@@ -1,5 +1,4 @@
 /// <reference types="node" />
-import { Buffer } from "buffer";
 import DataItem from "./DataItem";
 import Transaction from "arweave/node/lib/transaction";
 import Arweave from "arweave";
