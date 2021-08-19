@@ -19,7 +19,28 @@ export default class Bundle {
     this.binary = binary;
   }
 
-  public get length() { return this.getDataItemCount(); }
+  public get length(): number { return this.getDataItemCount(); }
+
+  get items(): DataItem[] {
+    const items = new Array(this.length);
+    let offset = 0;
+    const bundleStart = this.getBundleStart();
+
+    let counter = 0;
+    for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
+      const _offset = byteArrayToLong(this.binary.slice(i, i + 32))
+
+      const dataItemStart = bundleStart + offset;
+      const bytes = this.binary.slice(dataItemStart, dataItemStart + _offset);
+
+      offset += _offset;
+
+      items[counter] = new DataItem(bytes);
+
+      counter++;
+    }
+    return items;
+  }
 
   public getRaw(): Buffer {
     return this.binary;
@@ -57,27 +78,6 @@ export default class Bundle {
 
     const start = 64 + (64 * index);
     return base64url.encode(this.binary.slice(start, start + 32), "hex");
-  }
-
-  public getAll(): DataItem[] {
-    const items = new Array(this.length);
-    let offset = 0;
-    const bundleStart = this.getBundleStart();
-
-    let counter = 0;
-    for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
-      const _offset = byteArrayToLong(this.binary.slice(i, i + 32))
-
-      const dataItemStart = bundleStart + offset;
-      const bytes = this.binary.slice(dataItemStart, dataItemStart + _offset);
-
-      offset += _offset;
-
-      items[counter] = new DataItem(bytes);
-
-      counter++;
-    }
-    return items;
   }
 
   public async toTransaction(arweave: Arweave): Promise<Transaction> {

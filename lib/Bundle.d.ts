@@ -7,6 +7,7 @@ export default class Bundle {
     readonly binary: Buffer;
     constructor(binary: Buffer, verify?: boolean);
     get length(): number;
+    get items(): DataItem[];
     getRaw(): Buffer;
     /**
      * Get a DataItem by index (`number`) or by txId (`string`)
@@ -15,7 +16,6 @@ export default class Bundle {
     get(index: number | string): DataItem;
     getIds(): string[];
     getIdBy(index: number): string;
-    getAll(): DataItem[];
     toTransaction(arweave: Arweave): Promise<Transaction>;
     verify(): boolean;
     private static _verify;

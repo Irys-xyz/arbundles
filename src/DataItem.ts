@@ -140,7 +140,7 @@ export default class DataItem {
   public async sign(jwk: JWKPublicInterface): Promise<Buffer> {
     this._id = await sign(this, jwk);
 
-    return this.getRawId();
+    return this.rawId;
   }
 
   public isSigned(): boolean {
@@ -152,11 +152,11 @@ export default class DataItem {
    */
   public toJSON(): { owner: string; data: string; signature: string; target: string; tags: { name: string; value: string }[] } {
     return {
-      signature: this.getSignature(),
-      owner: this.getOwner(),
-      target: this.getTarget(),
-      tags: this.getTags().map(t => ({ name: base64url.encode(t.name), value: base64url.encode(t.value) })),
-      data: base64url.encode(this.getData())
+      signature: this.signature,
+      owner: this.owner,
+      target: this.target,
+      tags: this.tags.map(t => ({ name: base64url.encode(t.name), value: base64url.encode(t.value) })),
+      data: this.data
     };
   }
 
