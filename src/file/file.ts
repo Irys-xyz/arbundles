@@ -111,7 +111,7 @@ export async function getOwner(file: File, options?: { offset: number }): Promis
   const buffer = await read(fd.fd, Buffer.allocUnsafe(512), offset + 512, 512, null).then(r => r.buffer);
   await fd.close();
 
-  return base64url.encode(buffer, "hex");
+  return base64url.encode(buffer);
 }
 
 export async function getTarget(file: File, options?: { offset: number }): Promise<string | undefined> {
@@ -127,7 +127,7 @@ export async function getTarget(file: File, options?: { offset: number }): Promi
   const buffer = await read(fd.fd, Buffer.allocUnsafe(32), targetStart + 1, 32, null).then(r => r.buffer);
   await fd.close();
 
-  return base64url.encode(buffer, "hex");
+  return base64url.encode(buffer);
 }
 
 export async function getAnchor(file: File, options?: { offset: number }): Promise<string | undefined> {
@@ -149,7 +149,7 @@ export async function getAnchor(file: File, options?: { offset: number }): Promi
   const buffer = await read(fd.fd, Buffer.allocUnsafe(32), anchorStart + 1, 32, null).then(r => r.buffer);
   await fd.close();
 
-  return base64url.encode(buffer, "hex");
+  return base64url.encode(buffer);
 }
 
 export async function getTags(file: File, options?: { offset: number }): Promise<{ name: string, value: string }[]> {

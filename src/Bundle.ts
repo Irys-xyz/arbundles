@@ -67,7 +67,7 @@ export default class Bundle {
   public getIds(): string[] {
     const ids = [];
     for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
-      ids.push(base64url.encode(this.binary.slice(i + 32, i + 64), "hex"))
+      ids.push(base64url.encode(this.binary.slice(i + 32, i + 64)))
     }
 
     return ids;
@@ -79,7 +79,7 @@ export default class Bundle {
     }
 
     const start = 64 + (64 * index);
-    return base64url.encode(this.binary.slice(start, start + 32), "hex");
+    return base64url.encode(this.binary.slice(start, start + 32));
   }
 
   public async toTransaction(arweave: Arweave): Promise<Transaction> {
@@ -161,7 +161,7 @@ export default class Bundle {
   }
 
   private getById(id: string): DataItem {
-    const _id = Uint8Array.from(Buffer.from(base64url.decode(id, "hex")));
+    const _id = base64url.toBuffer(id);
 
     const offset = this.getOffset(_id);
     if (offset.startOffset === -1) {

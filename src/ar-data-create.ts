@@ -24,10 +24,10 @@ export async function createData(
 ): Promise<DataItem> {
   // TODO: Add asserts
   // Parse all values to a buffer and
-  const _owner = Buffer.from(base64url.decode(jwk.n, "hex"), "hex");
+  const _owner = base64url.toBuffer(jwk.n);
   assert(_owner.byteLength == OWNER_LENGTH, new Error(`Public key isn't the correct length: ${_owner.byteLength}`));
 
-  const _target = opts.target ? Buffer.from(base64url.decode(opts.target, "hex"), "hex") : null;
+  const _target = opts.target ? base64url.toBuffer(opts.target) : null;
   const target_length = 1 + (_target?.byteLength ?? 0);
   const _anchor = opts.anchor ? Buffer.from(opts.anchor) : null;
   const anchor_length = 1 + (_anchor?.byteLength ?? 0);

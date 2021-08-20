@@ -4,7 +4,6 @@ import base64url from 'base64url';
 import { Buffer } from 'buffer';
 import { JWKPublicInterface } from './interface-jwk';
 import { sign } from './ar-data-bundle';
-import Arweave from 'arweave';
 
 export const MIN_BINARY_SIZE = 1042;
 
@@ -25,11 +24,11 @@ export default class DataItem {
   }
 
   get id(): string {
-    return base64url.encode(this._id, "hex");
+    return base64url.encode(this._id);
   }
 
   set id(id: string) {
-    this._id = Buffer.from(base64url.decode(id, "hex"), "hex");
+    this._id = base64url.toBuffer(id);
   }
 
   get rawId(): Buffer {
@@ -53,12 +52,7 @@ export default class DataItem {
   }
 
   get owner(): string {
-    return base64url.encode(Buffer.from(this.rawOwner), "hex");
-  }
-
-
-  async getAddress(): Promise<string> {
-    return base64url.encode(Buffer.from(await Arweave.crypto.hash(this.rawOwner, "SHA-256")), "hex");
+    return base64url.encode(this.rawOwner);
   }
 
   get rawTarget(): Buffer {
@@ -68,8 +62,7 @@ export default class DataItem {
   }
 
   get target(): string {
-    const target = this.rawTarget;
-    return base64url.encode(target, "hex");
+    return base64url.encode(this.rawTarget);
   }
 
   get rawAnchor(): Buffer {
@@ -126,7 +119,7 @@ export default class DataItem {
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
     const dataStart = tagsStart + 16 + numberOfTagBytes;
 
-    return base64url.encode(this.binary.slice(dataStart, this.binary.length), "hex");
+    return base64url.encode(this.binary.slice(dataStart, this.binary.length));
   }
 
   /**
