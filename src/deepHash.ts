@@ -2,8 +2,6 @@
 // `type DeepHashChunk = Uint8Array | DeepHashChunk[];`
 import Arweave from 'arweave';
 import * as crypto from 'crypto';
-import { Transform } from 'stream';
-import { pipeline } from 'stream/promises';
 
 type DeepHashChunk = Uint8Array | AsyncIterable<Buffer> | DeepHashChunks;
 type DeepHashChunks = DeepHashChunk[];
@@ -18,14 +16,10 @@ export default async function deepHash(
 
     let length = 0;
 
-    await pipeline(
-      Transform.from(_data),
-      async function(chunkedSource: AsyncIterable<Buffer>) {
-        for await (const chunk of chunkedSource) {
-          length += chunk.byteLength;
-          context.update(chunk);
-        }
-      });
+    for await (const chunk of _data) {
+        length += chunk.byteLength;
+        context.update(chunk);
+    }
 
     const tag = Arweave.utils.concatBuffers([
       Arweave.utils.stringToBuffer('blob'),
@@ -84,13 +78,9 @@ async function deepHashChunks(
 export async function hashStream(stream: AsyncIterable<Buffer>): Promise<Buffer> {
   const context = crypto.createHash('sha384');
 
-  await pipeline(
-    Transform.from(stream),
-    async function(chunkedSource: AsyncIterable<Buffer>) {
-      for await (const chunk of chunkedSource) {
-        context.update(chunk);
-      }
-    });
+  for await (const chunk of stream) {
+    context.update(chunk);
+  }
 
   return context.digest();
 }

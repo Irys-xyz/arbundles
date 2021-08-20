@@ -64,7 +64,7 @@ export default class Bundle {
   public getIds(): string[] {
     const ids = [];
     for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
-      ids.push(base64url.encode(this.binary.slice(i + 32, i + 64)), "hex")
+      ids.push(base64url.encode(this.binary.slice(i + 32, i + 64), "hex"))
     }
 
     return ids;
