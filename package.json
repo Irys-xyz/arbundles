@@ -1,6 +1,6 @@
 {
   "name": "ans104",
-  "version": "0.3.7",
+  "version": "0.3.9",
   "description": "Arweave bundling library",
   "main": "build/index.js",
   "types": "build/index.d.ts",

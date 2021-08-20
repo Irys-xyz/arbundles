@@ -55,6 +55,9 @@ describe('Creating and indexing a data item', function() {
       { data: '4242' },
     ], wallet0);
 
+
+
+    console.log(bundle.items[0].id);
     console.log(bundle.get(1).rawData);
     expect(bundle.get(1).rawData).toEqual(Buffer.from('4242'));
   });
@@ -109,4 +112,8 @@ describe('Creating and indexing a data item', function() {
 
     expect(bundle.verify()).toEqual(true);
   });
+
+  it('should work again', async function() {
+
+  })
 });

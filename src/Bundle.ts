@@ -28,13 +28,16 @@ export default class Bundle {
     let counter = 0;
     for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
       const _offset = byteArrayToLong(this.binary.slice(i, i + 32))
+      const _id = this.binary.slice(i + 32, i + 64);
 
       const dataItemStart = bundleStart + offset;
       const bytes = this.binary.slice(dataItemStart, dataItemStart + _offset);
 
       offset += _offset;
 
-      items[counter] = new DataItem(bytes);
+      const item = new DataItem(bytes);
+      item.rawId = _id;
+      items[counter] = item;
 
       counter++;
     }
