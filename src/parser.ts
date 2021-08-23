@@ -13,3 +13,11 @@ export const tagsParser = avro.Type.forSchema({
   type: "array",
   items: tagParser
 });
+
+export async function serializeTags(tags: { name: string; value: string }[]): Promise<Uint8Array> {
+  if (tags!.length == 0) {
+    return new Uint8Array(0);
+  }
+
+  return Uint8Array.from(tagsParser.toBuffer(tags));
+}

@@ -95,6 +95,15 @@ export async function* getHeaders(file: string): AsyncGenerator<DataItemHeader> 
   }
 }
 
+export async function getId(file: File, options?: { offset: number }): Promise<Buffer> {
+  const fd = await fileToFd(file);
+  const offset = options.offset ?? 0;
+
+  const buffer = await read(fd.fd, Buffer.allocUnsafe(512), offset, 512, null).then(r => r.buffer);
+  await fd.close();
+  return buffer;
+}
+
 export async function getSignature(file: File, options?: { offset: number }): Promise<Buffer> {
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;

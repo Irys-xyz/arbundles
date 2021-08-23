@@ -25,6 +25,8 @@ const dataItems = [
   { data: "some other data" },
 ];
 
+const signer = new ArweaveSigner(jwk);
+const signer = new SolanaSigner(solanaPrivateKey);
 const bundle = bundleAndSignData(dataItems, jwk);
 ```
 It's as simple as that! All the binary encoding is handled for you.

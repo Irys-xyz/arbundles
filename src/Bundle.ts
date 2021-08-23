@@ -3,10 +3,12 @@ import { arraybufferEqual, byteArrayToLong } from "./utils";
 import DataItem from "./DataItem";
 import Transaction  from "arweave/node/lib/transaction";
 import Arweave from "arweave";
+import { BundleInterface } from './BundleInterface';
+import { JWKInterface } from './interface-jwk';
 
 const HEADER_START = 32;
 
-export default class Bundle {
+export default class Bundle implements BundleInterface {
   readonly binary: Buffer;
 
   constructor(binary: Buffer, verify = false) {
@@ -82,10 +84,10 @@ export default class Bundle {
     return base64url.encode(this.binary.slice(start, start + 32));
   }
 
-  public async toTransaction(arweave: Arweave): Promise<Transaction> {
+  public async toTransaction(arweave: Arweave, jwk: JWKInterface): Promise<Transaction> {
     const tx = await arweave.createTransaction({
       data: this.binary
-    });
+    }, jwk);
     tx.addTag("Bundle-Format", "binary");
     tx.addTag("Bundle-Version", "2.0.0");
     return tx;
@@ -100,7 +102,6 @@ export default class Bundle {
     let offset = 32 + (64 * length);
     for (let i = HEADER_START; i < (HEADER_START + (64 * length)); i+=64) {
       const _offset = byteArrayToLong(binary.slice(i, i + 32));
-      console.log(_offset);
 
       const item = new DataItem(binary.slice(offset, offset + _offset));
       if (!item.isValid()) {

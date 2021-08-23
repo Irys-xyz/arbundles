@@ -2,12 +2,15 @@ import { byteArrayToLong } from './utils';
 import { tagsParser } from './parser';
 import base64url from 'base64url';
 import { Buffer } from 'buffer';
-import { JWKPublicInterface } from './interface-jwk';
 import { sign } from './ar-data-bundle';
+import { BundleItem } from './BundleItem';
+import { Signer } from './signing';
+import { indexToType } from './signing';
+import { getSignatureData } from './ar-data-base';
 
-export const MIN_BINARY_SIZE = 1042;
+export const MIN_BINARY_SIZE = 1044;
 
-export default class DataItem {
+export default class DataItem implements BundleItem {
   private readonly binary: Buffer;
   private _id: Buffer;
 
@@ -19,7 +22,11 @@ export default class DataItem {
     return obj.binary !== undefined;
   }
 
-  isValid(): boolean {
+  get signatureType(): number {
+    return byteArrayToLong(this.binary.slice(0, 2));
+  }
+
+  async isValid(): Promise<boolean> {
     return DataItem.verify(this.binary);
   }
 
@@ -48,7 +55,7 @@ export default class DataItem {
   }
 
   get rawOwner(): Buffer {
-    return this.binary.slice(512, 512 + 512);
+    return this.binary.slice(514, 514 + 512);
   }
 
   get owner(): string {
@@ -94,6 +101,11 @@ export default class DataItem {
     return tagsParser.fromBuffer(Buffer.from(this.binary.slice(tagsStart + 16, tagsStart + 16 + tagsSize)));
   }
 
+  get tagsB64Url(): { name: string, value: string }[] {
+    const _tags = this.tags;
+    return _tags.map(t => ({ name: base64url.encode(t.name), value: base64url.encode(t.value) }));
+  }
+
   getStartOfData(): number {
     const tagsStart = this.getTagsStart();
 
@@ -113,13 +125,7 @@ export default class DataItem {
   }
 
   get data(): string {
-    const tagsStart = this.getTagsStart();
-
-    const numberOfTagBytesArray = this.binary.slice(tagsStart + 8, tagsStart + 16);
-    const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
-    const dataStart = tagsStart + 16 + numberOfTagBytes;
-
-    return base64url.encode(this.binary.slice(dataStart, this.binary.length));
+    return base64url.encode(this.rawData);
   }
 
   /**
@@ -130,8 +136,8 @@ export default class DataItem {
     return this.binary;
   }
 
-  public async sign(jwk: JWKPublicInterface): Promise<Buffer> {
-    this._id = await sign(this, jwk);
+  public async sign(signer: Signer): Promise<Buffer> {
+    this._id = await sign(this, signer);
 
     return this.rawId;
   }
@@ -159,36 +165,40 @@ export default class DataItem {
    * A binary is valid iff:
    * - the tags are encoded correctly
    */
-  static verify(buffer: Buffer, extras?: { id: Uint8Array, jwk: JWKPublicInterface }): boolean {
+  static async verify(buffer: Buffer, extras?: { pk: string | Buffer }): Promise<boolean> {
     if (buffer.length < MIN_BINARY_SIZE) {
       return false;
     }
-    let tagsStart = 512 + 512 + 2;
-    const targetPresent = (buffer[1024] == 1);
+    const sigType = byteArrayToLong(buffer.slice(0, 2));
+    let tagsStart = 2 + 512 + 512 + 2;
+    const targetPresent = (buffer[1026] == 1);
     tagsStart += targetPresent ? 32: 0;
-    const anchorPresentByte = (targetPresent ? 1057 : 1025);
+    const anchorPresentByte = (targetPresent ? 1059 : 1027);
     const anchorPresent = (buffer[anchorPresentByte] == 1);
     tagsStart += anchorPresent ? 32: 0;
 
     const numberOfTags = byteArrayToLong(buffer.slice(tagsStart, tagsStart + 8));
-    if (numberOfTags == 0) {
-      return true;
-    }
     const numberOfTagBytesArray = buffer.slice(tagsStart + 8, tagsStart + 16);
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
 
-    if (extras) {
-      // TODO: Check if id matches
+    if (numberOfTags > 0) {
+      try {
+        const tags: { name: string, value:string }[] = tagsParser.fromBuffer(Buffer.from(buffer.slice(tagsStart + 16, tagsStart + 16 + numberOfTagBytes)));
+
+        if (tags.length !== numberOfTags) {
+          return false
+        }
+      } catch (e) {
+        return false;
+      }
     }
 
-    try {
-      const tags: { name: string, value:string }[] = tagsParser.fromBuffer(Buffer.from(buffer.slice(tagsStart + 16, tagsStart + 16 + numberOfTagBytes)));
+    if (extras) {
+      const Signer = indexToType[sigType];
 
-      if (tags.length !== numberOfTags) {
-        return false
-      }
-    } catch (e) {
-      return false;
+      const signatureData = await getSignatureData(new DataItem(buffer));
+
+      if (!await Signer.verify(extras.pk, signatureData, buffer.slice(2, 514))) return false;
     }
 
     return true;
@@ -200,10 +210,10 @@ export default class DataItem {
    * @private
    */
   private getTagsStart(): number {
-    let tagsStart = 512 + 512 + 2;
-    const targetPresent = (this.binary[1024] == 1);
+    let tagsStart = 2 + 512 + 512 + 2;
+    const targetPresent = (this.binary[1026] == 1);
     tagsStart += targetPresent ? 32: 0;
-    const anchorPresentByte = (targetPresent ? 1057 : 1025);
+    const anchorPresentByte = (targetPresent ? 1059 : 1027);
     const anchorPresent = (this.binary[anchorPresentByte] == 1);
     tagsStart += anchorPresent ? 32: 0;
 
@@ -217,7 +227,7 @@ export default class DataItem {
    * @private
    */
   private getTargetStart(): number {
-    return 1024;
+    return 1026;
   }
 
   /**

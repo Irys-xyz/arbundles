@@ -1,11 +1,10 @@
 import { DataItemCreateOptions } from "./ar-data-base";
-import { JWKPublicInterface } from "./interface-jwk";
 import assert from "assert";
 import base64url from "base64url";
-import { longTo8ByteArray } from "./utils";
-import { tagsParser } from "./parser";
+import { longTo8ByteArray, shortTo2ByteArray } from './utils';
 import DataItem from "./DataItem";
-import { Buffer } from "buffer";
+import { serializeTags } from './parser';
+import { Signer } from './signing/Signer';
 
 const EMPTY_ARRAY = new Array(512).fill(0);
 const OWNER_LENGTH = 512;
@@ -14,17 +13,15 @@ const OWNER_LENGTH = 512;
  * This will create a single DataItem in binary format (Uint8Array)
  *
  * @param opts - Options involved in creating data items
- * @param jwk - User's jwk
- * @param encoding - encoding for raw data
+ * @param signer
  */
 export async function createData(
   opts: DataItemCreateOptions,
-  jwk: JWKPublicInterface,
-  encoding?: BufferEncoding
+  signer: Signer
 ): Promise<DataItem> {
   // TODO: Add asserts
   // Parse all values to a buffer and
-  const _owner = base64url.toBuffer(jwk.n);
+  const _owner = signer.publicKey;
   assert(_owner.byteLength == OWNER_LENGTH, new Error(`Public key isn't the correct length: ${_owner.byteLength}`));
 
   const _target = opts.target ? base64url.toBuffer(opts.target) : null;
@@ -33,35 +30,37 @@ export async function createData(
   const anchor_length = 1 + (_anchor?.byteLength ?? 0);
   const _tags = (opts.tags?.length ?? 0) > 0 ? await serializeTags(opts.tags) : null;
   const tags_length = 16 + (_tags ? _tags.byteLength : 0);
-  const _data = typeof opts.data === "string" ? Buffer.from(opts.data, encoding) : Buffer.from(opts.data);
+  const _data = typeof opts.data === "string" ? Buffer.from(opts.data) : Buffer.from(opts.data);
   const data_length = _data.byteLength;
 
 
   // See [https://github.com/joshbenaron/arweave-standards/blob/ans104/ans/ANS-104.md#13-dataitem-format]
-  const length = 512 + OWNER_LENGTH + target_length + anchor_length + tags_length + data_length;
+  const length = 2 + 512 + _owner.byteLength + target_length + anchor_length + tags_length + data_length;
   // Create array with set length
-  const bytes = Buffer.alloc(length);
+  const bytes = Buffer.allocUnsafe(length);
 
+
+  bytes.set(shortTo2ByteArray(signer.signatureType), 0);
   // Push bytes for `signature`
-  bytes.set(EMPTY_ARRAY, 0);
+  bytes.set(EMPTY_ARRAY, 2);
   // // Push bytes for `id`
   // bytes.set(EMPTY_ARRAY, 32);
   // Push bytes for `owner`
 
   assert(_owner.byteLength == 512, new Error("Owner must be 512 bytes"));
-  bytes.set(_owner, 512);
+  bytes.set(_owner, 514);
 
   // Push `presence byte` and push `target` if present
   // 64 + OWNER_LENGTH
-  bytes[1024] = _target ? 1  : 0;
+  bytes[1026] = _target ? 1  : 0;
   if (_target) {
     assert(_target.byteLength == 32, new Error("Target must be 32 bytes"));
-    bytes.set(_target, 1025);
+    bytes.set(_target, 1027);
   }
 
   // Push `presence byte` and push `anchor` if present
   // 64 + OWNER_LENGTH
-  const anchor_start = 1024 + target_length;
+  const anchor_start = 1026 + target_length;
   let tags_start = anchor_start + 1;
   bytes[anchor_start] = _anchor ? 1 : 0;
   if (_anchor) {
@@ -86,10 +85,4 @@ export async function createData(
   return new DataItem(bytes);
 }
 
-async function serializeTags(tags: { name: string; value: string }[]): Promise<Uint8Array> {
-  if (tags!.length == 0) {
-    return new Uint8Array(0);
-  }
 
-  return Uint8Array.from(tagsParser.toBuffer(tags));
-}
