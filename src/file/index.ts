@@ -1,5 +1,10 @@
 export * from "./file";
 export * from "./bundleData";
 export * from "./createData";
-export * from "./FileBundle";
-export * from "./FileDataItem";
+import FileBundle from "./FileBundle";
+
+import FileDataItem from './FileDataItem';
+export {
+  FileBundle,
+  FileDataItem
+};
