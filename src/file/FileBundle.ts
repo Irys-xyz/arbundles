@@ -56,12 +56,15 @@ export default class FileBundle implements BundleInterface {
   }
 
   async toTransaction(arweave: Arweave, jwk: JWKInterface): Promise<Transaction> {
-    return await pipeline(
+    const tx = await pipeline(
       multistreams.obj([
         fs.createReadStream(this._headerFile),
-        multistreams.obj(this._txs.map(tx => fs.createReadStream(tx)))
+        ...this._txs.map(tx => fs.createReadStream(tx))
       ]),
-      createTransactionAsync({}, arweave, jwk))
+      createTransactionAsync({}, arweave, jwk));
+    tx.addTag("Bundle-Format", "binary");
+    tx.addTag("Bundle-Version", "2.0.0");
+    return tx;
   }
 
   public async* getHeaders(): AsyncGenerator<{ offset: number, id: string }> {

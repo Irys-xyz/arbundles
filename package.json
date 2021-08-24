@@ -20,6 +20,7 @@
     "eslint-plugin-jest": "~24.3.6",
     "jest": "~27.0.3",
     "object-sizeof": "^1.6.1",
+    "perf_hooks": "^0.0.1",
     "prettier": "~2.3.0",
     "rimraf": "~3.0.2",
     "ts-jest": "~27.0.2",

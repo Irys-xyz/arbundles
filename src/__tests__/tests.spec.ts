@@ -5,6 +5,8 @@ import { DataItemCreateOptions } from '../ar-data-base';
 import { bundleAndSignData, createData, DataItem } from '..';
 import * as fs from 'fs';
 import ArweaveSigner from '../signing/chains/arweave/ArweaveSigner';
+import sizeof from 'object-sizeof';
+import { performance } from 'perf_hooks';
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, 'test_key0.json')).toString(),
@@ -178,4 +180,25 @@ describe('Creating and indexing a data item', function() {
 
     expect(bundle.verify()).toEqual(true);
   });
+
+  it("should bundle in loop", async function() {
+    const signer = new ArweaveSigner(wallet0);
+    const tags = [{
+      name: "Content-Type",
+      value: "image/png"
+    }];
+    const data = { data: await fs.promises.readFile("large_llama.png").then(r => Buffer.from(r.buffer)), tags };
+    const items = new Array(100_000).fill(data);
+    let now = performance.now();
+    for (let i = 0; i < 100_000; i++) {
+      if (i % 1000 === 0) {
+        const now2 = performance.now();
+        console.log(`${i} - ${now2 - now}ms`);
+        now = now2;
+      }      const item = await createData(data, signer);
+      await item.sign(signer);
+      items[i] = item;
+    }
+    console.log(sizeof(items));
+  }, 1000000000);
 });
