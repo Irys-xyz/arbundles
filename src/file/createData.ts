@@ -8,7 +8,7 @@ import assert from 'assert';
 import { Buffer } from 'buffer';
 import { longTo8ByteArray, shortTo2ByteArray } from '../utils';
 import { serializeTags } from '../parser';
-import { Signer } from '../signing';
+import { Signer } from '../signing/index';
 
 const EMPTY_ARRAY = new Array(512).fill(0);
 const OWNER_LENGTH = 512;

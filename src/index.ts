@@ -4,6 +4,7 @@ import Bundle from "./Bundle";
 import DataItem, { MIN_BINARY_SIZE } from './DataItem';
 import deepHash from './deepHash';
 import { DataItemCreateOptions } from './ar-data-base';
+import { ArweaveSigner } from './signing';
 
 export {
   MIN_BINARY_SIZE,
@@ -16,5 +17,8 @@ export {
   DataItemCreateOptions
 };
 
-export * from "./signing";
 
+
+export {
+  ArweaveSigner
+}

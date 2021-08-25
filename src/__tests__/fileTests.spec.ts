@@ -1,4 +1,4 @@
-import { bundleAndSignData, createData } from '../file';
+import { bundleAndSignData, createData, FileDataItem } from '../file';
 import { readFileSync } from 'fs';
 import path from 'path';
 import ArweaveSigner from '../signing/chains/arweave/ArweaveSigner';
@@ -19,7 +19,6 @@ const wallet0 = JSON.parse(
 
 arweave.wallets.getAddress(wallet0)
   .then(async (address) => {
-    console.log(address);
     return address;
   })
   .then(async (address) => console.log(await arweave.wallets.getBalance(address)))
@@ -28,15 +27,17 @@ arweave.wallets.getAddress(wallet0)
 describe("file tests", function() {
   it("should get all correct data", async function() {
     const signer = new ArweaveSigner(wallet0);
-    const d = { data: "hi" };
+    const d = { data: "hi", tags: [{name: "", value: ""}] };
 
     const data = await createData(d, signer);
+    await data.sign(signer);
     expect(data.signatureType).toEqual(1);
     expect(data.owner).toEqual(wallet0.n);
     expect(data.anchor).toEqual("");
-    expect(data.tags).toEqual([]);
+    expect(data.tags).toEqual([{name: "", value: ""}]);
     expect(data.target).toEqual("");
     expect(data.rawData.toString()).toEqual("hi");
+    expect(await FileDataItem.verify(data.filename, { pk: data.owner })).toEqual(true);
   });
 
   it("should bundle correctly", async function() {

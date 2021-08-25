@@ -1,6 +1,7 @@
 import { Signer } from './signing/Signer';
+import { Buffer } from 'buffer';
 
-export interface BundleItem {
+export abstract class BundleItem {
   readonly signatureType: number;
   readonly rawSignature: Buffer;
   readonly signature: string;
@@ -14,5 +15,10 @@ export interface BundleItem {
   readonly tags: { name: string, value: string }[];
   readonly rawData: Buffer;
   readonly data: string;
-  sign(signer: Signer): Promise<Buffer>;
+  abstract sign(signer: Signer): Promise<Buffer>;
+  abstract isValid(): Promise<boolean>
+  static async verify(..._: any[]): Promise<boolean> {
+    throw new Error("You must implement `verify`");
+  }
 }
+

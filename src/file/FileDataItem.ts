@@ -8,10 +8,11 @@ import { deepHash } from '../index';
 import { stringToBuffer } from 'arweave/web/lib/utils';
 import Arweave from 'arweave';
 import { promisify } from 'util';
-import { Signer } from '../signing';
+import { indexToType, Signer } from '../signing/index';
+import { Buffer } from 'buffer';
 
 const write = promisify(fs.write);
-
+const read = promisify(fs.read);
 export default class FileDataItem implements BundleItem {
   public readonly filename: PathLike;
   private readonly _id?: Buffer;
@@ -19,6 +20,10 @@ export default class FileDataItem implements BundleItem {
   constructor(filename: PathLike, id?: Buffer) {
     this.filename = filename;
     this._id = id;
+  }
+
+  isValid(): Promise<boolean> {
+    return FileDataItem.verify(this.filename);
   }
 
   get size(): number {
@@ -135,7 +140,8 @@ export default class FileDataItem implements BundleItem {
     fs.readSync(fd, numberOfTagsBytesBuffer, 0, 8, tagsStart + 8);
     const numberOfTagsBytes = byteArrayToLong(numberOfTagsBytesBuffer);
     const dataStart = tagsStart + 16 + numberOfTagsBytes;
-    const dataSize = this.size - dataStart;
+    const size = this.size;
+    const dataSize = size - dataStart;
     if (dataSize === 0) {
       return Buffer.allocUnsafe(0);
     }
@@ -161,13 +167,75 @@ export default class FileDataItem implements BundleItem {
       this.rawTags,
       fs.createReadStream(this.filename, { start: dataStart, end })
     ]);
+
     const signatureBytes = await signer.sign(signatureData);
     const idBytes = await Arweave.crypto.hash(signatureBytes);
-    const handle = await fs.promises.open(this.filename, "a");
+    const handle = await fs.promises.open(this.filename, "r+");
     await write(handle.fd, signatureBytes, 0, 512, 2);
 
     await handle.close();
     return Buffer.from(idBytes);
+  }
+
+  static async verify(filename: PathLike, extras?: { pk: string | Buffer }): Promise<boolean> {
+    const file = await fs.promises.open(filename, "r");
+    const sigType = await read(file.fd, Buffer.allocUnsafe(2), 0, 2, 0)
+      .then(r => byteArrayToLong(r.buffer));
+    let anchorStart = 1027;
+    const targetPresentBuffer = Buffer.allocUnsafe(1);
+    fs.readSync(file.fd, targetPresentBuffer, 0, 1, 1026);
+    const targetPresent = targetPresentBuffer[0] === 1;
+    if (targetPresent) {
+      anchorStart += 32;
+    }
+    const anchorPresentBuffer = Buffer.allocUnsafe(1);
+    fs.readSync(file.fd, anchorPresentBuffer, 0, 1, anchorStart);
+    const anchorPresent = anchorPresentBuffer[0] === 1;
+    let tagsStart = anchorStart;
+    tagsStart += anchorPresent ? 32 : 1;
+
+    const numberOfTags = await read(file.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart)
+      .then(r => byteArrayToLong(r.buffer));
+    const numberOfTagsBytes = await read(file.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart + 8)
+      .then(r => byteArrayToLong(r.buffer));
+    const tagsBytes = await read(file.fd, Buffer.allocUnsafe(numberOfTagsBytes), 0, numberOfTagsBytes, tagsStart + 16)
+      .then(r => r.buffer);
+    if (numberOfTags > 0) {
+      try {
+        tagsParser.fromBuffer(tagsBytes);
+      } catch (e) {
+        return false;
+      }
+    }
+    if (extras) {
+      const Signer = indexToType[sigType];
+
+      const owner = await read(file.fd, Buffer.allocUnsafe(512), 0, 512, 514)
+        .then(r => r.buffer);
+      const target = targetPresent ? await read(file.fd, Buffer.allocUnsafe(32), 0, 32, 1027)
+        .then(r => r.buffer) : Buffer.allocUnsafe(0);
+      const anchor = anchorPresent ? await read(file.fd, Buffer.allocUnsafe(32), 0, 32, anchorStart + 1)
+        .then(r => r.buffer) : Buffer.allocUnsafe(0);
+
+      const signatureData = await deepHash([
+        stringToBuffer("dataitem"),
+        stringToBuffer("1"),
+        stringToBuffer(sigType.toString()),
+        owner,
+        target,
+        anchor,
+        tagsBytes,
+        fs.createReadStream(filename, { start: tagsStart + 16 + numberOfTagsBytes })
+      ]);
+
+      const signature = await read(file.fd, Buffer.allocUnsafe(512), 0, 512, 2)
+        .then(r => r.buffer);
+
+      if (!await Signer.verify(extras.pk, signatureData, signature)) return false;
+    }
+    await file.close()
+
+    return true;
   }
 
   private get anchorStart(): [boolean, number] {

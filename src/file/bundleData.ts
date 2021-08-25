@@ -3,7 +3,7 @@ import { file } from 'tmp-promise';
 import * as fs from 'fs';
 import { createData } from './createData';
 import { longTo32ByteArray } from '../utils';
-import { Signer } from '../signing';
+import { Signer } from '../signing/index';
 import FileBundle from './FileBundle';
 import { performance } from 'perf_hooks';
 

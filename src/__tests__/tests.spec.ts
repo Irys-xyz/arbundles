@@ -7,10 +7,18 @@ import * as fs from 'fs';
 import ArweaveSigner from '../signing/chains/arweave/ArweaveSigner';
 import sizeof from 'object-sizeof';
 import { performance } from 'perf_hooks';
+import base64url from 'base64url';
+import Arweave from 'arweave';
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, 'test_key0.json')).toString(),
 );
+
+const arweave = Arweave.init({
+  host: 'arweave.dev',
+  port: 443,
+  protocol: 'https'
+});
 
 describe('Creating and indexing a data item', function() {
   it('should create with all and get', async function() {
@@ -188,17 +196,50 @@ describe('Creating and indexing a data item', function() {
       value: "image/png"
     }];
     const data = { data: await fs.promises.readFile("large_llama.png").then(r => Buffer.from(r.buffer)), tags };
-    const items = new Array(100_000).fill(data);
+    const items = new Array(3000).fill(data);
     let now = performance.now();
-    for (let i = 0; i < 100_000; i++) {
+    const ids = [];
+    for (let i = 0; i < 3000; i++) {
       if (i % 1000 === 0) {
         const now2 = performance.now();
         console.log(`${i} - ${now2 - now}ms`);
         now = now2;
       }      const item = await createData(data, signer);
-      await item.sign(signer);
+      const id = base64url(await item.sign(signer));
+      ids.push(id);
       items[i] = item;
     }
     console.log(sizeof(items));
+
+    const bundle = await bundleAndSignData(items, signer);
+
+    const tx = await bundle.toTransaction(arweave, wallet0);
+
+    await arweave.transactions.sign(tx, wallet0);
+
+    const uploader = await arweave.transactions.getUploader(tx);
+
+    while (!uploader.isComplete) {
+      await uploader.uploadChunk();
+      console.log(`${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`);
+    }
+
+    console.log(ids.slice(0, 10));
   }, 1000000000);
+
+  it("should get all correct data", async function() {
+    const signer = new ArweaveSigner(wallet0);
+    const d = { data: "hi", tags: [{name: "", value: ""}] };
+
+    const data = await createData(d, signer);
+    console.log(data.getRaw().length);
+    await data.sign(signer);
+    expect(data.signatureType).toEqual(1);
+    expect(data.owner).toEqual(wallet0.n);
+    expect(data.anchor).toEqual("");
+    expect(data.tags).toEqual([{name: "", value: ""}]);
+    expect(data.target).toEqual("");
+    expect(data.rawData.toString()).toEqual("hi");
+    expect(await DataItem.verify(data.getRaw(), { pk: data.owner })).toEqual(true);
+  });
 });

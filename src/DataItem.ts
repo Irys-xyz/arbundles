@@ -4,8 +4,8 @@ import base64url from 'base64url';
 import { Buffer } from 'buffer';
 import { sign } from './ar-data-bundle';
 import { BundleItem } from './BundleItem';
-import { Signer } from './signing';
-import { indexToType } from './signing';
+import { Signer } from './signing/index';
+import { indexToType } from './signing/index';
 import { getSignatureData } from './ar-data-base';
 
 export const MIN_BINARY_SIZE = 1044;
