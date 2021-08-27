@@ -54,6 +54,7 @@ export async function bundleAndSignData(dataItems: (DataItemCreateOptions | Data
     const raw = d.getRaw();
     return Array.from(raw);
   })).then(a => {
+    console.log(a.map(aa => aa.length).reduce((a, b) => a + b, 0));
     return a.flat();
   });
 

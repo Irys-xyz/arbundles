@@ -96,7 +96,7 @@ describe("file tests", function() {
     }];
     const data = { data: await fs.promises.readFile("large_llama.png").then(r => Buffer.from(r.buffer)), tags };
 
-    const num = 1;
+    const num = 100;
     const items = new Array(num);
 
     for (let i = 0; i < num; i++) {
@@ -106,10 +106,8 @@ describe("file tests", function() {
     const bundle = await bundleAndSignData(items, signer);
     const tx = await bundle.signAndSubmit(arweave, wallet0);
 
-    console.log(tx.data_size);
-
     console.log(tx.id);
-
+    console.log(await bundle.getIds());
   }, 1000000)
 
   it("Small test", async function() {

@@ -118,7 +118,7 @@ export default class FileBundle implements BundleInterface {
     for (let i = 32; i<(32 + 64*this.length); i+=64) {
       yield {
         offset: byteArrayToLong(await read(fd.fd, Buffer.allocUnsafe(32), 0, 32, i).then(r => r.buffer)),
-        id: await read(fd.fd, Buffer.allocUnsafe(32), 0, 32, i).then(r => base64url.encode(r.buffer))
+        id: await read(fd.fd, Buffer.allocUnsafe(32), 0, 32, i + 32).then(r => base64url.encode(r.buffer))
       };
     }
     await fd.close();

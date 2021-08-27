@@ -263,7 +263,7 @@ describe('Creating and indexing a data item', function() {
     }];
     const data = { data: await fs.promises.readFile("large_llama.png").then(r => r.buffer) as Buffer, tags };
 
-    const num = 10;
+    const num = 10000;
     const items = new Array(num);
 
     for (let i = 0; i < num; i++) {
@@ -278,6 +278,7 @@ describe('Creating and indexing a data item', function() {
     await arweave.transactions.sign(tx, wallet0);
 
     console.log(tx.id);
+    console.log(bundle.getIds());
 
     const uploader = await arweave.transactions.getUploader(tx);
 
