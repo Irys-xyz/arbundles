@@ -15,15 +15,23 @@ const write = promisify(fs.write);
 const read = promisify(fs.read);
 export default class FileDataItem implements BundleItem {
   public readonly filename: PathLike;
-  private readonly _id?: Buffer;
+  private _id?: Buffer;
 
   constructor(filename: PathLike, id?: Buffer) {
     this.filename = filename;
     this._id = id;
   }
 
+  static isDataItem(obj: any): boolean {
+    return obj.filename && typeof obj.filename === "string";
+  }
+
   isValid(): Promise<boolean> {
     return FileDataItem.verify(this.filename);
+  }
+
+  isSigned(): boolean {
+    return this._id !== undefined;
   }
 
   get size(): number {
@@ -36,6 +44,10 @@ export default class FileDataItem implements BundleItem {
     }
 
     throw new Error("ID is not set");
+  }
+
+  set rawId(id: Buffer) {
+    this._id = id;
   }
 
   get id(): string {
@@ -172,6 +184,8 @@ export default class FileDataItem implements BundleItem {
     const idBytes = await Arweave.crypto.hash(signatureBytes);
     const handle = await fs.promises.open(this.filename, "r+");
     await write(handle.fd, signatureBytes, 0, 512, 2);
+
+    this.rawId = Buffer.from(idBytes);
 
     await handle.close();
     return Buffer.from(idBytes);

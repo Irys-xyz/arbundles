@@ -81,8 +81,8 @@ export async function getHeaderAt(file: File, index: number): Promise<DataItemHe
   const headerBuffer = await read(fd.fd, Buffer.alloc(64), 0, 64, 32 + (64 * index)).then(v => v.buffer)
     .catch(_ => console.log("lol")) as Buffer;
   return {
-    offset: byteArrayToLong(headerBuffer.slice(0, 32)),
-    id: base64url.encode(headerBuffer.slice(32, 64))
+    offset: byteArrayToLong(headerBuffer.subarray(0, 32)),
+    id: base64url.encode(headerBuffer.subarray(32, 64))
   }
 }
 

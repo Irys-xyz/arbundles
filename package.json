@@ -1,6 +1,6 @@
 {
   "name": "ans104",
-  "version": "0.5.5",
+  "version": "0.5.9",
   "description": "Arweave bundling library",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -11,10 +11,12 @@
     "/file/**/*.ts"
   ],
   "devDependencies": {
+    "@types/deep-equal": "^1.0.1",
     "@types/jest": "~26.0.23",
     "@types/node": "^16.3.3",
     "@typescript-eslint/eslint-plugin": "~4.25.0",
     "@typescript-eslint/parser": "~4.25.0",
+    "deep-equal": "^2.0.5",
     "eslint": "~7.27.0",
     "eslint-config-prettier": "~8.3.0",
     "eslint-plugin-jest": "~24.3.6",
@@ -50,6 +52,7 @@
     "arweave-stream": "^0.1.3",
     "avsc": "^5.7.1",
     "base64url": "^3.0.1",
+    "combined-stream2": "^1.1.2",
     "multistream": "^4.1.0",
     "stream-chunker": "^1.2.8",
     "tmp": "^0.2.1",

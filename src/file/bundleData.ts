@@ -5,30 +5,32 @@ import { createData } from './createData';
 import { longTo32ByteArray } from '../utils';
 import { Signer } from '../signing/index';
 import FileBundle from './FileBundle';
-import { performance } from 'perf_hooks';
+import FileDataItem from './FileDataItem';
 
 export async function bundleAndSignData(
-  dataItems: DataItemCreateOptions[],
+  dataItems: (DataItemCreateOptions | FileDataItem)[],
   signer: Signer,
+  dir?: string
 ): Promise<FileBundle> {
-  const headerFile = await file();
+  const headerFile = await file({ dir });
   const headerStream = fs.createWriteStream(headerFile.path);
   const files = new Array(dataItems.length);
 
-  let now = performance.now();
-  let count = 1;
   headerStream.write(longTo32ByteArray(dataItems.length));
   for (const [index, item] of dataItems.entries()) {
-    if (count % 1000 === 0) {
-      const now2 = performance.now();
-      console.log(`${count} - ${now2 - now}ms`);
-      now = now2;
+    let dataItem: FileDataItem;
+    if (FileDataItem.isDataItem(item)) {
+      dataItem = item as FileDataItem;
+      if (!dataItem.isSigned()) {
+        await dataItem.sign(signer);
+      }
+    } else {
+      dataItem = await createData(item, signer);
+      await dataItem.sign(signer);
     }
-    const dataItem = await createData(item, signer);
-    const id = await dataItem.sign(signer);
+
     files[index] = dataItem.filename;
-    headerStream.write(Buffer.concat([longTo32ByteArray(dataItem.size), id]));
-    count++;
+    headerStream.write(Buffer.concat([longTo32ByteArray(dataItem.size), dataItem.rawId]));
   }
 
   await new Promise(resolve => headerStream.end(resolve));

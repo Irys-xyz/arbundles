@@ -20,8 +20,20 @@ const arweave = Arweave.init({
   protocol: 'https'
 });
 
+arweave.wallets.ownerToAddress(wallet0.n)
+  .then(r => {
+    arweave.wallets.getBalance(r)
+      .then(console.log)
+  });
+
 describe('Creating and indexing a data item', function() {
   it('should create with all and get', async function() {
+    await arweave.wallets.ownerToAddress(wallet0.n)
+      .then(async (r) => {
+        await arweave.wallets.getBalance(r)
+          .then(w => console.log(arweave.ar.winstonToAr(w)))
+      });
+
     const _d: DataItemCreateOptions = {
       data: 'tasty',
       target: 'pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A',
@@ -196,7 +208,7 @@ describe('Creating and indexing a data item', function() {
       value: "image/png"
     }];
     const data = { data: await fs.promises.readFile("large_llama.png").then(r => Buffer.from(r.buffer)), tags };
-    const items = new Array(3000).fill(data);
+    const items = new Array(25_000).fill(data);
     let now = performance.now();
     const ids = [];
     for (let i = 0; i < 3000; i++) {
@@ -242,4 +254,37 @@ describe('Creating and indexing a data item', function() {
     expect(data.rawData.toString()).toEqual("hi");
     expect(await DataItem.verify(data.getRaw(), { pk: data.owner })).toEqual(true);
   });
+
+  it("Test unbundle", async function() {
+    const signer = new ArweaveSigner(wallet0);
+    const tags = [{
+      name: "Content-Type",
+      value: "image/png"
+    }];
+    const data = { data: await fs.promises.readFile("large_llama.png").then(r => r.buffer) as Buffer, tags };
+
+    const num = 10;
+    const items = new Array(num);
+
+    for (let i = 0; i < num; i++) {
+      items[i] = await createData(data, signer);
+    }
+    const bundle = await bundleAndSignData(items, signer);
+
+    console.log(bundle.verify());
+
+    const tx = await bundle.toTransaction(arweave, wallet0);
+
+    await arweave.transactions.sign(tx, wallet0);
+
+    console.log(tx.id);
+
+    const uploader = await arweave.transactions.getUploader(tx);
+
+    while (!uploader.isComplete) {
+      await uploader.uploadChunk();
+      console.log(`${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`);
+    }
+
+  }, 1000000)
 });
