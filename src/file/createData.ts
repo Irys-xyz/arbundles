@@ -2,7 +2,7 @@ import FileDataItem from './FileDataItem';
 import { DataItemCreateOptions } from '../ar-data-base';
 import { PathLike } from 'fs';
 import * as fs from 'fs';
-import { file } from 'tmp-promise';
+import { tmpName } from 'tmp-promise';
 import base64url from 'base64url';
 import assert from 'assert';
 import { Buffer } from 'buffer';
@@ -23,8 +23,9 @@ export async function createData(
   signer: Signer,
   createOpts?: CreateFileDataItemOptions
 ): Promise<FileDataItem> {
-  const filename = await file();
-  const stream = createOpts?.stream ?? fs.createWriteStream(filename.path);
+  const filename = await tmpName();
+
+  const stream = createOpts?.stream ?? fs.createWriteStream(filename);
 
   // TODO: Add asserts
   // Parse all values to a buffer and
@@ -70,7 +71,7 @@ export async function createData(
     stream.end(resolve);
   });
 
-  return new FileDataItem(filename.path);
+  return new FileDataItem(filename);
 }
 
 function singleItemBuffer(i: number): Buffer {

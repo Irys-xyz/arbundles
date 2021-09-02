@@ -24,16 +24,20 @@ export async function bundleAndSignData(
       if (!dataItem.isSigned()) {
         await dataItem.sign(signer);
       }
+      console.log(await dataItem.owner());
+      console.log(dataItem.id);
     } else {
-      dataItem = await createData(item, signer);
+      dataItem = await createData(item as DataItemCreateOptions, signer);
       await dataItem.sign(signer);
     }
 
     files[index] = dataItem.filename;
-    headerStream.write(Buffer.concat([longTo32ByteArray(dataItem.size), dataItem.rawId]));
+    headerStream.write(Buffer.concat([longTo32ByteArray(await dataItem.size()), dataItem.rawId]));
   }
 
   await new Promise(resolve => headerStream.end(resolve));
+
+  headerStream.close();
 
   return new FileBundle(headerFile.path, files);
 }

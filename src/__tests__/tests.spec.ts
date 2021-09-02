@@ -198,6 +198,7 @@ describe('Creating and indexing a data item', function() {
       { data: '4242' },
     ], signer);
 
+    console.log(bundle.getIds());
     expect(bundle.verify()).toEqual(true);
   });
 

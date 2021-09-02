@@ -1,20 +1,22 @@
 import { Signer } from './signing/Signer';
 import { Buffer } from 'buffer';
 
+type ResolvesTo<T> = T | Promise<T> | ((...args: any[]) => Promise<T>);
+
 export abstract class BundleItem {
-  readonly signatureType: number;
-  readonly rawSignature: Buffer;
-  readonly signature: string;
-  readonly rawOwner: Buffer;
-  readonly owner: string;
-  readonly rawTarget: Buffer;
-  readonly target: string;
-  readonly rawAnchor: Buffer;
-  readonly anchor: string;
-  readonly rawTags: Buffer;
-  readonly tags: { name: string, value: string }[];
-  readonly rawData: Buffer;
-  readonly data: string;
+  readonly signatureType: ResolvesTo<number>;
+  readonly rawSignature: ResolvesTo<Buffer>;
+  readonly signature: ResolvesTo<string>;
+  readonly rawOwner: ResolvesTo<Buffer>;
+  readonly owner: ResolvesTo<string>;
+  readonly rawTarget: ResolvesTo<Buffer>;
+  readonly target: ResolvesTo<string>;
+  readonly rawAnchor: ResolvesTo<Buffer>;
+  readonly anchor: ResolvesTo<string>;
+  readonly rawTags: ResolvesTo<Buffer>;
+  readonly tags: ResolvesTo<{ name: string, value: string }[]>;
+  readonly rawData: ResolvesTo<Buffer>;
+  readonly data: ResolvesTo<string>;
   abstract sign(signer: Signer): Promise<Buffer>;
   abstract isValid(): Promise<boolean>
   static async verify(..._: any[]): Promise<boolean> {
