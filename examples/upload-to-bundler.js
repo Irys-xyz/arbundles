@@ -5,7 +5,7 @@ const jwk = JSON.parse(fs.readFileSync("wallet.json").toString());
 
 const signer = new ArweaveSigner(jwk);
 
-const directory = "Archive";
+const directory = "your_directory_of_files_to_upload";
 
 const files = fs.readdirSync(directory);
 
