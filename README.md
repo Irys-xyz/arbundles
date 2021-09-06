@@ -87,7 +87,7 @@ await arweave.transactions.post(tx);
 ## Parse a bundle binary
 
 ```ts
-import { unbundleData } from "arbundles";
+import { Bundle } from "arbundles";
 
 const data = await arweave.transactions.getData("hKMMPNh_emBf8v_at1tFzNYACisyMQNcKzeeE1QE9p8");
 
