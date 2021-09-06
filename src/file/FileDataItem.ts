@@ -9,7 +9,6 @@ import { stringToBuffer } from 'arweave/web/lib/utils';
 import Arweave from 'arweave';
 import { promisify } from 'util';
 import { indexToType, Signer } from '../signing';
-import { Buffer } from 'buffer';
 
 const write = promisify(fs.write);
 const read = promisify(fs.read);
@@ -58,7 +57,10 @@ export default class FileDataItem implements BundleItem {
       .then(r => r.buffer);
     const anchorPresent = anchorPresentBuffer[0] === 1;
     let tagsStart = anchorStart;
-    tagsStart += anchorPresent ? 32 : 1;
+    if (anchorPresent) {
+      tagsStart += 32;
+    }
+    tagsStart++;
 
     const numberOfTags = await read(handle.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart)
       .then(r => byteArrayToLong(r.buffer));
@@ -83,6 +85,7 @@ export default class FileDataItem implements BundleItem {
     const anchor = anchorPresent ? await read(handle.fd, Buffer.allocUnsafe(32), 0, 32, anchorStart + 1)
       .then(r => r.buffer) : Buffer.allocUnsafe(0);
 
+
     const signatureData = await deepHash([
       stringToBuffer('dataitem'),
       stringToBuffer('1'),
@@ -93,6 +96,7 @@ export default class FileDataItem implements BundleItem {
       tagsBytes,
       fs.createReadStream(filename, { start: tagsStart + 16 + numberOfTagsBytes }),
     ]);
+
 
     const signature = await read(handle.fd, Buffer.allocUnsafe(512), 0, 512, 2)
       .then(r => r.buffer);
@@ -242,6 +246,16 @@ export default class FileDataItem implements BundleItem {
   async sign(signer: Signer): Promise<Buffer> {
     const dataStart = await this.dataStart();
     const end = await this.size();
+
+    console.log(base64url(Buffer.concat([
+      stringToBuffer('dataitem'),
+      stringToBuffer('1'),
+      stringToBuffer(await this.signatureType().then(n => n.toString())),
+      await this.rawOwner(),
+      await this.rawTarget(),
+      await this.rawAnchor(),
+      await this.rawTags()
+    ])));
     const signatureData = await deepHash([
       stringToBuffer('dataitem'),
       stringToBuffer('1'),
@@ -287,7 +301,7 @@ export default class FileDataItem implements BundleItem {
     return tagsStart;
   }
 
-  private async dataStart(): Promise<number> {
+  public async dataStart(): Promise<number> {
     const handle = await fs.promises.open(this.filename, 'r');
     const tagsStart = await this.tagsStart();
     const numberOfTagsBytesBuffer = await read(handle.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart + 8)

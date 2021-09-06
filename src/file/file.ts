@@ -78,8 +78,7 @@ interface DataItemHeader {
 export async function getHeaderAt(file: File, index: number): Promise<DataItemHeader> {
   const fd = await fileToFd(file);
 
-  const headerBuffer = await read(fd.fd, Buffer.alloc(64), 0, 64, 32 + (64 * index)).then(v => v.buffer)
-    .catch(_ => console.log("lol")) as Buffer;
+  const headerBuffer = await read(fd.fd, Buffer.alloc(64), 0, 64, 32 + (64 * index)).then(v => v.buffer);
   return {
     offset: byteArrayToLong(headerBuffer.subarray(0, 32)),
     id: base64url.encode(headerBuffer.subarray(32, 64))
@@ -89,7 +88,6 @@ export async function getHeaderAt(file: File, index: number): Promise<DataItemHe
 export async function* getHeaders(file: string): AsyncGenerator<DataItemHeader> {
 
   const count = await numberOfItems(file);
-  console.log(count);
   for (let i = 0; i<count; i++) {
     yield getHeaderAt(file, i);
   }
@@ -173,10 +171,8 @@ export async function getTags(file: File, options?: { offset: number }): Promise
   const anchorPresent = await read(fd.fd, Buffer.allocUnsafe(1), 0, 1, anchorPresentByte).then(value => value.buffer[0] == 1);
   tagsStart += anchorPresent ? 32 : 0;
 
-  console.log(tagsStart - offset);
   const numberOfTags = byteArrayToLong(await read(fd.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart).then(value => value.buffer));
 
-  console.log(numberOfTags);
   if (numberOfTags == 0) {
     return [];
   }

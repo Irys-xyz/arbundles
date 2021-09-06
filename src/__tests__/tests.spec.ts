@@ -28,36 +28,37 @@ arweave.wallets.ownerToAddress(wallet0.n)
 
 describe('Creating and indexing a data item', function() {
   it('should create with all and get', async function() {
-    await arweave.wallets.ownerToAddress(wallet0.n)
-      .then(async (r) => {
-        await arweave.wallets.getBalance(r)
-          .then(w => console.log(arweave.ar.winstonToAr(w)))
-      });
+    // await arweave.wallets.ownerToAddress(wallet0.n)
+    //   .then(async (r) => {
+    //     await arweave.wallets.getBalance(r)
+    //       .then(w => console.log(arweave.ar.winstonToAr(w)))
+    //   });
 
     const _d: DataItemCreateOptions = {
       data: 'tasty',
-      target: 'pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A',
-      anchor: 'Math.apt\'#]gng(36).substring(30)',
-      tags: [{
-        name: "testname",
-        value: "testvalue"
-      }]
+      anchor: 'Math.apt\'#]gng(36).substring(30)'
     };
 
     const signer = new ArweaveSigner(wallet0);
 
     const d = await createData(_d, signer);
     await d.sign(signer);
+
+    // const response = await d.sendToBundler().catch(console.log);
+    // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // // @ts-ignore
+    // console.log(response.status);
+
     expect(Buffer.from(d.rawData).toString()).toBe('tasty');
     expect(d.owner).toBe(wallet0.n);
-    expect(d.target).toBe('pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A');
+    expect(d.target).toBe('');
     expect(d.anchor).toEqual('Math.apt\'#]gng(36).substring(30)');
-    expect(d.tags).toEqual([{
-      name: "testname",
-      value: "testvalue"
-    }]);
-    expect(await DataItem.verify(d.getRaw(), { pk: wallet0.n })).toEqual(true);
-  });
+    expect(d.tags).toEqual([]);
+    expect(await DataItem.verify(d.getRaw())).toEqual(true);
+
+
+    console.log("yep");
+  }, 5000000);
 
   it('should create with no target and get', async function() {
     const _d: DataItemCreateOptions = {
@@ -81,7 +82,7 @@ describe('Creating and indexing a data item', function() {
       name: "testname",
       value: "testvalue"
     }]);
-    expect(await DataItem.verify(d.getRaw(), { pk: wallet0.n })).toEqual(true);
+    expect(await DataItem.verify(d.getRaw())).toEqual(true);
   });
 
   it('should create with no anchor and get', async function() {
@@ -106,7 +107,7 @@ describe('Creating and indexing a data item', function() {
       name: "testname",
       value: "testvalue"
     }]);
-    expect(await DataItem.verify(d.getRaw(), { pk: wallet0.n })).toEqual(true);
+    expect(await DataItem.verify(d.getRaw())).toEqual(true);
   });
 
   it('should create with no target or anchor and get', async function() {
@@ -130,7 +131,7 @@ describe('Creating and indexing a data item', function() {
       name: "testname",
       value: "testvalue"
     }]);
-    expect(await DataItem.verify(d.getRaw(), { pk: wallet0.n })).toEqual(true);
+    expect(await DataItem.verify(d.getRaw())).toEqual(true);
   });
 
 
@@ -218,6 +219,7 @@ describe('Creating and indexing a data item', function() {
         console.log(`${i} - ${now2 - now}ms`);
         now = now2;
       }      const item = await createData(data, signer);
+
       const id = base64url(await item.sign(signer));
       ids.push(id);
       items[i] = item;
@@ -253,18 +255,18 @@ describe('Creating and indexing a data item', function() {
     expect(data.tags).toEqual([{name: "", value: ""}]);
     expect(data.target).toEqual("");
     expect(data.rawData.toString()).toEqual("hi");
-    expect(await DataItem.verify(data.getRaw(), { pk: data.owner })).toEqual(true);
+    expect(await DataItem.verify(data.getRaw())).toEqual(true);
   });
 
   it("Test unbundle", async function() {
     const signer = new ArweaveSigner(wallet0);
     const tags = [{
       name: "Content-Type",
-      value: "image/png"
+      value: "text/html"
     }];
-    const data = { data: await fs.promises.readFile("large_llama.png").then(r => r.buffer) as Buffer, tags };
+    const data = { data: "hello", tags };
 
-    const num = 10000;
+    const num = 1;
     const items = new Array(num);
 
     for (let i = 0; i < num; i++) {

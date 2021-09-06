@@ -24,8 +24,6 @@ export async function bundleAndSignData(
       if (!dataItem.isSigned()) {
         await dataItem.sign(signer);
       }
-      console.log(await dataItem.owner());
-      console.log(dataItem.id);
     } else {
       dataItem = await createData(item as DataItemCreateOptions, signer);
       await dataItem.sign(signer);

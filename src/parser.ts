@@ -19,5 +19,12 @@ export async function serializeTags(tags: { name: string; value: string }[]): Pr
     return new Uint8Array(0);
   }
 
-  return Uint8Array.from(tagsParser.toBuffer(tags));
+  let tagsBuffer;
+  try {
+    tagsBuffer = tagsParser.toBuffer(tags);
+  } catch (e) {
+    throw new Error("Incorrect tag format used. Make sure your tags are { name: string!, name: string! }[]");
+  }
+
+  return Uint8Array.from(tagsBuffer);
 }

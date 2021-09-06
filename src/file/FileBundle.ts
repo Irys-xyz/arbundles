@@ -110,14 +110,6 @@ export default class FileBundle implements BundleInterface {
     ];
 
     const stream = MultiStream.obj(streams);
-    const streams3 = [
-      fs.createReadStream(this.headerFile),
-      ...this.txs.map(t => fs.createReadStream(t))
-    ];
-
-    const stream3 = MultiStream.obj(streams3);
-
-    console.log(await streamToBuffer(stream3).then(r => r.slice(-5)));
 
     const tx = await pipeline(
       stream,
@@ -138,9 +130,8 @@ export default class FileBundle implements BundleInterface {
 
     const stream2 = MultiStream.obj(streams2);
 
-    const uploadOp = await pipeline(stream2, uploadTransactionAsync(tx, arweave, true));
+    await pipeline(stream2, uploadTransactionAsync(tx, arweave, true));
 
-    console.log(uploadOp);
     return tx;
   }
 
@@ -185,13 +176,3 @@ export default class FileBundle implements BundleInterface {
   }
 }
 
-async function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
-  let b = Buffer.allocUnsafe(0);
-  stream.on("data", function(chunk) {
-    b = Buffer.concat([b, Buffer.from(chunk)]);
-  });
-
-  return new Promise(resolve => {
-    stream.on("end", () => resolve(b));
-  })
-}

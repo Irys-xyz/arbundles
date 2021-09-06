@@ -1,4 +1,5 @@
 import { bundleAndSignData, createData, FileDataItem } from '../file';
+import { createData as cd } from "../ar-data-create";
 import { readFileSync } from 'fs';
 import path from 'path';
 import ArweaveSigner from '../signing/chains/arweave/ArweaveSigner';
@@ -6,8 +7,6 @@ import sizeof from 'object-sizeof';
 import * as fs from 'fs';
 import DataItem from '../DataItem';
 import Arweave from 'arweave';
-import crypto, { constants } from 'crypto';
-import { jwkTopem } from 'arweave/node/lib/crypto/pem';
 
 const arweave = Arweave.init({
   host: 'arweave.net',
@@ -28,27 +27,41 @@ arweave.wallets.getAddress(wallet0)
 
 
 describe("file tests", function() {
-  it("should get all correct data", async function() {
-    const pem = jwkTopem(wallet0);
-    console.log(crypto
-      .createSign('sha256')
-      .update('hi')
-      .sign({
-        key: pem,
-        padding: constants.RSA_PKCS1_PSS_PADDING,
-      }));
+  it("should verify ts file", async function() {
     const signer = new ArweaveSigner(wallet0);
-    const d = { data: "hi", tags: [{name: "", value: ""}] };
+    const d = { data: fs.readFileSync("Archive/bundler.d.ts") };
+    const data = await createData(d, signer);
+    await data.sign(signer);
+
+    expect(await FileDataItem.verify(data.filename)).toBe(true);
+  });
+
+  it("should get all correct data", async function() {
+    const signer = new ArweaveSigner(wallet0);
+    const d = {
+      data: 'tasty',
+    }
 
     const data = await createData(d, signer);
     await data.sign(signer);
+
+    console.log(await data.owner());
+
+    console.log(await DataItem.verify(fs.readFileSync(data.filename)));
+
+    const im = await cd(d, signer);
+    await im.sign(signer);
+
+    expect(fs.readFileSync(data.filename).slice(514)).toEqual(im.getRaw().slice(514));
+
+    expect(await data.isValid()).toBe(true);
     console.log(await data.signature());
     expect(await data.signatureType()).toEqual(1);
     expect(await data.owner()).toEqual(wallet0.n);
     expect(await data.anchor()).toEqual("");
-    expect(await data.tags()).toEqual([{name: "", value: ""}]);
+    expect(await data.tags()).toEqual([]);
     expect(await data.target()).toEqual("");
-    expect((await data.rawData()).toString()).toEqual("hi");
+    expect((await data.rawData()).toString()).toEqual("tasty");
     expect(await FileDataItem.verify(data.filename)).toEqual(true);
   });
 
@@ -62,6 +75,10 @@ describe("file tests", function() {
     const d = new Array(5).fill(data);
     const bundle = await bundleAndSignData(d, signer);
     console.log(sizeof(bundle));
+
+    const tx = await bundle.toTransaction(arweave, wallet0);
+
+    console.log(tx.data_size);
 
     console.log(await bundle.getIds());
     const first = await bundle.get(0);
@@ -138,11 +155,10 @@ describe("file tests", function() {
     const bundle = await bundleAndSignData([d], signer);
 
     const _tx = await bundle.toTransaction(arweave, wallet0);
-    console.log(_tx);
-    const tx = await bundle.signAndSubmit(arweave, wallet0);
 
-    console.log(tx.id);
+    _tx.reward = (+_tx.reward * 2).toString();
 
-    console.log(await arweave.transactions.post(tx));
+    await arweave.transactions.sign(_tx, wallet0);
+
   })
 })

@@ -1,12 +1,14 @@
-import { byteArrayToLong } from './utils';
-import { tagsParser } from './parser';
-import base64url from 'base64url';
-import { Buffer } from 'buffer';
-import { sign } from './ar-data-bundle';
-import { BundleItem } from './BundleItem';
-import { Signer } from './signing/index';
-import { indexToType } from './signing/index';
-import { getSignatureData } from './ar-data-base';
+import { byteArrayToLong } from "./utils";
+import { tagsParser } from "./parser";
+import base64url from "base64url";
+import { Buffer } from "buffer";
+import { sign } from "./ar-data-bundle";
+import { BundleItem } from "./BundleItem";
+import { Signer } from "./signing/index";
+import { indexToType } from "./signing/index";
+import { getSignatureData } from "./ar-data-base";
+import axios, { AxiosResponse } from "axios";
+import { BUNDLER } from './constants';
 
 export const MIN_BINARY_SIZE = 1044;
 
@@ -39,6 +41,9 @@ export default class DataItem implements BundleItem {
   }
 
   get rawId(): Buffer {
+    if (!this._id) {
+      throw new Error("To get the data item id you must sign the item first");
+    }
     return this._id;
   }
 
@@ -159,13 +164,26 @@ export default class DataItem implements BundleItem {
     };
   }
 
+  public async sendToBundler(): Promise<AxiosResponse> {
+    const headers = {
+      "Content-Type": "application/octet-stream"
+    };
+
+    if (!this.isSigned()) throw new Error("You must sign before sending to bundler");
+    return await axios.post(`${BUNDLER}/tx`, this.getRaw(), {
+      headers,
+      timeout: 200000,
+      maxBodyLength: Infinity,
+    })
+  }
+
   /**
    * Verifies a `Buffer` and checks it fits the format of a DataItem
    *
    * A binary is valid iff:
    * - the tags are encoded correctly
    */
-  static async verify(buffer: Buffer, extras?: { pk: string | Buffer }): Promise<boolean> {
+  static async verify(buffer: Buffer): Promise<boolean> {
     if (buffer.length < MIN_BINARY_SIZE) {
       return false;
     }
@@ -193,15 +211,12 @@ export default class DataItem implements BundleItem {
       }
     }
 
-    if (extras) {
-      const Signer = indexToType[sigType];
+    const Signer = indexToType[sigType];
 
-      const signatureData = await getSignatureData(new DataItem(buffer));
+    const item = new DataItem(buffer);
+    const signatureData = await getSignatureData(item);
 
-      if (!await Signer.verify(extras.pk, signatureData, buffer.subarray(2, 514))) return false;
-    }
-
-    return true;
+    return await Signer.verify(item.owner, signatureData, buffer.subarray(2, 514));
   }
 
   /**
