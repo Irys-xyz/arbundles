@@ -19,6 +19,7 @@ export async function getSignatureData(item: DataItem): Promise<Uint8Array> {
     return web.default([
       stringToBuffer("dataitem"),
       stringToBuffer("1"),
+      stringToBuffer(item.signatureType.toString()),
       item.rawOwner,
       item.rawTarget,
       item.rawAnchor,
@@ -29,6 +30,7 @@ export async function getSignatureData(item: DataItem): Promise<Uint8Array> {
     return deepHash([
       stringToBuffer("dataitem"),
       stringToBuffer("1"),
+      stringToBuffer(item.signatureType.toString()),
       item.rawOwner,
       item.rawTarget,
       item.rawAnchor,

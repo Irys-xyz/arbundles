@@ -31,5 +31,7 @@ build/
 *.lock
 package-lock.json
 
-file/
+file/**/*
+
 stream/
+lib/
