@@ -9,6 +9,7 @@ import sizeof from 'object-sizeof';
 import { performance } from 'perf_hooks';
 import base64url from 'base64url';
 import Arweave from 'arweave';
+import { FileDataItem } from '../file';
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, 'test_key0.json')).toString(),
@@ -44,6 +45,11 @@ describe('Creating and indexing a data item', function() {
     const d = await createData(_d, signer);
     await d.sign(signer);
 
+    fs.writeFileSync("test", d.getRaw());
+
+    const item = new FileDataItem("test");
+    console.log(await item.isValid());
+
     // const response = await d.sendToBundler().catch(console.log);
     // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // // @ts-ignore
@@ -57,7 +63,8 @@ describe('Creating and indexing a data item', function() {
     expect(await DataItem.verify(d.getRaw())).toEqual(true);
 
 
-    console.log("yep");
+  const response = await d.sendToBundler();
+    console.log(response.status);
   }, 5000000);
 
   it('should create with no target and get', async function() {
