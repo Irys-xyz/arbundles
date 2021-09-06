@@ -221,18 +221,14 @@ export default class FileDataItem implements BundleItem {
   }
 
   async rawData(): Promise<Buffer> {
-    const handle = await fs.promises.open(this.filename, 'r');
-    const tagsStart = await this.tagsStart();
-    const numberOfTagsBytesBuffer = await read(handle.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart + 8)
-      .then(r => r.buffer);
-    const numberOfTagsBytes = byteArrayToLong(numberOfTagsBytesBuffer);
-    const dataStart = tagsStart + 16 + numberOfTagsBytes;
+    const dataStart = await this.dataStart();
     const size = await this.size();
     const dataSize = size - dataStart;
     if (dataSize === 0) {
-      await handle.close();
       return Buffer.allocUnsafe(0);
     }
+    const handle = await fs.promises.open(this.filename, "r");
+
     const dataBuffer = await read(handle.fd, Buffer.allocUnsafe(dataSize), 0, dataSize, dataStart)
       .then(r => r.buffer);
     await handle.close();
@@ -247,15 +243,6 @@ export default class FileDataItem implements BundleItem {
     const dataStart = await this.dataStart();
     const end = await this.size();
 
-    console.log(base64url(Buffer.concat([
-      stringToBuffer('dataitem'),
-      stringToBuffer('1'),
-      stringToBuffer(await this.signatureType().then(n => n.toString())),
-      await this.rawOwner(),
-      await this.rawTarget(),
-      await this.rawAnchor(),
-      await this.rawTags()
-    ])));
     const signatureData = await deepHash([
       stringToBuffer('dataitem'),
       stringToBuffer('1'),
@@ -308,6 +295,6 @@ export default class FileDataItem implements BundleItem {
       .then(r => r.buffer);
     const numberOfTagsBytes = byteArrayToLong(numberOfTagsBytesBuffer);
     await handle.close();
-    return tagsStart + 16 + numberOfTagsBytes;
+    return tagsStart + 16 + numberOfTagsBytes + 1;
   }
 }

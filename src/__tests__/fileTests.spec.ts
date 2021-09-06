@@ -1,5 +1,4 @@
 import { bundleAndSignData, createData, FileDataItem } from '../file';
-import { createData as cd } from "../ar-data-create";
 import { readFileSync } from 'fs';
 import path from 'path';
 import ArweaveSigner from '../signing/chains/arweave/ArweaveSigner';
@@ -40,25 +39,18 @@ describe("file tests", function() {
     const signer = new ArweaveSigner(wallet0);
     const d = {
       data: 'tasty',
+      anchor: "fgggggggggggggggggggggggggllllll"
     }
 
     const data = await createData(d, signer);
     await data.sign(signer);
 
-    console.log(await data.owner());
-
     console.log(await DataItem.verify(fs.readFileSync(data.filename)));
 
-    const im = await cd(d, signer);
-    await im.sign(signer);
-
-    expect(fs.readFileSync(data.filename).slice(514)).toEqual(im.getRaw().slice(514));
-
     expect(await data.isValid()).toBe(true);
-    console.log(await data.signature());
     expect(await data.signatureType()).toEqual(1);
     expect(await data.owner()).toEqual(wallet0.n);
-    expect(await data.anchor()).toEqual("");
+    expect(await data.rawAnchor().then(r => r.toString())).toEqual("fgggggggggggggggggggggggggllllll");
     expect(await data.tags()).toEqual([]);
     expect(await data.target()).toEqual("");
     expect((await data.rawData()).toString()).toEqual("tasty");
