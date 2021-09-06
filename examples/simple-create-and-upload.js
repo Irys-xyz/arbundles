@@ -5,7 +5,7 @@ import { ArweaveSigner, bundleAndSignData } from "arbundles";
 const jwk = JSON.parse(fs.readFileSync("keyfile.json").toString());
 
 const arweave = Arweave.init({
-    host: 'arweave.dev',
+    host: 'arweave.net',
     port: 443,
     protocol: 'https'
 });
