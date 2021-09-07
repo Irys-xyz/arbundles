@@ -10,9 +10,7 @@ const directory = "Archive";
 const files = fs.readdirSync(directory);
 
 for (const file of files) {
-  const data = {
-    data: fs.readFileSync(`${directory}/${file}`)
-  };
+  const data = fs.readFileSync(`${directory}/${file}`);
 
   const item = await createData(data, signer);
 

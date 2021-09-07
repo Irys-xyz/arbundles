@@ -4,7 +4,7 @@ import base64url from "base64url";
 import { longTo8ByteArray, shortTo2ByteArray } from "./utils";
 import DataItem from "./DataItem";
 import { serializeTags } from "./parser";
-import { Signer } from "./signing/Signer";
+import { Signer } from './signing';
 
 const EMPTY_ARRAY = new Array(512).fill(0);
 const OWNER_LENGTH = 512;
@@ -12,13 +12,14 @@ const OWNER_LENGTH = 512;
 /**
  * This will create a single DataItem in binary format (Uint8Array)
  *
+ * @param data
  * @param opts - Options involved in creating data items
  * @param signer
  */
 export function createData(
   data: string | Uint8Array,
-  opts: DataItemCreateOptions,
-  signer: Signer
+  signer: Signer,
+  opts?: DataItemCreateOptions,
 ): DataItem {
   // TODO: Add asserts
   // Parse all values to a buffer and
@@ -28,11 +29,11 @@ export function createData(
     new Error(`Public key isn't the correct length: ${_owner.byteLength}`)
   );
 
-  const _target = opts.target ? base64url.toBuffer(opts.target) : null;
+  const _target = opts?.target ? base64url.toBuffer(opts.target) : null;
   const target_length = 1 + (_target?.byteLength ?? 0);
-  const _anchor = opts.anchor ? Buffer.from(opts.anchor) : null;
+  const _anchor = opts?.anchor ? Buffer.from(opts.anchor) : null;
   const anchor_length = 1 + (_anchor?.byteLength ?? 0);
-  const _tags = (opts.tags?.length ?? 0) > 0 ? serializeTags(opts.tags) : null;
+  const _tags = (opts?.tags?.length ?? 0) > 0 ? serializeTags(opts.tags) : null;
   const tags_length = 16 + (_tags ? _tags.byteLength : 0);
   const _data =
     typeof data === "string" ? Buffer.from(data) : Buffer.from(data);
@@ -79,9 +80,7 @@ export function createData(
     bytes.set(_anchor, anchor_start + 1);
   }
 
-  // TODO: Shall I manually add 8 bytes?
-  // TODO: Finish this
-  bytes.set(longTo8ByteArray(opts.tags?.length ?? 0), tags_start);
+  bytes.set(longTo8ByteArray(opts?.tags?.length ?? 0), tags_start);
   const bytesCount = longTo8ByteArray(_tags?.byteLength ?? 0);
   bytes.set(bytesCount, tags_start + 8);
   if (_tags) {

@@ -15,9 +15,12 @@ const myTags = [
     { name: 'App-Version', value: '1.0.0' }
 ];
 
-const d = [{ data: 'somemessage', tags: myTags }, { data: 'somemessage2' }];
-
 const signer = new ArweaveSigner(jwk);
+
+const d = [
+  createData("hello", signer, { tags: myTags }),
+  createData("world", signer),
+]
 
 const myBundle = await bundleAndSignData(d, signer);
 

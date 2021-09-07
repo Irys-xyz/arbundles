@@ -8,7 +8,10 @@ import deepHash from './deepHash';
  * Options for creation of a DataItem
  */
 export interface DataItemCreateOptions {
-  data: never; // breaking api change, should get the message across
+  /**
+   * @deprecated
+   */
+  data?: never; // breaking api change, should get the message across
   target?: string;
   anchor?: string;
   tags?: { name: string; value: string }[];

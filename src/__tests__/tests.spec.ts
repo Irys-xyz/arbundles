@@ -34,13 +34,12 @@ describe("Creating and indexing a data item", function () {
     //   });
 
     const _d: DataItemCreateOptions = {
-      data: "tasty",
       anchor: "Math.apt'#]gng(36).substring(30)",
     };
 
     const signer = new ArweaveSigner(wallet0);
 
-    const d = await createData(_d, signer);
+    const d = await createData("tasty", signer, _d);
     await d.sign(signer);
 
     fs.writeFileSync("test", d.getRaw());
@@ -66,7 +65,6 @@ describe("Creating and indexing a data item", function () {
 
   it("should create with no target and get", async function () {
     const _d: DataItemCreateOptions = {
-      data: "tasty",
       anchor: "Math.apt'#]gng(36).substring(30)",
       tags: [
         {
@@ -78,7 +76,7 @@ describe("Creating and indexing a data item", function () {
 
     const signer = new ArweaveSigner(wallet0);
 
-    const d = await createData(_d, signer);
+    const d = await createData("tasty", signer, _d);
     await d.sign(signer);
     expect(Buffer.from(d.rawData).toString()).toBe("tasty");
     expect(d.owner).toBe(wallet0.n);
@@ -95,7 +93,6 @@ describe("Creating and indexing a data item", function () {
 
   it("should create with no anchor and get", async function () {
     const _d: DataItemCreateOptions = {
-      data: "tasty",
       target: "pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A",
       tags: [
         {
@@ -107,7 +104,7 @@ describe("Creating and indexing a data item", function () {
 
     const signer = new ArweaveSigner(wallet0);
 
-    const d = await createData(_d, signer);
+    const d = await createData("tasty", signer, _d);
     await d.sign(signer);
     expect(Buffer.from(d.rawData).toString()).toBe("tasty");
     expect(d.owner).toBe(wallet0.n);
@@ -124,7 +121,6 @@ describe("Creating and indexing a data item", function () {
 
   it("should create with no target or anchor and get", async function () {
     const _d: DataItemCreateOptions = {
-      data: "tasty",
       tags: [
         {
           name: "testname",
@@ -135,7 +131,7 @@ describe("Creating and indexing a data item", function () {
 
     const signer = new ArweaveSigner(wallet0);
 
-    const d = await createData(_d, signer);
+    const d = await createData("tasty", signer, _d);
     await d.sign(signer);
     expect(Buffer.from(d.rawData).toString()).toBe("tasty");
     expect(d.owner).toBe(wallet0.n);
@@ -152,13 +148,15 @@ describe("Creating and indexing a data item", function () {
 
   it("Test Bundle", async function () {
     const signer = new ArweaveSigner(wallet0);
-    const _dataItems: DataItemCreateOptions[] = [
-      {
-        data: "tasty",
+    const _dataItems = [
+      createData(
+        "tasty",
+        signer,
+        {
         target: "pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A",
         anchor: "Math.randomgng(36).substring(30)",
         tags: [{ name: "x", value: "y" }],
-      },
+      }),
     ];
 
     const bundle = await bundleAndSignData(_dataItems, signer);
@@ -179,7 +177,7 @@ describe("Creating and indexing a data item", function () {
   it("Test bugs", async function () {
     const signer = new ArweaveSigner(wallet0);
     const bundle = await bundleAndSignData(
-      [{ data: "1984" }, { data: "4242" }],
+      [createData("1894", signer), createData("4242", signer)],
       signer
     );
 
@@ -189,7 +187,6 @@ describe("Creating and indexing a data item", function () {
   it("Test file verification", async function () {
     const signer = new ArweaveSigner(wallet0);
     const _d: DataItemCreateOptions = {
-      data: "tasty",
       anchor: "Math.apt'#]gng(36).substring(30)",
       tags: [
         {
@@ -199,7 +196,7 @@ describe("Creating and indexing a data item", function () {
       ],
     };
 
-    const d = await createData(_d, signer);
+    const d = await createData("tasty", signer, _d);
     await d.sign(signer);
     const binary = d.getRaw();
     fs.writeFileSync("test", binary);
@@ -215,11 +212,15 @@ describe("Creating and indexing a data item", function () {
 
   it("should verify", async function () {
     const signer = new ArweaveSigner(wallet0);
+
+    const tags = [{ name: "gdf", value: "gfgdf" }];
+
+    const items = [
+      createData("1984", signer, { tags }),
+      createData("4242", signer)
+    ]
     const bundle = await bundleAndSignData(
-      [
-        { data: "1984", tags: [{ name: "gdf", value: "gfgdf" }] },
-        { data: "4242" },
-      ],
+      items,
       signer
     );
 
@@ -236,9 +237,6 @@ describe("Creating and indexing a data item", function () {
       },
     ];
     const data = {
-      data: await fs.promises
-        .readFile("large_llama.png")
-        .then((r) => Buffer.from(r.buffer)),
       tags,
     };
     const items = new Array(25_000).fill(data);
@@ -250,7 +248,13 @@ describe("Creating and indexing a data item", function () {
         console.log(`${i} - ${now2 - now}ms`);
         now = now2;
       }
-      const item = await createData(data, signer);
+      const item = await createData(
+        await fs.promises
+          .readFile("large_llama.png")
+          .then((r) => Buffer.from(r.buffer)),
+        signer,
+        data
+      );
 
       const id = base64url(await item.sign(signer));
       ids.push(id);
@@ -278,9 +282,9 @@ describe("Creating and indexing a data item", function () {
 
   it("should get all correct data", async function () {
     const signer = new ArweaveSigner(wallet0);
-    const d = { data: "hi", tags: [{ name: "", value: "" }] };
+    const d = { tags: [{ name: "", value: "" }] };
 
-    const data = await createData(d, signer);
+    const data = await createData("hi", signer, d);
     console.log(data.getRaw().length);
     await data.sign(signer);
     expect(data.signatureType).toEqual(1);
@@ -300,13 +304,13 @@ describe("Creating and indexing a data item", function () {
         value: "text/html",
       },
     ];
-    const data = { data: "hello", tags };
+    const data = { tags };
 
     const num = 1;
     const items = new Array(num);
 
     for (let i = 0; i < num; i++) {
-      items[i] = await createData(data, signer);
+      items[i] = await createData("hello", signer, data);
     }
     const bundle = await bundleAndSignData(items, signer);
 
