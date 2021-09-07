@@ -1,11 +1,10 @@
-import { DataItemCreateOptions, getSignatureData } from "./ar-data-base";
-import { createData } from "./ar-data-create";
-import { longTo32ByteArray } from "./utils";
-import DataItem from "./DataItem";
-import Arweave from "arweave";
-import Bundle from "./Bundle";
-import { Buffer } from "buffer";
-import { Signer } from "./signing/Signer";
+import { getSignatureData } from './ar-data-base';
+import { longTo32ByteArray } from './utils';
+import DataItem from './DataItem';
+import Arweave from 'arweave';
+import Bundle from './Bundle';
+import { Buffer } from 'buffer';
+import { Signer } from './signing/Signer';
 
 /**
  * Unbundles a transaction into an Array of DataItems.
@@ -32,17 +31,13 @@ export function unbundleData(txData: Buffer): Bundle {
  * @param jwk
  */
 export async function bundleAndSignData(
-  dataItems: (DataItemCreateOptions | DataItem)[],
-  signer: Signer
+  dataItems: DataItem[],
+  signer: Signer,
 ): Promise<Bundle> {
   const headers = new Uint8Array(64 * dataItems.length);
 
   const binaries = await Promise.all(
-    dataItems.map(async (di, index) => {
-      // Create DataItem
-      const d = DataItem.isDataItem(di)
-        ? (di as DataItem)
-        : await createData(di.data, di as DataItemCreateOptions, signer);
+    dataItems.map(async (d, index) => {
       // Sign DataItem
       const id = d.isSigned() ? d.rawId : await sign(d, signer);
       // Create header array
@@ -56,7 +51,7 @@ export async function bundleAndSignData(
       // Convert to array for flattening
       const raw = d.getRaw();
       return Array.from(raw);
-    })
+    }),
   ).then((a) => {
     return a.flat();
   });
@@ -79,7 +74,7 @@ export async function bundleAndSignData(
  */
 export async function getSignatureAndId(
   item: DataItem,
-  signer: Signer
+  signer: Signer,
 ): Promise<{ signature: Buffer; id: Buffer }> {
   const signatureData = await getSignatureData(item);
   const signatureBytes = await signer.sign(signatureData);
