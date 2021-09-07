@@ -12,7 +12,7 @@ const files = fs.readdirSync(directory);
 for (const file of files) {
   const data = fs.readFileSync(`${directory}/${file}`);
 
-  const item = await createData(data, signer);
+  const item = createData(data, signer);
 
   await item.sign(signer);
 
