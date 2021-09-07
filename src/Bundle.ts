@@ -11,44 +11,13 @@ const HEADER_START = 32;
 export default class Bundle implements BundleInterface {
   readonly binary: Buffer;
 
-  constructor(binary: Buffer, verify = false) {
-    // TODO: Add some verification
-    if (verify) {
-      if (!Bundle._verify(binary)) throw new Error("Binary not valid bundle");
-    }
-
+  constructor(binary: Buffer) {
     this.binary = binary;
   }
 
   public get length(): number { return this.getDataItemCount(); }
-
-  get items(): DataItem[] {
-    const items = new Array(this.length);
-    let offset = 0;
-    const bundleStart = this.getBundleStart();
-
-    let counter = 0;
-    for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
-      const _offset = byteArrayToLong(this.binary.subarray(i, i + 32))
-      const _id = this.binary.subarray(i + 32, i + 64);
-
-      const dataItemStart = bundleStart + offset;
-      const bytes = this.binary.subarray(dataItemStart, dataItemStart + _offset);
-
-      offset += _offset;
-
-      const item = new DataItem(bytes);
-      item.rawId = _id;
-      items[counter] = item;
-
-      counter++;
-    }
-    return items;
-  }
-
-  public getRaw(): Buffer {
-    return this.binary;
-  }
+  public get items(): DataItem[] { return this.getItems(); }
+  public getRaw(): Buffer { return this.binary; }
 
   /**
    * Get a DataItem by index (`number`) or by txId (`string`)
@@ -93,25 +62,12 @@ export default class Bundle implements BundleInterface {
     return tx;
   }
 
-  public verify(): boolean {
-    return Bundle._verify(this.binary);
-  }
+  public async verify(): Promise<boolean> {
+    const items = this.getItems();
 
-  private static _verify(binary: Buffer): boolean {
-    const length = byteArrayToLong(binary.subarray(0, 32));
-    let offset = 32 + (64 * length);
-    for (let i = HEADER_START; i < (HEADER_START + (64 * length)); i+=64) {
-      const _offset = byteArrayToLong(binary.subarray(i, i + 32));
+    const validity = await Promise.all(items.map(item => item.isValid()))
 
-      const item = new DataItem(binary.subarray(offset, offset + _offset));
-      if (!item.isValid()) {
-        return false;
-      }
-
-      offset += _offset;
-    }
-
-    return true;
+    return validity.every(valid => valid === true)
   }
 
   private getOffset(id: Uint8Array): { startOffset: number, size: number } {
@@ -180,5 +136,29 @@ export default class Bundle implements BundleInterface {
 
   private getBundleStart(): number {
     return 32 + (64 * this.length);
+  }
+
+  private getItems(): DataItem[] {
+    const items = new Array(this.length);
+    let offset = 0;
+    const bundleStart = this.getBundleStart();
+
+    let counter = 0;
+    for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
+      const _offset = byteArrayToLong(this.binary.subarray(i, i + 32))
+      const _id = this.binary.subarray(i + 32, i + 64);
+
+      const dataItemStart = bundleStart + offset;
+      const bytes = this.binary.subarray(dataItemStart, dataItemStart + _offset);
+
+      offset += _offset;
+
+      const item = new DataItem(bytes);
+      item.rawId = _id;
+      items[counter] = item;
+
+      counter++;
+    }
+    return items;
   }
 }
