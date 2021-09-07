@@ -20,11 +20,11 @@ Using yarn:
 ## Creating bundles
 
 ```ts
-import { bundleAndSignData } from "arbundles";
+import { bundleAndSignData, createData } from "arbundles";
 
 const dataItems = [
-  { data: "some data" },
-  { data: "some other data" },
+  createData("some data"),
+  createData("some other data")
 ];
 
 const signer = new ArweaveSigner(jwk);
@@ -34,16 +34,14 @@ const bundle = await bundleAndSignData(dataItems, jwk);
 
 It's as simple as that! All the binary encoding is handled for you.
 
-## Creating and using a DataItem
+## Creating and sending data to a Bundler
 
 ```ts
 import { createData } from "arbundles";
 
-const data = { data: "some data" };
-
 const signer = new ArweaveSigner(jwk);
 
-const dataItem = await createData(data, signer);
+const dataItem = createData("some message", signer);
 
 // Get owner in base64url encoded string
 const owner = dataItem.owner;
@@ -51,7 +49,7 @@ const owner = dataItem.owner;
 // Sign a single DataItem 
 await dataItem.sign(jwk);
 
-assert(owner == jwk.n);
+const response = dataItem.sendToBundler();
 ```
 
 ## Get a DataItem in a bundle
