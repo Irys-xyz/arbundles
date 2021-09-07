@@ -1,19 +1,22 @@
-import { BundleInterface } from '../BundleInterface';
-import FileDataItem from './FileDataItem';
-import { PathLike } from 'fs';
-import * as fs from 'fs';
-import { byteArrayToLong } from '../utils';
-import Arweave from 'arweave';
-import Transaction from 'arweave/node/lib/transaction';
-import MultiStream from 'multistream';
+import { BundleInterface } from "../BundleInterface";
+import FileDataItem from "./FileDataItem";
+import { PathLike } from "fs";
+import * as fs from "fs";
+import { byteArrayToLong } from "../utils";
+import Arweave from "arweave";
+import Transaction from "arweave/node/lib/transaction";
+import MultiStream from "multistream";
 // import { pipeline } from 'stream/promises';
 // import { createTransactionAsync } from 'arweave-stream';
-import { JWKInterface } from '../interface-jwk';
-import { promisify } from 'util';
-import base64url from 'base64url';
-import { pipeline } from 'stream/promises';
+import { JWKInterface } from "../interface-jwk";
+import { promisify } from "util";
+import base64url from "base64url";
+import { pipeline } from "stream/promises";
 
-import { createTransactionAsync, uploadTransactionAsync } from 'arweave-stream-tx';
+import {
+  createTransactionAsync,
+  uploadTransactionAsync,
+} from "arweave-stream-tx";
 // import { Readable } from 'stream';
 // import { createTransactionAsync } from 'arweave-stream';
 // import { pipeline } from 'stream/promises';
@@ -29,14 +32,25 @@ export default class FileBundle implements BundleInterface {
   }
 
   static async fromDir(dir: string): Promise<FileBundle> {
-    const txs = await fs.promises.readdir(dir).then(r => r.filter(async (f) => !await fs.promises.stat(f).then(s => s.isDirectory())));
+    const txs = await fs.promises
+      .readdir(dir)
+      .then((r) =>
+        r.filter(
+          async (f) => !(await fs.promises.stat(f).then((s) => s.isDirectory()))
+        )
+      );
     return new FileBundle(dir + "/header", txs);
   }
 
   async length(): Promise<number> {
     const handle = await fs.promises.open(this.headerFile, "r");
-    const lengthBuffer = await read(handle.fd, Buffer.allocUnsafe(32), 0, 32, 0)
-      .then(r => r.buffer);
+    const lengthBuffer = await read(
+      handle.fd,
+      Buffer.allocUnsafe(32),
+      0,
+      32,
+      0
+    ).then((r) => r.buffer);
     await handle.close();
     return byteArrayToLong(lengthBuffer);
   }
@@ -47,7 +61,7 @@ export default class FileBundle implements BundleInterface {
 
   async get(index: number | string): Promise<FileDataItem> {
     if (typeof index === "number") {
-      if (index > await this.length()) {
+      if (index > (await this.length())) {
         throw new RangeError("Index out of range");
       }
 
@@ -70,7 +84,7 @@ export default class FileBundle implements BundleInterface {
   async getRaw(): Promise<Buffer> {
     const streams = [
       fs.createReadStream(this.headerFile),
-      ...this.txs.map(t => fs.createReadStream(t))
+      ...this.txs.map((t) => fs.createReadStream(t)),
     ];
 
     const stream = MultiStream.obj(streams);
@@ -78,24 +92,24 @@ export default class FileBundle implements BundleInterface {
     let buff = Buffer.allocUnsafe(0);
 
     for await (const chunk of stream) {
-      buff = Buffer.concat([buff, Buffer.from(chunk)])
+      buff = Buffer.concat([buff, Buffer.from(chunk)]);
     }
 
     return buff;
   }
 
-  async toTransaction(arweave: Arweave, jwk: JWKInterface): Promise<Transaction> {
+  async toTransaction(
+    arweave: Arweave,
+    jwk: JWKInterface
+  ): Promise<Transaction> {
     const streams = [
       fs.createReadStream(this.headerFile),
-      ...this.txs.map(t => fs.createReadStream(t))
+      ...this.txs.map((t) => fs.createReadStream(t)),
     ];
 
     const stream = MultiStream.obj(streams);
 
-    const tx = await pipeline(
-      stream,
-      createTransactionAsync({}, arweave, jwk)
-    );
+    const tx = await pipeline(stream, createTransactionAsync({}, arweave, jwk));
     tx.addTag("Bundle-Format", "binary");
     tx.addTag("Bundle-Version", "2.0.0");
 
@@ -103,18 +117,19 @@ export default class FileBundle implements BundleInterface {
     return tx;
   }
 
-  async signAndSubmit(arweave: Arweave, jwk: JWKInterface, tags: { name: string, value: string }[] = []): Promise<Transaction> {
+  async signAndSubmit(
+    arweave: Arweave,
+    jwk: JWKInterface,
+    tags: { name: string; value: string }[] = []
+  ): Promise<Transaction> {
     const streams = [
       fs.createReadStream(this.headerFile),
-      ...this.txs.map(t => fs.createReadStream(t))
+      ...this.txs.map((t) => fs.createReadStream(t)),
     ];
 
     const stream = MultiStream.obj(streams);
 
-    const tx = await pipeline(
-      stream,
-      createTransactionAsync({}, arweave, jwk)
-    );
+    const tx = await pipeline(stream, createTransactionAsync({}, arweave, jwk));
     tx.addTag("Bundle-Format", "binary");
     tx.addTag("Bundle-Version", "2.0.0");
     for (const { name, value } of tags) {
@@ -125,7 +140,7 @@ export default class FileBundle implements BundleInterface {
 
     const streams2 = [
       fs.createReadStream(this.headerFile),
-      ...this.txs.map(t => fs.createReadStream(t))
+      ...this.txs.map((t) => fs.createReadStream(t)),
     ];
 
     const stream2 = MultiStream.obj(streams2);
@@ -135,18 +150,28 @@ export default class FileBundle implements BundleInterface {
     return tx;
   }
 
-  public async* getHeaders(): AsyncGenerator<{ offset: number, id: string }> {
+  public async *getHeaders(): AsyncGenerator<{ offset: number; id: string }> {
     const handle = await fs.promises.open(this.headerFile, "r");
-    for (let i = 32; i<(32 + 64*await this.length()); i+=64) {
+    for (let i = 32; i < 32 + 64 * (await this.length()); i += 64) {
       yield {
-        offset: byteArrayToLong(await read(handle.fd, Buffer.allocUnsafe(32), 0, 32, i).then(r => r.buffer)),
-        id: await read(handle.fd, Buffer.allocUnsafe(32), 0, 32, i + 32).then(r => base64url.encode(r.buffer))
+        offset: byteArrayToLong(
+          await read(handle.fd, Buffer.allocUnsafe(32), 0, 32, i).then(
+            (r) => r.buffer
+          )
+        ),
+        id: await read(
+          handle.fd,
+          Buffer.allocUnsafe(32),
+          0,
+          32,
+          i + 32
+        ).then((r) => base64url.encode(r.buffer)),
       };
     }
     await handle.close();
   }
 
-  private async* itemsGenerator(): AsyncGenerator<FileDataItem> {
+  private async *itemsGenerator(): AsyncGenerator<FileDataItem> {
     let counter = 0;
     for await (const { id } of this.getHeaders()) {
       yield new FileDataItem(this.txs[counter], base64url.toBuffer(id));
@@ -157,7 +182,8 @@ export default class FileBundle implements BundleInterface {
   private async getById(txId: string): Promise<FileDataItem> {
     let counter = 0;
     for await (const { id } of this.getHeaders()) {
-      if (id === txId) return new FileDataItem(this.txs[counter], base64url.toBuffer(id));
+      if (id === txId)
+        return new FileDataItem(this.txs[counter], base64url.toBuffer(id));
       counter++;
     }
     throw new Error("Can't find by id");
@@ -172,7 +198,6 @@ export default class FileBundle implements BundleInterface {
       }
       count++;
     }
-    throw new Error("Can't find by index")
+    throw new Error("Can't find by index");
   }
 }
-

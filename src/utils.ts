@@ -4,7 +4,7 @@ export function longTo8ByteArray(long: number): Uint8Array {
 
   for (let index = 0; index < byteArray.length; index++) {
     const byte = long & 0xff;
-    byteArray [index] = byte;
+    byteArray[index] = byte;
     long = (long - byte) / 256;
   }
 
@@ -12,13 +12,13 @@ export function longTo8ByteArray(long: number): Uint8Array {
 }
 
 export function shortTo2ByteArray(long: number): Uint8Array {
-  if (long > (2^32 - 1)) throw new Error("Short too long");
+  if (long > (2 ^ (32 - 1))) throw new Error("Short too long");
   // we want to represent the input as a 8-bytes array
   const byteArray = [0, 0];
 
   for (let index = 0; index < byteArray.length; index++) {
     const byte = long & 0xff;
-    byteArray [index] = byte;
+    byteArray[index] = byte;
     long = (long - byte) / 256;
   }
 
@@ -31,7 +31,7 @@ export function longTo16ByteArray(long: number): number[] {
 
   for (let index = 0; index < byteArray.length; index++) {
     const byte = long & 0xff;
-    byteArray [index] = byte;
+    byteArray[index] = byte;
     long = (long - byte) / 256;
   }
 
@@ -40,11 +40,44 @@ export function longTo16ByteArray(long: number): number[] {
 
 export function longTo32ByteArray(long: number): Uint8Array {
   // we want to represent the input as a 8-bytes array
-  const byteArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  const byteArray = [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+  ];
 
   for (let index = 0; index < byteArray.length; index++) {
     const byte = long & 0xff;
-    byteArray [index] = byte;
+    byteArray[index] = byte;
     long = (long - byte) / 256;
   }
 
@@ -54,12 +87,12 @@ export function longTo32ByteArray(long: number): Uint8Array {
 export function byteArrayToLong(byteArray: Uint8Array): number {
   let value = 0;
   for (let i = byteArray.length - 1; i >= 0; i--) {
-    value = (value * 256) + byteArray[i];
+    value = value * 256 + byteArray[i];
   }
   return value;
 }
 
-export function arraybufferEqual (buf1: Uint8Array, buf2: Uint8Array) {
+export function arraybufferEqual(buf1: Uint8Array, buf2: Uint8Array) {
   const _buf1 = buf1.buffer;
   const _buf2 = buf2.buffer;
 
@@ -84,4 +117,5 @@ export function arraybufferEqual (buf1: Uint8Array, buf2: Uint8Array) {
   return true;
 }
 
-export const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+export const isBrowser =
+  typeof window !== "undefined" && typeof window.document !== "undefined";

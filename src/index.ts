@@ -1,10 +1,10 @@
 import { createData } from "./ar-data-create";
 import { bundleAndSignData, unbundleData } from "./ar-data-bundle";
 import Bundle from "./Bundle";
-import DataItem, { MIN_BINARY_SIZE } from './DataItem';
-import deepHash from './deepHash';
-import { DataItemCreateOptions } from './ar-data-base';
-import { ArweaveSigner } from './signing';
+import DataItem, { MIN_BINARY_SIZE } from "./DataItem";
+import deepHash from "./deepHash";
+import { DataItemCreateOptions } from "./ar-data-base";
+import { ArweaveSigner } from "./signing";
 
 export {
   MIN_BINARY_SIZE,
@@ -14,11 +14,7 @@ export {
   bundleAndSignData,
   unbundleData,
   deepHash,
-  DataItemCreateOptions
+  DataItemCreateOptions,
 };
 
-
-
-export {
-  ArweaveSigner
-}
+export { ArweaveSigner };

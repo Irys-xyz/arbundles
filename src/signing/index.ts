@@ -1,10 +1,8 @@
-import ArweaveSigner from './chains';
+import ArweaveSigner from "./chains";
 
 export * from "./Signer";
 export * from "./constants";
 export * from "./keys";
 export * from "./chains";
 
-export {
-  ArweaveSigner
-}
+export { ArweaveSigner };
