@@ -1,8 +1,8 @@
-import { DataItemCreateOptions } from "./ar-data-base";
-import assert from "assert";
-import base64url from "base64url";
+import { DataItemCreateOptions } from './ar-data-base';
+import assert from 'assert';
+import base64url from 'base64url';
 import { longTo8ByteArray, shortTo2ByteArray } from './utils';
-import DataItem from "./DataItem";
+import DataItem from './DataItem';
 import { serializeTags } from './parser';
 import { Signer } from './signing/Signer';
 
@@ -15,30 +15,40 @@ const OWNER_LENGTH = 512;
  * @param opts - Options involved in creating data items
  * @param signer
  */
-export async function createData(
+export function createData(
+  data: string | Uint8Array,
   opts: DataItemCreateOptions,
-  signer: Signer
-): Promise<DataItem> {
+  signer: Signer,
+): DataItem {
   // TODO: Add asserts
   // Parse all values to a buffer and
   const _owner = signer.publicKey;
-  assert(_owner.byteLength == OWNER_LENGTH, new Error(`Public key isn't the correct length: ${_owner.byteLength}`));
+  assert(
+    _owner.byteLength == OWNER_LENGTH,
+    new Error(`Public key isn't the correct length: ${_owner.byteLength}`),
+  );
 
   const _target = opts.target ? base64url.toBuffer(opts.target) : null;
   const target_length = 1 + (_target?.byteLength ?? 0);
   const _anchor = opts.anchor ? Buffer.from(opts.anchor) : null;
   const anchor_length = 1 + (_anchor?.byteLength ?? 0);
-  const _tags = (opts.tags?.length ?? 0) > 0 ? await serializeTags(opts.tags) : null;
+  const _tags = (opts.tags?.length ?? 0) > 0 ? serializeTags(opts.tags) : null;
   const tags_length = 16 + (_tags ? _tags.byteLength : 0);
-  const _data = typeof opts.data === "string" ? Buffer.from(opts.data) : Buffer.from(opts.data);
+  const _data =
+    typeof data === 'string' ? Buffer.from(data) : Buffer.from(data);
   const data_length = _data.byteLength;
 
-
   // See [https://github.com/joshbenaron/arweave-standards/blob/ans104/ans/ANS-104.md#13-dataitem-format]
-  const length = 2 + 512 + _owner.byteLength + target_length + anchor_length + tags_length + data_length;
+  const length =
+    2 +
+    512 +
+    _owner.byteLength +
+    target_length +
+    anchor_length +
+    tags_length +
+    data_length;
   // Create array with set length
   const bytes = Buffer.allocUnsafe(length);
-
 
   bytes.set(shortTo2ByteArray(signer.signatureType), 0);
   // Push bytes for `signature`
@@ -47,14 +57,14 @@ export async function createData(
   // bytes.set(EMPTY_ARRAY, 32);
   // Push bytes for `owner`
 
-  assert(_owner.byteLength == 512, new Error("Owner must be 512 bytes"));
+  assert(_owner.byteLength == 512, new Error('Owner must be 512 bytes'));
   bytes.set(_owner, 514);
 
   // Push `presence byte` and push `target` if present
   // 64 + OWNER_LENGTH
-  bytes[1026] = _target ? 1  : 0;
+  bytes[1026] = _target ? 1 : 0;
   if (_target) {
-    assert(_target.byteLength == 32, new Error("Target must be 32 bytes"));
+    assert(_target.byteLength == 32, new Error('Target must be 32 bytes'));
     bytes.set(_target, 1027);
   }
 
@@ -65,7 +75,7 @@ export async function createData(
   bytes[anchor_start] = _anchor ? 1 : 0;
   if (_anchor) {
     tags_start += _anchor.byteLength;
-    assert(_anchor.byteLength == 32, new Error("Anchor must be 32 bytes"));
+    assert(_anchor.byteLength == 32, new Error('Anchor must be 32 bytes'));
     bytes.set(_anchor, anchor_start + 1);
   }
 
@@ -75,7 +85,7 @@ export async function createData(
   const bytesCount = longTo8ByteArray(_tags?.byteLength ?? 0);
   bytes.set(bytesCount, tags_start + 8);
   if (_tags) {
-    bytes.set(_tags, tags_start + 16)
+    bytes.set(_tags, tags_start + 16);
   }
 
   const data_start = tags_start + tags_length;
@@ -84,5 +94,3 @@ export async function createData(
 
   return new DataItem(bytes);
 }
-
-
