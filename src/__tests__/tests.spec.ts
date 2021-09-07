@@ -225,7 +225,7 @@ describe("Creating and indexing a data item", function () {
     );
 
     console.log(bundle.getIds());
-    expect(bundle.verify()).toEqual(true);
+    expect(await bundle.verify()).toEqual(true);
   });
 
   it("should bundle in loop", async function () {
