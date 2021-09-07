@@ -1,5 +1,5 @@
-import { Signer } from './signing/Signer';
-import { Buffer } from 'buffer';
+import { Signer } from "./signing/Signer";
+import { Buffer } from "buffer";
 
 type ResolvesTo<T> = T | Promise<T> | ((...args: any[]) => Promise<T>);
 
@@ -14,13 +14,12 @@ export abstract class BundleItem {
   readonly rawAnchor: ResolvesTo<Buffer>;
   readonly anchor: ResolvesTo<string>;
   readonly rawTags: ResolvesTo<Buffer>;
-  readonly tags: ResolvesTo<{ name: string, value: string }[]>;
+  readonly tags: ResolvesTo<{ name: string; value: string }[]>;
   readonly rawData: ResolvesTo<Buffer>;
   readonly data: ResolvesTo<string>;
   abstract sign(signer: Signer): Promise<Buffer>;
-  abstract isValid(): Promise<boolean>
+  abstract isValid(): Promise<boolean>;
   static async verify(..._: any[]): Promise<boolean> {
     throw new Error("You must implement `verify`");
   }
 }
-

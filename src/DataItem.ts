@@ -8,7 +8,7 @@ import { Signer } from "./signing/index";
 import { indexToType } from "./signing/index";
 import { getSignatureData } from "./ar-data-base";
 import axios, { AxiosResponse } from "axios";
-import { BUNDLER } from './constants';
+import { BUNDLER } from "./constants";
 
 export const MIN_BINARY_SIZE = 1044;
 
@@ -18,7 +18,7 @@ export default class DataItem implements BundleItem {
 
   constructor(binary: Buffer) {
     this.binary = binary;
-  };
+  }
 
   static isDataItem(obj: any): boolean {
     return obj.binary !== undefined;
@@ -70,7 +70,9 @@ export default class DataItem implements BundleItem {
   get rawTarget(): Buffer {
     const targetStart = this.getTargetStart();
     const isPresent = this.binary[targetStart] == 1;
-    return isPresent ? this.binary.subarray(targetStart + 1, targetStart + 33) : Buffer.alloc(0);
+    return isPresent
+      ? this.binary.subarray(targetStart + 1, targetStart + 33)
+      : Buffer.alloc(0);
   }
 
   get target(): string {
@@ -81,7 +83,9 @@ export default class DataItem implements BundleItem {
     const anchorStart = this.getAnchorStart();
     const isPresent = this.binary[anchorStart] == 1;
 
-    return isPresent ? this.binary.subarray(anchorStart + 1, anchorStart + 33) : Buffer.alloc(0);
+    return isPresent
+      ? this.binary.subarray(anchorStart + 1, anchorStart + 33)
+      : Buffer.alloc(0);
   }
 
   get anchor(): string {
@@ -90,31 +94,47 @@ export default class DataItem implements BundleItem {
 
   get rawTags(): Buffer {
     const tagsStart = this.getTagsStart();
-    const tagsSize = byteArrayToLong(this.binary.subarray(tagsStart + 8, tagsStart + 16));
+    const tagsSize = byteArrayToLong(
+      this.binary.subarray(tagsStart + 8, tagsStart + 16)
+    );
     return this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize);
   }
 
-  get tags(): { name: string, value: string }[] {
+  get tags(): { name: string; value: string }[] {
     const tagsStart = this.getTagsStart();
-    const tagsCount = byteArrayToLong(this.binary.subarray(tagsStart, tagsStart + 8));
+    const tagsCount = byteArrayToLong(
+      this.binary.subarray(tagsStart, tagsStart + 8)
+    );
     if (tagsCount == 0) {
       return [];
     }
 
-    const tagsSize = byteArrayToLong(this.binary.subarray(tagsStart + 8, tagsStart + 16));
+    const tagsSize = byteArrayToLong(
+      this.binary.subarray(tagsStart + 8, tagsStart + 16)
+    );
 
-    return tagsParser.fromBuffer(Buffer.from(this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize)));
+    return tagsParser.fromBuffer(
+      Buffer.from(
+        this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize)
+      )
+    );
   }
 
-  get tagsB64Url(): { name: string, value: string }[] {
+  get tagsB64Url(): { name: string; value: string }[] {
     const _tags = this.tags;
-    return _tags.map(t => ({ name: base64url.encode(t.name), value: base64url.encode(t.value) }));
+    return _tags.map((t) => ({
+      name: base64url.encode(t.name),
+      value: base64url.encode(t.value),
+    }));
   }
 
   getStartOfData(): number {
     const tagsStart = this.getTagsStart();
 
-    const numberOfTagBytesArray = this.binary.subarray(tagsStart + 8, tagsStart + 16);
+    const numberOfTagBytesArray = this.binary.subarray(
+      tagsStart + 8,
+      tagsStart + 16
+    );
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
     return tagsStart + 16 + numberOfTagBytes;
   }
@@ -122,7 +142,10 @@ export default class DataItem implements BundleItem {
   get rawData(): Buffer {
     const tagsStart = this.getTagsStart();
 
-    const numberOfTagBytesArray = this.binary.subarray(tagsStart + 8, tagsStart + 16);
+    const numberOfTagBytesArray = this.binary.subarray(
+      tagsStart + 8,
+      tagsStart + 16
+    );
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
     const dataStart = tagsStart + 16 + numberOfTagBytes;
 
@@ -154,27 +177,37 @@ export default class DataItem implements BundleItem {
   /**
    * Returns a JSON representation of a DataItem
    */
-  public toJSON(): { owner: string; data: string; signature: string; target: string; tags: { name: string; value: string }[] } {
+  public toJSON(): {
+    owner: string;
+    data: string;
+    signature: string;
+    target: string;
+    tags: { name: string; value: string }[];
+  } {
     return {
       signature: this.signature,
       owner: this.owner,
       target: this.target,
-      tags: this.tags.map(t => ({ name: base64url.encode(t.name), value: base64url.encode(t.value) })),
-      data: this.data
+      tags: this.tags.map((t) => ({
+        name: base64url.encode(t.name),
+        value: base64url.encode(t.value),
+      })),
+      data: this.data,
     };
   }
 
   public async sendToBundler(): Promise<AxiosResponse> {
     const headers = {
-      "Content-Type": "application/octet-stream"
+      "Content-Type": "application/octet-stream",
     };
 
-    if (!this.isSigned()) throw new Error("You must sign before sending to bundler");
+    if (!this.isSigned())
+      throw new Error("You must sign before sending to bundler");
     return await axios.post(`${BUNDLER}/tx`, this.getRaw(), {
       headers,
       timeout: 200000,
       maxBodyLength: Infinity,
-    })
+    });
   }
 
   /**
@@ -189,22 +222,31 @@ export default class DataItem implements BundleItem {
     }
     const sigType = byteArrayToLong(buffer.subarray(0, 2));
     let tagsStart = 2 + 512 + 512 + 2;
-    const targetPresent = (buffer[1026] == 1);
-    tagsStart += targetPresent ? 32: 0;
-    const anchorPresentByte = (targetPresent ? 1059 : 1027);
-    const anchorPresent = (buffer[anchorPresentByte] == 1);
-    tagsStart += anchorPresent ? 32: 0;
+    const targetPresent = buffer[1026] == 1;
+    tagsStart += targetPresent ? 32 : 0;
+    const anchorPresentByte = targetPresent ? 1059 : 1027;
+    const anchorPresent = buffer[anchorPresentByte] == 1;
+    tagsStart += anchorPresent ? 32 : 0;
 
-    const numberOfTags = byteArrayToLong(buffer.subarray(tagsStart, tagsStart + 8));
-    const numberOfTagBytesArray = buffer.subarray(tagsStart + 8, tagsStart + 16);
+    const numberOfTags = byteArrayToLong(
+      buffer.subarray(tagsStart, tagsStart + 8)
+    );
+    const numberOfTagBytesArray = buffer.subarray(
+      tagsStart + 8,
+      tagsStart + 16
+    );
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
 
     if (numberOfTags > 0) {
       try {
-        const tags: { name: string, value:string }[] = tagsParser.fromBuffer(Buffer.from(buffer.subarray(tagsStart + 16, tagsStart + 16 + numberOfTagBytes)));
+        const tags: { name: string; value: string }[] = tagsParser.fromBuffer(
+          Buffer.from(
+            buffer.subarray(tagsStart + 16, tagsStart + 16 + numberOfTagBytes)
+          )
+        );
 
         if (tags.length !== numberOfTags) {
-          return false
+          return false;
         }
       } catch (e) {
         return false;
@@ -216,7 +258,11 @@ export default class DataItem implements BundleItem {
     const item = new DataItem(buffer);
     const signatureData = await getSignatureData(item);
 
-    return await Signer.verify(item.owner, signatureData, buffer.subarray(2, 514));
+    return await Signer.verify(
+      item.owner,
+      signatureData,
+      buffer.subarray(2, 514)
+    );
   }
 
   /**
@@ -226,12 +272,11 @@ export default class DataItem implements BundleItem {
    */
   private getTagsStart(): number {
     let tagsStart = 2 + 512 + 512 + 2;
-    const targetPresent = (this.binary[1026] == 1);
-    tagsStart += targetPresent ? 32: 0;
-    const anchorPresentByte = (targetPresent ? 1059 : 1027);
-    const anchorPresent = (this.binary[anchorPresentByte] == 1);
-    tagsStart += anchorPresent ? 32: 0;
-
+    const targetPresent = this.binary[1026] == 1;
+    tagsStart += targetPresent ? 32 : 0;
+    const anchorPresentByte = targetPresent ? 1059 : 1027;
+    const anchorPresent = this.binary[anchorPresentByte] == 1;
+    tagsStart += anchorPresent ? 32 : 0;
 
     return tagsStart;
   }
@@ -252,8 +297,8 @@ export default class DataItem implements BundleItem {
    */
   private getAnchorStart(): number {
     let anchorStart = this.getTargetStart() + 1;
-    const targetPresent = (this.binary[this.getTargetStart()] == 1);
-    anchorStart += (targetPresent ? 32: 0);
+    const targetPresent = this.binary[this.getTargetStart()] == 1;
+    anchorStart += targetPresent ? 32 : 0;
 
     return anchorStart;
   }

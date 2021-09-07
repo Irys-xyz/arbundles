@@ -1,32 +1,34 @@
-import { bundleAndSignData, createData, FileDataItem } from '../file';
-import { readFileSync } from 'fs';
-import path from 'path';
-import ArweaveSigner from '../signing/chains/arweave/ArweaveSigner';
-import sizeof from 'object-sizeof';
-import * as fs from 'fs';
-import DataItem from '../DataItem';
-import Arweave from 'arweave';
+import { bundleAndSignData, createData, FileDataItem } from "../file";
+import { readFileSync } from "fs";
+import path from "path";
+import ArweaveSigner from "../signing/chains/arweave/ArweaveSigner";
+import sizeof from "object-sizeof";
+import * as fs from "fs";
+import DataItem from "../DataItem";
+import Arweave from "arweave";
 
 const arweave = Arweave.init({
-  host: 'arweave.net',
+  host: "arweave.net",
   port: 443,
-  protocol: 'https',
-  logging: false
+  protocol: "https",
+  logging: false,
 });
 
 const wallet0 = JSON.parse(
-  readFileSync(path.join(__dirname, 'test_key0.json')).toString(),
+  readFileSync(path.join(__dirname, "test_key0.json")).toString()
 );
 
-arweave.wallets.getAddress(wallet0)
+arweave.wallets
+  .getAddress(wallet0)
   .then(async (address) => {
     return address;
   })
-  .then(async (address) => console.log(await arweave.wallets.getBalance(address)))
+  .then(async (address) =>
+    console.log(await arweave.wallets.getBalance(address))
+  );
 
-
-describe("file tests", function() {
-  it("should verify ts file", async function() {
+describe("file tests", function () {
+  it("should verify ts file", async function () {
     const signer = new ArweaveSigner(wallet0);
     const d = { data: fs.readFileSync("Archive/bundler.d.ts") };
     const data = await createData(d, signer);
@@ -35,12 +37,12 @@ describe("file tests", function() {
     expect(await FileDataItem.verify(data.filename)).toBe(true);
   });
 
-  it("should get all correct data", async function() {
+  it("should get all correct data", async function () {
     const signer = new ArweaveSigner(wallet0);
     const d = {
-      data: 'tasty',
-      anchor: "fgggggggggggggggggggggggggllllll"
-    }
+      data: "tasty",
+      anchor: "fgggggggggggggggggggggggggllllll",
+    };
 
     const data = await createData(d, signer);
     await data.sign(signer);
@@ -50,20 +52,29 @@ describe("file tests", function() {
     expect(await data.isValid()).toBe(true);
     expect(await data.signatureType()).toEqual(1);
     expect(await data.owner()).toEqual(wallet0.n);
-    expect(await data.rawAnchor().then(r => r.toString())).toEqual("fgggggggggggggggggggggggggllllll");
+    expect(await data.rawAnchor().then((r) => r.toString())).toEqual(
+      "fgggggggggggggggggggggggggllllll"
+    );
     expect(await data.tags()).toEqual([]);
     expect(await data.target()).toEqual("");
     expect((await data.rawData()).toString()).toEqual("tasty");
     expect(await FileDataItem.verify(data.filename)).toEqual(true);
   });
 
-  it("should bundle correctly", async function() {
+  it("should bundle correctly", async function () {
     const signer = new ArweaveSigner(wallet0);
-    const tags = [{
-      name: "Content-Type",
-      value: "image/png"
-    }];
-    const data = { data: await fs.promises.readFile("large_llama.png").then(r => Buffer.from(r.buffer)), tags };
+    const tags = [
+      {
+        name: "Content-Type",
+        value: "image/png",
+      },
+    ];
+    const data = {
+      data: await fs.promises
+        .readFile("large_llama.png")
+        .then((r) => Buffer.from(r.buffer)),
+      tags,
+    };
     const d = new Array(5).fill(data);
     const bundle = await bundleAndSignData(d, signer);
     console.log(sizeof(bundle));
@@ -85,13 +96,20 @@ describe("file tests", function() {
     expect(await third.owner()).toEqual(wallet0.n);
   }, 1000000000);
 
-  it("Should post correctly", async function() {
+  it("Should post correctly", async function () {
     const signer = new ArweaveSigner(wallet0);
-    const tags = [{
-      name: "Content-Type",
-      value: "image/png"
-    }];
-    const data = { data: await fs.promises.readFile("large_llama.png").then(r => Buffer.from(r.buffer)), tags };
+    const tags = [
+      {
+        name: "Content-Type",
+        value: "image/png",
+      },
+    ];
+    const data = {
+      data: await fs.promises
+        .readFile("large_llama.png")
+        .then((r) => Buffer.from(r.buffer)),
+      tags,
+    };
     const d = new Array(3).fill(data);
     const bundle = await bundleAndSignData(d, signer);
     const tx = await bundle.toTransaction(arweave, wallet0);
@@ -105,25 +123,33 @@ describe("file tests", function() {
     console.log(await bundle.getRaw());
   });
 
-  it("Test posted tx", async function() {
-    const tx = await arweave.transactions.getData("viUi_gCJyL2Wgjd0AcBtHjkNw0Vgj7v-HshQF8NRcBY");
+  it("Test posted tx", async function () {
+    const tx = await arweave.transactions.getData(
+      "viUi_gCJyL2Wgjd0AcBtHjkNw0Vgj7v-HshQF8NRcBY"
+    );
     console.log(tx);
-  }, 10000000)
+  }, 10000000);
 
-  it("Test unbundle", async function() {
+  it("Test unbundle", async function () {
     const signer = new ArweaveSigner(wallet0);
-    const tags = [{
-      name: "Content-Type",
-      value: "image/png"
-    }];
-    const data = { data: await fs.promises.readFile("large_llama.png").then(r => Buffer.from(r.buffer)), tags };
+    const tags = [
+      {
+        name: "Content-Type",
+        value: "image/png",
+      },
+    ];
+    const data = {
+      data: await fs.promises
+        .readFile("large_llama.png")
+        .then((r) => Buffer.from(r.buffer)),
+      tags,
+    };
 
     const num = 100;
     const items = new Array(num);
 
     for (let i = 0; i < num; i++) {
       items[i] = await createData(data, signer);
-
     }
 
     const bundle = await bundleAndSignData(items, signer);
@@ -131,15 +157,22 @@ describe("file tests", function() {
 
     console.log(tx.id);
     console.log(await bundle.getIds());
-  }, 1000000)
+  }, 1000000);
 
-  it("Small test", async function() {
+  it("Small test", async function () {
     const signer = new ArweaveSigner(wallet0);
-    const tags = [{
-      name: "Content-Type",
-      value: "image/png"
-    }];
-    const data = { data: await fs.promises.readFile("large_llama.png").then(r => Buffer.from(r.buffer)), tags };
+    const tags = [
+      {
+        name: "Content-Type",
+        value: "image/png",
+      },
+    ];
+    const data = {
+      data: await fs.promises
+        .readFile("large_llama.png")
+        .then((r) => Buffer.from(r.buffer)),
+      tags,
+    };
 
     const d = await createData(data, signer);
     await d.sign(signer);
@@ -151,6 +184,5 @@ describe("file tests", function() {
     _tx.reward = (+_tx.reward * 2).toString();
 
     await arweave.transactions.sign(_tx, wallet0);
-
-  })
-})
+  });
+});

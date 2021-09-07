@@ -1,11 +1,11 @@
-import { DataItemCreateOptions } from '../ar-data-base';
-import { file } from 'tmp-promise';
-import * as fs from 'fs';
-import { createData } from './createData';
-import { longTo32ByteArray } from '../utils';
-import { Signer } from '../signing/index';
-import FileBundle from './FileBundle';
-import FileDataItem from './FileDataItem';
+import { DataItemCreateOptions } from "../ar-data-base";
+import { file } from "tmp-promise";
+import * as fs from "fs";
+import { createData } from "./createData";
+import { longTo32ByteArray } from "../utils";
+import { Signer } from "../signing/index";
+import FileBundle from "./FileBundle";
+import FileDataItem from "./FileDataItem";
 
 export async function bundleAndSignData(
   dataItems: (DataItemCreateOptions | FileDataItem)[],
@@ -30,10 +30,12 @@ export async function bundleAndSignData(
     }
 
     files[index] = dataItem.filename;
-    headerStream.write(Buffer.concat([longTo32ByteArray(await dataItem.size()), dataItem.rawId]));
+    headerStream.write(
+      Buffer.concat([longTo32ByteArray(await dataItem.size()), dataItem.rawId])
+    );
   }
 
-  await new Promise(resolve => headerStream.end(resolve));
+  await new Promise((resolve) => headerStream.end(resolve));
 
   headerStream.close();
 
