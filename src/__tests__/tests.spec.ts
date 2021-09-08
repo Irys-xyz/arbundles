@@ -35,6 +35,9 @@ describe("Creating and indexing a data item", function () {
 
     const _d: DataItemCreateOptions = {
       anchor: "Math.apt'#]gng(36).substring(30)",
+      tags: [
+        { name: "hi", value: "lol" }
+      ]
     };
 
     const signer = new ArweaveSigner(wallet0);
