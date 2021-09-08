@@ -42,7 +42,7 @@ describe("Creating and indexing a data item", function () {
 
     const signer = new ArweaveSigner(wallet0);
 
-    const d = await createData(fs.readFileSync("large_llama.png"), signer, _d);
+    const d = await createData("hi", signer, _d);
     await d.sign(signer);
 
     // const response = await d.sendToBundler().catch(console.log);
@@ -57,6 +57,7 @@ describe("Creating and indexing a data item", function () {
     console.log(await fileItem.target());
     console.log(await fileItem.owner());
     console.log(await fileItem.tags());
+    console.log(await fileItem.rawData());
 
 
 

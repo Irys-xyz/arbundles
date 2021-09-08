@@ -396,6 +396,6 @@ export default class FileDataItem implements BundleItem {
     ).then((r) => r.buffer);
     const numberOfTagsBytes = byteArrayToLong(numberOfTagsBytesBuffer);
     await handle.close();
-    return tagsStart + 16 + numberOfTagsBytes + 1;
+    return tagsStart + 16 + numberOfTagsBytes;
   }
 }
