@@ -244,28 +244,9 @@ export default class FileDataItem implements BundleItem {
   }
 
   async rawAnchor(): Promise<Buffer> {
-    let anchorStart = 1027;
-    const handle = await fs.promises.open(this.filename, "r");
-    const targetPresentBuffer = await read(
-      handle.fd,
-      Buffer.allocUnsafe(1),
-      0,
-      1,
-      1026
-    ).then((r) => r.buffer);
-    const targetPresent = targetPresentBuffer[0] === 1;
-    if (targetPresent) {
-      anchorStart += 32;
-    }
-    const anchorPresentBuffer = await read(
-      handle.fd,
-      Buffer.allocUnsafe(1),
-      0,
-      1,
-      anchorStart
-    ).then((r) => r.buffer);
-    const anchorPresent = anchorPresentBuffer[0] === 1;
+    const [anchorPresent, anchorStart] = await this.anchorStart();
     if (anchorPresent) {
+      const handle = await fs.promises.open(this.filename, "r");
       const anchorBuffer = await read(
         handle.fd,
         Buffer.allocUnsafe(32),
@@ -276,7 +257,6 @@ export default class FileDataItem implements BundleItem {
       await handle.close();
       return anchorBuffer;
     }
-    await handle.close();
     return Buffer.allocUnsafe(0);
   }
 
@@ -400,7 +380,7 @@ export default class FileDataItem implements BundleItem {
   private async tagsStart(): Promise<number> {
     const [anchorPresent, anchorStart] = await this.anchorStart();
     let tagsStart = anchorStart;
-    tagsStart += anchorPresent ? 32 : 1;
+    tagsStart += anchorPresent ? 33 : 1;
     return tagsStart;
   }
 

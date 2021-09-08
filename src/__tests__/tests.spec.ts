@@ -9,7 +9,7 @@ import sizeof from "object-sizeof";
 import { performance } from "perf_hooks";
 import base64url from "base64url";
 import Arweave from "arweave";
-import { FileDataItem } from "../file";
+import { FileDataItem } from '../file';
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString()
@@ -36,32 +36,40 @@ describe("Creating and indexing a data item", function () {
     const _d: DataItemCreateOptions = {
       anchor: "Math.apt'#]gng(36).substring(30)",
       tags: [
-        { name: "hi", value: "lol" }
+        { name: "Content-Type", value: "image/png" }
       ]
     };
 
     const signer = new ArweaveSigner(wallet0);
 
-    const d = await createData("tasty", signer, _d);
+    const d = await createData(fs.readFileSync("large_llama.png"), signer, _d);
     await d.sign(signer);
-
-    fs.writeFileSync("test", d.getRaw());
-
-    const item = new FileDataItem("test");
-    console.log(await item.isValid());
 
     // const response = await d.sendToBundler().catch(console.log);
     // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // // @ts-ignore
     // console.log(response.status);
 
-    expect(Buffer.from(d.rawData).toString()).toBe("tasty");
+    const file = "test";
+    fs.writeFileSync(file, d.getRaw());
+    const fileItem = new FileDataItem(file);
+    console.log((await fileItem.rawAnchor()).toString());
+    console.log(await fileItem.target());
+    console.log(await fileItem.owner());
+    console.log(await fileItem.tags());
+
+
+
+    expect(d.rawData).toStrictEqual(fs.readFileSync("large_llama.png"));
     expect(d.owner).toBe(wallet0.n);
     expect(d.target).toBe("");
     expect(d.anchor).toEqual("Math.apt'#]gng(36).substring(30)");
-    expect(d.tags).toEqual([]);
+    expect(d.tags).toEqual([
+      { name: "Content-Type", value: "image/png" }
+    ]);
     expect(await DataItem.verify(d.getRaw())).toEqual(true);
 
+    console.log(d.id);
     const response = await d.sendToBundler();
     console.log(response.status);
   }, 5000000);
