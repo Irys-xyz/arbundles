@@ -1,8 +1,10 @@
 import Arweave from 'arweave';
-import fs from "fs";
-import { ArweaveSigner, bundleAndSignData } from "arbundles";
+import { ArweaveSigner, bundleAndSignData, createData } from "arbundles";
+import fs from 'fs'
 
-const jwk = JSON.parse(fs.readFileSync("keyfile.json").toString());
+const jwk = JSON.parse(	
+	fs.readFileSync('src/secrets/jwk.json', {encoding: 'utf8'})
+)
 
 const arweave = Arweave.init({
     host: 'arweave.net',
@@ -10,24 +12,31 @@ const arweave = Arweave.init({
     protocol: 'https'
 });
 
-const myTags = [
-    { name: 'App-Name', value: 'myApp' },
-    { name: 'App-Version', value: '1.0.0' }
-];
+const main = async()=>{
 
-const signer = new ArweaveSigner(jwk);
+	const myTags = [
+			{ name: 'App-Name', value: 'myApp' },
+			{ name: 'App-Version', value: '1.0.0' }
+	];
 
-const d = [
-  createData("hello", signer, { tags: myTags }),
-  createData("world", signer),
-]
+	const signer = new ArweaveSigner(jwk);
 
-const myBundle = await bundleAndSignData(d, signer);
+	const d = [
+		await createData({ data: "hello", tags: myTags }, signer),
+		await createData({ data: "world" }, signer),
+	]
 
-const tx = await myBundle.toTransaction(arweave, jwk);
+	const myBundle = await bundleAndSignData(d, signer);
 
-await arweave.transactions.sign(tx, jwk);
+	const tx = await myBundle.toTransaction(arweave, jwk);
 
-console.log(`Posted bundle with tx id: ${tx.id}`);
+	await arweave.transactions.sign(tx, jwk);
 
-console.log(await arweave.transactions.post(tx));
+	console.log(`Posted bundle with tx id: ${tx.id}`);
+
+	console.log(await arweave.transactions.post(tx));
+
+	console.log(await arweave.transactions.getStatus(tx.id))
+
+} 
+main();
