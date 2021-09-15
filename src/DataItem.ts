@@ -196,16 +196,16 @@ export default class DataItem implements BundleItem {
     };
   }
 
-  public async sendToBundler(): Promise<AxiosResponse> {
+  public async sendToBundler(bundler?: string): Promise<AxiosResponse> {
     const headers = {
       "Content-Type": "application/octet-stream",
     };
 
     if (!this.isSigned())
       throw new Error("You must sign before sending to bundler");
-    return await axios.post(`${BUNDLER}/tx`, this.getRaw(), {
+    return await axios.post(`${bundler ?? BUNDLER}/tx`, this.getRaw(), {
       headers,
-      timeout: 200000,
+      timeout: 100000,
       maxBodyLength: Infinity,
     });
   }

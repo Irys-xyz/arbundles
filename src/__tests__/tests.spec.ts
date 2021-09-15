@@ -42,9 +42,11 @@ describe("Creating and indexing a data item", function () {
 
     const signer = new ArweaveSigner(wallet0);
 
-    const d = await createData("hi", signer, _d);
+    const d = await createData(fs.readFileSync("large_llama.png"), signer, _d);
     await d.sign(signer);
 
+    console.log(d.id);
+    const response = await d.sendToBundler("http://localhost:10000");
     // const response = await d.sendToBundler().catch(console.log);
     // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // // @ts-ignore
@@ -70,8 +72,6 @@ describe("Creating and indexing a data item", function () {
     ]);
     expect(await DataItem.verify(d.getRaw())).toEqual(true);
 
-    console.log(d.id);
-    const response = await d.sendToBundler();
     console.log(response.status);
   }, 5000000);
 
@@ -362,5 +362,17 @@ describe("Creating and indexing a data item", function () {
       console.log(used);
       console.log(item);
     }
-  })
+  });
+
+  it("should send loads", async function() {
+    const signer = new ArweaveSigner(wallet0);
+    const tags = [{ name: "Content-Type", value: "image/png" }];
+    const data = createData(fs.readFileSync("large_llama.png"), signer, { tags });
+
+    await data.sign(signer);
+    for (let i = 0; i < 2; i++) {
+      console.log(data.id);
+      await data.sendToBundler("http://bundler.arweave.net:10000");
+    }
+  }, 50000)
 });

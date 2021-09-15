@@ -113,7 +113,6 @@ export default class FileBundle implements BundleInterface {
     tx.addTag("Bundle-Format", "binary");
     tx.addTag("Bundle-Version", "2.0.0");
 
-    await arweave.transactions.sign(tx, jwk);
     return tx;
   }
 
@@ -122,14 +121,7 @@ export default class FileBundle implements BundleInterface {
     jwk: JWKInterface,
     tags: { name: string; value: string }[] = []
   ): Promise<Transaction> {
-    const streams = [
-      fs.createReadStream(this.headerFile),
-      ...this.txs.map((t) => fs.createReadStream(t)),
-    ];
-
-    const stream = MultiStream.obj(streams);
-
-    const tx = await pipeline(stream, createTransactionAsync({}, arweave, jwk));
+    const tx = await this.toTransaction(arweave, jwk);
     tx.addTag("Bundle-Format", "binary");
     tx.addTag("Bundle-Version", "2.0.0");
     for (const { name, value } of tags) {

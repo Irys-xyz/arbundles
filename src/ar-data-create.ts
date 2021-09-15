@@ -49,7 +49,7 @@ export function createData(
     tags_length +
     data_length;
   // Create array with set length
-  const bytes = Buffer.allocUnsafe(length);
+  const bytes = Buffer.alloc(length);
 
   bytes.set(shortTo2ByteArray(signer.signatureType), 0);
   // Push bytes for `signature`
