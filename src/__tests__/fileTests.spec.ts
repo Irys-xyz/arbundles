@@ -187,4 +187,26 @@ describe("file tests", function () {
 
     await arweave.transactions.sign(_tx, wallet0);
   });
+
+  it("should get 200", async function() {
+    const signer = new ArweaveSigner(wallet0);
+    const tags = [
+      {
+        name: "Content-Type",
+        value: "image/png",
+      },
+    ];
+    const data = {
+      data: await fs.promises
+        .readFile("large_llama.png")
+        .then((r) => Buffer.from(r.buffer)) as never,
+      tags,
+    };
+
+    const d = await createData(data, signer);
+    await d.sign(signer);
+
+    const response = await d.sendToBundler("http://bundler.arweave.net");
+    expect(response.status).toBe(200);
+  });
 });

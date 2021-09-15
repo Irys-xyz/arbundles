@@ -9,6 +9,8 @@ import { stringToBuffer } from "arweave/web/lib/utils";
 import Arweave from "arweave";
 import { promisify } from "util";
 import { indexToType, Signer } from "../signing";
+import axios, { AxiosResponse } from 'axios';
+import { BUNDLER } from '../constants';
 
 const write = promisify(fs.write);
 const read = promisify(fs.read);
@@ -349,6 +351,21 @@ export default class FileDataItem implements BundleItem {
 
     await handle.close();
     return Buffer.from(idBytes);
+  }
+
+  public async sendToBundler(bundler: string): Promise<AxiosResponse> {
+    const headers = {
+      "Content-Type": "application/octet-stream",
+    };
+
+    if (!this.isSigned())
+      throw new Error("You must sign before sending to bundler");
+    return await axios.post(`${bundler ?? BUNDLER}/tx`, fs.createReadStream(this.filename), {
+      headers,
+      timeout: 100000,
+      maxBodyLength: Infinity,
+    });
+
   }
 
   private async anchorStart(): Promise<[boolean, number]> {
