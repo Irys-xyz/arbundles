@@ -560,6 +560,13 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@textury/ardb@^1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@textury/ardb/-/ardb-1.1.3.tgz#a16c2cac807eef955fe0ff21bcce0f2597a6adef"
+  integrity sha512-Q7mQH56zLNIpbEJ2E7/UM1e2b0lgaU8ARr/KCEq/m9aXJwvNJBCB+YCbPe9oQcZgXtybgNR0hEwBaYSaoicF3w==
+  dependencies:
+    arweave "^1.10.15"
+
 "@tootallnate/once@1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
