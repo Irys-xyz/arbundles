@@ -33,7 +33,7 @@ export default class DataItem implements BundleItem {
   }
 
   get id(): string {
-    return base64url.encode(this._id);
+    return base64url.encode(this.rawId);
   }
 
   set id(id: string) {
@@ -52,7 +52,7 @@ export default class DataItem implements BundleItem {
   }
 
   get rawSignature(): Buffer {
-    return this.binary.subarray(0, 512);
+    return this.binary.subarray(2, 514);
   }
 
   get signature(): string {

@@ -92,7 +92,7 @@ export function byteArrayToLong(byteArray: Uint8Array): number {
   return value;
 }
 
-export function arraybufferEqual(buf1: Uint8Array, buf2: Uint8Array) {
+export function arraybufferEqual(buf1: Uint8Array, buf2: Uint8Array): boolean {
   const _buf1 = buf1.buffer;
   const _buf2 = buf2.buffer;
 

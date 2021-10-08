@@ -28,7 +28,7 @@ export function unbundleData(txData: Buffer): Bundle {
  * Throws if any of the data items fail verification.
  *
  * @param dataItems
- * @param jwk
+ * @param signer
  */
 export async function bundleAndSignData(
   dataItems: DataItem[],
@@ -49,13 +49,15 @@ export async function bundleAndSignData(
       // Add header to array of headers
       headers.set(header, 64 * index);
       // Convert to array for flattening
-      const raw = d.getRaw();
-      return Array.from(raw);
+      return d.getRaw();
     }),
   ).then((a) => {
-    return a.flat();
+    return a.reduce((previousValue, currentValue) => {
+      return Buffer.concat([previousValue, currentValue]);
+    }, Buffer.allocUnsafe(0));
   });
 
+  console.log(dataItems.length);
   const buffer = Buffer.from([
     ...longTo32ByteArray(dataItems.length),
     ...headers,

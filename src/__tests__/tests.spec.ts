@@ -10,13 +10,16 @@ import { performance } from "perf_hooks";
 import base64url from "base64url";
 import Arweave from "arweave";
 import { FileDataItem } from '../file';
+import { tagsParser } from '../parser';
+import Bundle from '../Bundle';
+import ArDB from '@textury/ardb';
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString()
 );
 
 const arweave = Arweave.init({
-  host: "arweave.dev",
+  host: "arweave.net",
   port: 443,
   protocol: "https",
 });
@@ -171,8 +174,9 @@ describe("Creating and indexing a data item", function () {
       }),
     ];
 
-    const bundle = await bundleAndSignData(_dataItems, signer);
+    const bundle = await bundleAndSignData([_dataItems[0], _dataItems[0]], signer);
     const dataItems = bundle.items;
+    console.log(dataItems);
 
     expect(bundle.length).toEqual(1);
     expect(dataItems.length).toEqual(1);
@@ -374,5 +378,54 @@ describe("Creating and indexing a data item", function () {
       console.log(data.id);
       await data.sendToBundler("http://bundler.arweave.net:10000");
     }
-  }, 50000)
+  }, 50000);
+
+  it('should parse', function() {
+    const output = tagsParser.fromBuffer(Buffer.from("0342104170702d4e616d650a6d79417070164170702d56657273696f6e0a312e302e3000", "hex"));
+    console.log(output);
+  });
+
+  it("should fetch and index", async function() {
+    const ardb = new ArDB(arweave);
+
+    const txs = await ardb.search("transactions")
+      .min(770000)
+      .max(770010)
+      .from("OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs")
+      .tags([
+        { name: "Bundle-Format", values: "binary" },
+        { name: "Bundle-Version", values: "2.0.0" }
+      ])
+      .findAll();
+
+    console.log(txs.length);
+
+    for (const tx of txs) {
+      const data = await arweave.transactions.getData(tx.id).then(r => base64url.toBuffer(r as string));
+      console.log(typeof data);
+      const bundle = new Bundle(Buffer.from(data));
+      try {
+        console.log(await bundle.verify())
+      } catch (e) {
+        console.log("Error", false);
+      }
+    }
+  }, 1000000);
+
+  it("should index", async function() {
+    const bundleStr = fs.readFileSync(path.join(__dirname, "./IbLRUSkcIzpAn93o6KWC946p7XIjdeZiBeTW2JlbZL0"));
+
+    const bundle = new Bundle(bundleStr);
+    console.log(bundle.getRaw().toString().indexOf("As a member of the Alura racing faction"));
+    console.log(bundle.getRaw().slice(3168, 3168+2601).toString());
+    console.log(bundle.getSizes());
+    console.log(bundle.getIds());
+    console.log(bundle.items[0].rawData.slice(1076).toString());
+
+
+
+    console.log(bundle.items[0].rawData.toString());
+    const allIds = bundle.items[0];
+    console.log(allIds.getRaw().toString())
+  })
 });

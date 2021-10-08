@@ -394,7 +394,7 @@ export default class FileDataItem implements BundleItem {
     return [anchorPresent, anchorStart];
   }
 
-  private async tagsStart(): Promise<number> {
+  public async tagsStart(): Promise<number> {
     const [anchorPresent, anchorStart] = await this.anchorStart();
     let tagsStart = anchorStart;
     tagsStart += anchorPresent ? 33 : 1;

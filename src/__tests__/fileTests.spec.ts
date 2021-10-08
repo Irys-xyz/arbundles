@@ -30,7 +30,7 @@ arweave.wallets
 describe("file tests", function () {
   it("should verify ts file", async function () {
     const signer = new ArweaveSigner(wallet0);
-    const d = { data: fs.readFileSync("Archive/bundler.d.ts") as never };
+    const d = fs.readFileSync("Archive/bundler.d.ts");
     const data = await createData(d, signer);
     await data.sign(signer);
 
@@ -39,12 +39,11 @@ describe("file tests", function () {
 
   it("should get all correct data", async function () {
     const signer = new ArweaveSigner(wallet0);
-    const d = {
-      data: "tasty" as never,
+    const opts = {
       anchor: "fgggggggggggggggggggggggggllllll",
     };
 
-    const data = await createData(d, signer);
+    const data = await createData("tasty", signer, opts);
     await data.sign(signer);
 
     console.log(await data.rawData().then(r => r.toString()));
@@ -69,13 +68,10 @@ describe("file tests", function () {
         value: "image/png",
       },
     ];
-    const data = {
-      data: await fs.promises
+    const data = await fs.promises
         .readFile("large_llama.png")
-        .then((r) => Buffer.from(r.buffer)),
-      tags,
-    };
-    const d = new Array(5).fill(data);
+        .then((r) => Buffer.from(r.buffer));
+    const d = new Array(5).fill(await createData(data, signer, { tags }));
     const bundle = await bundleAndSignData(d, signer);
     console.log(sizeof(bundle));
 
@@ -140,18 +136,15 @@ describe("file tests", function () {
         value: "image/png",
       },
     ];
-    const data = {
-      data: await fs.promises
+    const data = await fs.promises
         .readFile("large_llama.png")
-        .then((r) => Buffer.from(r.buffer)) as never,
-      tags,
-    };
+        .then((r) => Buffer.from(r.buffer)) as never;
 
     const num = 100;
     const items = new Array(num);
 
     for (let i = 0; i < num; i++) {
-      items[i] = await createData(data, signer);
+      items[i] = await createData(data, signer, { tags });
     }
 
     const bundle = await bundleAndSignData(items, signer);
@@ -169,14 +162,11 @@ describe("file tests", function () {
         value: "image/png",
       },
     ];
-    const data = {
-      data: await fs.promises
+    const data = await fs.promises
         .readFile("large_llama.png")
-        .then((r) => Buffer.from(r.buffer)) as never,
-      tags,
-    };
+        .then((r) => Buffer.from(r.buffer)) as never;
 
-    const d = await createData(data, signer);
+    const d = await createData(data, signer, { tags });
     await d.sign(signer);
 
     const bundle = await bundleAndSignData([d], signer);
@@ -196,14 +186,11 @@ describe("file tests", function () {
         value: "image/png",
       },
     ];
-    const data = {
-      data: await fs.promises
+    const data = await fs.promises
         .readFile("large_llama.png")
-        .then((r) => Buffer.from(r.buffer)) as never,
-      tags,
-    };
+        .then((r) => Buffer.from(r.buffer)) as never;
 
-    const d = await createData(data, signer);
+    const d = await createData(data, signer, { tags });
     await d.sign(signer);
 
     const response = await d.sendToBundler("http://bundler.arweave.net");

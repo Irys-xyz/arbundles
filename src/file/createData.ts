@@ -1,6 +1,5 @@
 import FileDataItem from "./FileDataItem";
 import { DataItemCreateOptions } from "../ar-data-base";
-import { PathLike } from "fs";
 import * as fs from "fs";
 import { tmpName } from "tmp-promise";
 import base64url from "base64url";
@@ -8,24 +7,19 @@ import assert from "assert";
 import { Buffer } from "buffer";
 import { longTo8ByteArray, shortTo2ByteArray } from "../utils";
 import { serializeTags } from "../parser";
-import { Signer } from "../signing/index";
+import { Signer } from '../signing';
 
 const EMPTY_ARRAY = new Array(512).fill(0);
 const OWNER_LENGTH = 512;
 
-interface CreateFileDataItemOptions {
-  path?: PathLike;
-  stream?: fs.WriteStream;
-}
 
 export async function createData(
-  opts: DataItemCreateOptions,
+  data: string | Uint8Array,
   signer: Signer,
-  createOpts?: CreateFileDataItemOptions
+  opts?: DataItemCreateOptions
 ): Promise<FileDataItem> {
   const filename = await tmpName();
-
-  const stream = createOpts?.stream ?? fs.createWriteStream(filename);
+  const stream = fs.createWriteStream(filename);
 
   // TODO: Add asserts
   // Parse all values to a buffer and
@@ -35,14 +29,11 @@ export async function createData(
     new Error(`Public key isn't the correct length: ${_owner.byteLength}`)
   );
 
-  const _target = opts.target ? base64url.toBuffer(opts.target) : null;
-  const _anchor = opts.anchor ? Buffer.from(opts.anchor) : null;
+  const _target = opts?.target ? base64url.toBuffer(opts.target) : null;
+  const _anchor = opts?.anchor ? Buffer.from(opts.anchor) : null;
   const _tags =
-    (opts.tags?.length ?? 0) > 0 ? await serializeTags(opts.tags) : null;
-  const _data =
-    typeof opts.data === "string"
-      ? Buffer.from(opts.data)
-      : Buffer.from(opts.data);
+    (opts?.tags?.length ?? 0) > 0 ? await serializeTags(opts.tags) : null;
+  const _data = Buffer.from(data);
 
   stream.write(shortTo2ByteArray(signer.signatureType));
   // Signature
@@ -63,7 +54,7 @@ export async function createData(
 
   // TODO: Shall I manually add 8 bytes?
   // TODO: Finish this
-  stream.write(longTo8ByteArray(opts.tags?.length ?? 0));
+  stream.write(longTo8ByteArray(opts?.tags?.length ?? 0));
   const bytesCount = longTo8ByteArray(_tags?.byteLength ?? 0);
   stream.write(bytesCount);
   if (_tags) {

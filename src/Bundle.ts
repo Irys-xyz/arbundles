@@ -5,6 +5,7 @@ import Transaction  from "arweave/node/lib/transaction";
 import Arweave from "arweave";
 import { BundleInterface } from './BundleInterface';
 import { JWKInterface } from './interface-jwk';
+import * as crypto from 'crypto';
 
 const HEADER_START = 32;
 
@@ -33,6 +34,15 @@ export default class Bundle implements BundleInterface {
     } else {
       return this.getById(index);
     }
+  }
+
+  public getSizes(): number[] {
+    const ids = [];
+    for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
+      ids.push(byteArrayToLong(this.binary.subarray(i, i + 32)))
+    }
+
+    return ids;
   }
 
   public getIds(): string[] {
@@ -65,7 +75,11 @@ export default class Bundle implements BundleInterface {
   public async verify(): Promise<boolean> {
     const items = this.getItems();
 
-    const validity = await Promise.all(items.map(item => item.isValid()))
+    const validity = await Promise.all(items.map(item => {
+      const valid = item.isValid();
+      const expected = base64url(crypto.createHash("sha256").update(item.rawSignature).digest());
+      return valid && item.id === expected;
+    }));
 
     return validity.every(valid => valid === true)
   }
@@ -113,8 +127,11 @@ export default class Bundle implements BundleInterface {
 
     const bundleStart = this.getBundleStart();
     const dataItemStart = bundleStart + offset;
-    const slice = this.binary.subarray(dataItemStart, dataItemStart + dataItemSize);
-    return new DataItem(slice);
+    const slice = this.binary.subarray(dataItemStart, dataItemStart + dataItemSize + 200);
+    console.log(slice.toString());
+    const item = new DataItem(slice);
+    item.rawId = this.binary.slice(32 + (64 * index), 64 + (64 * index));
+    return item;
   }
 
   private getById(id: string): DataItem {
