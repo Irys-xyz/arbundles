@@ -75,13 +75,13 @@ export default class Bundle implements BundleInterface {
   public async verify(): Promise<boolean> {
     const items = this.getItems();
 
-    const validity = await Promise.all(items.map(item => {
-      const valid = item.isValid();
+    for (const item of items) {
+      const valid = await item.isValid();
       const expected = base64url(crypto.createHash("sha256").update(item.rawSignature).digest());
-      return valid && item.id === expected;
-    }));
+      if(!(valid && item.id === expected)) return false;
+    }
 
-    return validity.every(valid => valid === true)
+    return true;
   }
 
   private getOffset(id: Uint8Array): { startOffset: number, size: number } {

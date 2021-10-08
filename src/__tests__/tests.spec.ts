@@ -13,6 +13,7 @@ import { FileDataItem } from '../file';
 import { tagsParser } from '../parser';
 import Bundle from '../Bundle';
 import ArDB from '@textury/ardb';
+import axios from 'axios';
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString()
@@ -427,5 +428,14 @@ describe("Creating and indexing a data item", function () {
     console.log(bundle.items[0].rawData.toString());
     const allIds = bundle.items[0];
     console.log(allIds.getRaw().toString())
-  })
+  });
+
+  it("should not cause out of memory", async function()  {
+    const bundleStr = await axios.get("https://arweave.net/5bcAKFvMaVbHhigTmN1791dLQazrtw6YA_HT-9Fg4M8", { responseType: "arraybuffer" });
+
+    const bundle = new Bundle(bundleStr.data);
+    console.log(await bundle.verify());
+    console.log(bundle.getIds());
+    console.log(process.memoryUsage())
+  }, 1000000);
 });
