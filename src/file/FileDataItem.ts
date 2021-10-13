@@ -93,6 +93,8 @@ export default class FileDataItem implements BundleItem {
       8,
       tagsStart + 8
     ).then((r) => byteArrayToLong(r.buffer));
+    if (numberOfTagsBytes > 2048) return false;
+
     const tagsBytes = await read(
       handle.fd,
       Buffer.allocUnsafe(numberOfTagsBytes),

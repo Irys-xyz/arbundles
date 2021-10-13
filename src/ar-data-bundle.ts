@@ -57,7 +57,6 @@ export async function bundleAndSignData(
     }, Buffer.allocUnsafe(0));
   });
 
-  console.log(dataItems.length);
   const buffer = Buffer.from([
     ...longTo32ByteArray(dataItems.length),
     ...headers,

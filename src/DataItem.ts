@@ -60,7 +60,12 @@ export default class DataItem implements BundleItem {
   }
 
   get rawOwner(): Buffer {
-    return this.binary.subarray(514, 514 + 512);
+    switch (this.signatureType) {
+      case 1:
+        return this.binary.subarray(514, 514 + 512);
+    }
+
+    throw new Error("Not a valid signature type");
   }
 
   get owner(): string {
@@ -236,6 +241,8 @@ export default class DataItem implements BundleItem {
       tagsStart + 16
     );
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
+
+    if (numberOfTagBytes > 2048) return false;
 
     if (numberOfTags > 0) {
       try {
