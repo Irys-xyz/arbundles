@@ -20,10 +20,10 @@ const main = async()=>{
 	];
 
 	const signer = new ArweaveSigner(jwk);
-
+  
 	const d = [
-		await createData({ data: "hello", tags: myTags }, signer),
-		await createData({ data: "world" }, signer),
+		await createData("hello", signer, {myTags}),
+		await createData("world", signer),
 	]
 
 	const myBundle = await bundleAndSignData(d, signer);
