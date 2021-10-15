@@ -22,7 +22,7 @@ const main = async()=>{
 	const signer = new ArweaveSigner(jwk);
   
 	const d = [
-		await createData("hello", signer, {myTags}),
+		await createData("hello", signer, { tags: myTags }),
 		await createData("world", signer),
 	]
 
