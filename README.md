@@ -88,7 +88,7 @@ await arweave.transactions.post(tx);
 ```ts
 import { Bundle } from "arbundles";
 
-const data = await arweave.transactions.getData("hKMMPNh_emBf8v_at1tFzNYACisyMQNcKzeeE1QE9p8");
+const data = await arweave.transactions.getData("hKMMPNh_emBf8v_at1tFzNYACisyMQNcKzeeE1QE9p8", { decode: true });
 
 const bundle = new Bundle(data);
 ```
