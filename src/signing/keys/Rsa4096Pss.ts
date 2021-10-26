@@ -5,10 +5,12 @@ import Arweave from "arweave";
 
 export default class Rsa4096Pss implements Signer {
   readonly signatureType: number = 1;
-
-  get publicKey(): Buffer {
-    return Buffer.allocUnsafe(0);
-  }
+  private readonly _publicKey: Buffer;
+  readonly ownerLength: number = 512;
+  readonly signatureLength: number = 512;
+  public get publicKey(): Buffer {
+        return this._publicKey;
+    }
 
   constructor(private _key: string, public pk?: string) {
     if (!pk) {

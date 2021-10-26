@@ -7,8 +7,10 @@ export abstract class BundleItem {
   readonly signatureType: ResolvesTo<number>;
   readonly rawSignature: ResolvesTo<Buffer>;
   readonly signature: ResolvesTo<string>;
+  readonly signatureLength: ResolvesTo<number>;
   readonly rawOwner: ResolvesTo<Buffer>;
   readonly owner: ResolvesTo<string>;
+  readonly ownerLength: ResolvesTo<number>;
   readonly rawTarget: ResolvesTo<Buffer>;
   readonly target: ResolvesTo<string>;
   readonly rawAnchor: ResolvesTo<Buffer>;

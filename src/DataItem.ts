@@ -52,24 +52,37 @@ export default class DataItem implements BundleItem {
   }
 
   get rawSignature(): Buffer {
-    return this.binary.subarray(2, 514);
+    return this.binary.subarray(2, 2 + this.signatureLength);
   }
 
   get signature(): string {
     return base64url.encode(this.rawSignature);
   }
 
-  get rawOwner(): Buffer {
+  get signatureLength(): number {
     switch (this.signatureType) {
-      case 1:
-        return this.binary.subarray(514, 514 + 512);
+      case 1: return 512; // RSA-4096-PSS
+      case 2: return 32;  // curve25519
     }
 
-    throw new Error("Not a valid signature type");
+    throw new Error("Signature type not supported");
+  }
+
+  get rawOwner(): Buffer {
+    return this.binary.subarray(2 + this.signatureLength, 2 + this.signatureLength + this.ownerLength);
   }
 
   get owner(): string {
     return base64url.encode(this.rawOwner);
+  }
+
+  get ownerLength(): number {
+    switch (this.signatureType) {
+      case 1: return 512; // RSA-4096-PSS
+      case 2: return 32;  // curve25519
+    }
+
+    throw new Error("Signature type not supported");
   }
 
   get rawTarget(): Buffer {
@@ -230,13 +243,9 @@ export default class DataItem implements BundleItem {
     if (buffer.length < MIN_BINARY_SIZE) {
       return false;
     }
-    const sigType = byteArrayToLong(buffer.subarray(0, 2));
-    let tagsStart = 2 + 512 + 512 + 2;
-    const targetPresent = buffer[1026] == 1;
-    tagsStart += targetPresent ? 32 : 0;
-    const anchorPresentByte = targetPresent ? 1059 : 1027;
-    const anchorPresent = buffer[anchorPresentByte] == 1;
-    tagsStart += anchorPresent ? 32 : 0;
+    const item = new DataItem(buffer);
+    const sigType = item.signatureType;
+    const tagsStart = item.getTagsStart();
 
     const numberOfTags = byteArrayToLong(
       buffer.subarray(tagsStart, tagsStart + 8)
@@ -267,13 +276,12 @@ export default class DataItem implements BundleItem {
 
     const Signer = indexToType[sigType];
 
-    const item = new DataItem(buffer);
     const signatureData = await getSignatureData(item);
 
     return await Signer.verify(
       item.owner,
       signatureData,
-      buffer.subarray(2, 514)
+      buffer.subarray(2, 2 + item.signatureLength)
     );
   }
 
@@ -283,10 +291,11 @@ export default class DataItem implements BundleItem {
    * @private
    */
   private getTagsStart(): number {
-    let tagsStart = 2 + 512 + 512 + 2;
-    const targetPresent = this.binary[1026] == 1;
+    let tagsStart = 2 + this.signatureLength + this.ownerLength + 2;
+    const targetStart = this.getTargetStart()
+    const targetPresent = this.binary[targetStart] == 1;
     tagsStart += targetPresent ? 32 : 0;
-    const anchorPresentByte = targetPresent ? 1059 : 1027;
+    const anchorPresentByte = targetPresent ? targetStart + 32 : targetStart + 1;
     const anchorPresent = this.binary[anchorPresentByte] == 1;
     tagsStart += anchorPresent ? 32 : 0;
 
@@ -299,7 +308,7 @@ export default class DataItem implements BundleItem {
    * @private
    */
   private getTargetStart(): number {
-    return 1026;
+    return 2 + this.signatureLength + this.ownerLength;
   }
 
   /**

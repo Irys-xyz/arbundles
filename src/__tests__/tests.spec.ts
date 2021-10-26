@@ -2,11 +2,14 @@ import { readFileSync } from "fs";
 import path from "path";
 import { Buffer } from "buffer";
 import { DataItemCreateOptions } from "../ar-data-base";
-import { Bundle, bundleAndSignData, createData, DataItem } from "..";
 import * as fs from "fs";
 import ArweaveSigner from "../signing/chains/arweave/ArweaveSigner";
 import Arweave from "arweave";
 import axios from 'axios';
+import { createData } from "../ar-data-create";
+import DataItem from '../DataItem';
+import { bundleAndSignData } from '../ar-data-bundle';
+import Bundle from '../Bundle';
 // import sizeof from "object-sizeof";
 // import { performance } from "perf_hooks";
 // import base64url from "base64url";
@@ -39,6 +42,7 @@ describe("Creating and indexing a data item", function () {
 
     const _d: DataItemCreateOptions = {
       anchor: "Math.apt'#]gng(36).substring(30)",
+      target: "OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs",
       tags: [
         { name: "Content-Type", value: "image/png" }
       ]
@@ -46,7 +50,7 @@ describe("Creating and indexing a data item", function () {
 
     const signer = new ArweaveSigner(wallet0);
 
-    const d = await createData(fs.readFileSync("large_llama.png"), signer, _d);
+    const d = createData(fs.readFileSync("large_llama.png"), signer, _d);
     await d.sign(signer);
 
     // const response = await d.sendToBundler().catch(console.log);
@@ -56,7 +60,7 @@ describe("Creating and indexing a data item", function () {
 
     expect(d.rawData).toStrictEqual(fs.readFileSync("large_llama.png"));
     expect(d.owner).toBe(wallet0.n);
-    expect(d.target).toBe("");
+    expect(d.target).toBe("OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs");
     expect(d.anchor).toEqual("Math.apt'#]gng(36).substring(30)");
     expect(d.tags).toEqual([
       { name: "Content-Type", value: "image/png" }
