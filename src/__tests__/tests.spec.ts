@@ -163,6 +163,7 @@ describe("Creating and indexing a data item", function () {
 
     const bundle = await bundleAndSignData([_dataItems[0], _dataItems[0]], signer);
     const dataItems = bundle.items;
+    console.log(dataItems[0].rawData.toString());
 
     expect(bundle.length).toEqual(2);
     expect(dataItems.length).toEqual(2);
@@ -414,11 +415,12 @@ describe("Creating and indexing a data item", function () {
   // });
   //
   it("should not cause out of memory", async function()  {
-    const bundleStr = await axios.get("https://arweave.net/yx5Ug_cygBGI0vaI3cwnNt6ZktwkMcmoWRlcpGlRCvI", { responseType: "arraybuffer" });
+    const bundleStr = await axios.get("https://arweave.net/gdaxDdsAl6_naCZPzoW0_XeXSsnBtaoio7mCE5O_xig", { responseType: "arraybuffer" });
 
     const bundle = new Bundle(bundleStr.data);
     console.log(bundle.length);
     console.log(await bundle.verify());
+    console.log(bundle.getIds());
     console.log(bundle.getIds());
     console.log(process.memoryUsage())
   }, 1000000);

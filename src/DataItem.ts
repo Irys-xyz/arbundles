@@ -208,11 +208,16 @@ export default class DataItem implements BundleItem {
 
     if (!this.isSigned())
       throw new Error("You must sign before sending to bundler");
-    return await axios.post(`${bundler ?? BUNDLER}/tx`, this.getRaw(), {
+    const response = await axios.post(`${bundler ?? BUNDLER}/tx`, this.getRaw(), {
       headers,
       timeout: 100000,
       maxBodyLength: Infinity,
+      validateStatus: (status) => (status > 200 && status < 300) || status !== 402
     });
+
+    if (response.status === 402) throw new Error("Not enough funds to send data");
+
+    return response;
   }
 
   /**
