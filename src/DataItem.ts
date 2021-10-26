@@ -60,7 +60,12 @@ export default class DataItem implements BundleItem {
   }
 
   get rawOwner(): Buffer {
-    return this.binary.subarray(514, 514 + 512);
+    switch (this.signatureType) {
+      case 1:
+        return this.binary.subarray(514, 514 + 512);
+    }
+
+    throw new Error("Not a valid signature type");
   }
 
   get owner(): string {
@@ -203,11 +208,16 @@ export default class DataItem implements BundleItem {
 
     if (!this.isSigned())
       throw new Error("You must sign before sending to bundler");
-    return await axios.post(`${bundler ?? BUNDLER}/tx`, this.getRaw(), {
+    const response = await axios.post(`${bundler ?? BUNDLER}/tx`, this.getRaw(), {
       headers,
       timeout: 100000,
       maxBodyLength: Infinity,
+      validateStatus: (status) => (status > 200 && status < 300) || status !== 402
     });
+
+    if (response.status === 402) throw new Error("Not enough funds to send data");
+
+    return response;
   }
 
   /**
@@ -236,6 +246,8 @@ export default class DataItem implements BundleItem {
       tagsStart + 16
     );
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
+
+    if (numberOfTagBytes > 2048) return false;
 
     if (numberOfTags > 0) {
       try {

@@ -93,6 +93,8 @@ export default class FileDataItem implements BundleItem {
       8,
       tagsStart + 8
     ).then((r) => byteArrayToLong(r.buffer));
+    if (numberOfTagsBytes > 2048) return false;
+
     const tagsBytes = await read(
       handle.fd,
       Buffer.allocUnsafe(numberOfTagsBytes),
@@ -360,12 +362,16 @@ export default class FileDataItem implements BundleItem {
 
     if (!this.isSigned())
       throw new Error("You must sign before sending to bundler");
-    return await axios.post(`${bundler ?? BUNDLER}/tx`, fs.createReadStream(this.filename), {
+    const response = await axios.post(`${bundler ?? BUNDLER}/tx`, fs.createReadStream(this.filename), {
       headers,
       timeout: 100000,
       maxBodyLength: Infinity,
+      validateStatus: (status) => (status > 200 && status < 300) || status !== 402
     });
 
+    if (response.status === 402) throw new Error("Not enough funds to send data");
+
+    return response;
   }
 
   private async anchorStart(): Promise<[boolean, number]> {

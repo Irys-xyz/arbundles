@@ -2,18 +2,18 @@ import { readFileSync } from "fs";
 import path from "path";
 import { Buffer } from "buffer";
 import { DataItemCreateOptions } from "../ar-data-base";
-import { bundleAndSignData, createData, DataItem } from "..";
+import { Bundle, bundleAndSignData, createData, DataItem } from "..";
 import * as fs from "fs";
 import ArweaveSigner from "../signing/chains/arweave/ArweaveSigner";
-import sizeof from "object-sizeof";
-import { performance } from "perf_hooks";
-import base64url from "base64url";
 import Arweave from "arweave";
-import { FileDataItem } from '../file';
-import { tagsParser } from '../parser';
-import Bundle from '../Bundle';
-import ArDB from '@textury/ardb';
 import axios from 'axios';
+// import sizeof from "object-sizeof";
+// import { performance } from "perf_hooks";
+// import base64url from "base64url";
+// import { tagsParser } from '../parser';
+// import Bundle from '../Bundle';
+// import ArDB from '@textury/ardb';
+// import axios from 'axios';
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString()
@@ -49,23 +49,10 @@ describe("Creating and indexing a data item", function () {
     const d = await createData(fs.readFileSync("large_llama.png"), signer, _d);
     await d.sign(signer);
 
-    console.log(d.id);
-    const response = await d.sendToBundler("http://localhost:10000");
     // const response = await d.sendToBundler().catch(console.log);
     // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // // @ts-ignore
     // console.log(response.status);
-
-    const file = "test";
-    fs.writeFileSync(file, d.getRaw());
-    const fileItem = new FileDataItem(file);
-    console.log((await fileItem.rawAnchor()).toString());
-    console.log(await fileItem.target());
-    console.log(await fileItem.owner());
-    console.log(await fileItem.tags());
-    console.log(await fileItem.rawData());
-
-
 
     expect(d.rawData).toStrictEqual(fs.readFileSync("large_llama.png"));
     expect(d.owner).toBe(wallet0.n);
@@ -76,7 +63,6 @@ describe("Creating and indexing a data item", function () {
     ]);
     expect(await DataItem.verify(d.getRaw())).toEqual(true);
 
-    console.log(response.status);
   }, 5000000);
 
   it("should create with no target and get", async function () {
@@ -177,10 +163,10 @@ describe("Creating and indexing a data item", function () {
 
     const bundle = await bundleAndSignData([_dataItems[0], _dataItems[0]], signer);
     const dataItems = bundle.items;
-    console.log(dataItems);
+    console.log(dataItems[0].rawData.toString());
 
-    expect(bundle.length).toEqual(1);
-    expect(dataItems.length).toEqual(1);
+    expect(bundle.length).toEqual(2);
+    expect(dataItems.length).toEqual(2);
     expect(Buffer.from(dataItems[0].rawData).toString()).toBe("tasty");
     expect(dataItems[0].owner).toBe(wallet0.n);
     expect(Buffer.from(dataItems[0].target).toString()).toBe(
@@ -241,68 +227,14 @@ describe("Creating and indexing a data item", function () {
       signer
     );
 
-    console.log(bundle.getIds());
     expect(await bundle.verify()).toEqual(true);
   });
-
-  it("should bundle in loop", async function () {
-    const signer = new ArweaveSigner(wallet0);
-    const tags = [
-      {
-        name: "Content-Type",
-        value: "image/png",
-      },
-    ];
-    const data = {
-      tags,
-    };
-    const items = new Array(25_000).fill(data);
-    let now = performance.now();
-    const ids = [];
-    for (let i = 0; i < 3000; i++) {
-      if (i % 1000 === 0) {
-        const now2 = performance.now();
-        console.log(`${i} - ${now2 - now}ms`);
-        now = now2;
-      }
-      const item = await createData(
-        await fs.promises
-          .readFile("large_llama.png")
-          .then((r) => Buffer.from(r.buffer)),
-        signer,
-        data
-      );
-
-      const id = base64url(await item.sign(signer));
-      ids.push(id);
-      items[i] = item;
-    }
-    console.log(sizeof(items));
-
-    const bundle = await bundleAndSignData(items, signer);
-
-    const tx = await bundle.toTransaction(arweave, wallet0);
-
-    await arweave.transactions.sign(tx, wallet0);
-
-    const uploader = await arweave.transactions.getUploader(tx);
-
-    while (!uploader.isComplete) {
-      await uploader.uploadChunk();
-      console.log(
-        `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`
-      );
-    }
-
-    console.log(ids.slice(0, 10));
-  }, 1000000000);
 
   it("should get all correct data", async function () {
     const signer = new ArweaveSigner(wallet0);
     const d = { tags: [{ name: "", value: "" }] };
 
     const data = await createData("hi", signer, d);
-    console.log(data.getRaw().length);
     await data.sign(signer);
     expect(data.signatureType).toEqual(1);
     expect(data.owner).toEqual(wallet0.n);
@@ -313,128 +245,182 @@ describe("Creating and indexing a data item", function () {
     expect(await DataItem.verify(data.getRaw())).toEqual(true);
   });
 
-  it("Test unbundle", async function () {
-    const signer = new ArweaveSigner(wallet0);
-    const tags = [
-      {
-        name: "Content-Type",
-        value: "text/html",
-      },
-    ];
-    const data = { tags };
-
-    const num = 1;
-    const items = new Array(num);
-
-    for (let i = 0; i < num; i++) {
-      items[i] = await createData("hello", signer, data);
-    }
-    const bundle = await bundleAndSignData(items, signer);
-
-    console.log(bundle.verify());
-
-    const tx = await bundle.toTransaction(arweave, wallet0);
-
-    await arweave.transactions.sign(tx, wallet0);
-
-    console.log(tx.id);
-    console.log(bundle.getIds());
-
-    const uploader = await arweave.transactions.getUploader(tx);
-
-    while (!uploader.isComplete) {
-      await uploader.uploadChunk();
-      console.log(
-        `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`
-      );
-    }
-  }, 1000000);
-
-  it("should not leak", function() {
-
-    const myTags = [
-      { name: 'App-Name', value: 'myApp' },
-      { name: 'App-Version', value: '1.0.0' }
-    ];
-
-    const signer = new ArweaveSigner(wallet0);
-
-    for (let i = 0; i < 300000000; i++) {
-      const opts = { tags: myTags };
-      const data = new Uint8Array(1_000_000_000).fill(10);
-      const item = createData(data, signer, opts);
-      const used = process.memoryUsage();
-      console.log(used);
-      console.log(item);
-    }
-  });
-
-  it("should send loads", async function() {
-    const signer = new ArweaveSigner(wallet0);
-    const tags = [{ name: "Content-Type", value: "image/png" }];
-    const data = createData(fs.readFileSync("large_llama.png"), signer, { tags });
-
-    await data.sign(signer);
-    for (let i = 0; i < 2; i++) {
-      console.log(data.id);
-      await data.sendToBundler("http://bundler.arweave.net:10000");
-    }
-  }, 50000);
-
-  it('should parse', function() {
-    const output = tagsParser.fromBuffer(Buffer.from("0342104170702d4e616d650a6d79417070164170702d56657273696f6e0a312e302e3000", "hex"));
-    console.log(output);
-  });
-
-  it("should fetch and index", async function() {
-    const ardb = new ArDB(arweave);
-
-    const txs = await ardb.search("transactions")
-      .min(770000)
-      .max(770010)
-      .from("OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs")
-      .tags([
-        { name: "Bundle-Format", values: "binary" },
-        { name: "Bundle-Version", values: "2.0.0" }
-      ])
-      .findAll();
-
-    console.log(txs.length);
-
-    for (const tx of txs) {
-      const data = await arweave.transactions.getData(tx.id).then(r => base64url.toBuffer(r as string));
-      console.log(typeof data);
-      const bundle = new Bundle(Buffer.from(data));
-      try {
-        console.log(await bundle.verify())
-      } catch (e) {
-        console.log("Error", false);
-      }
-    }
-  }, 1000000);
-
-  it("should index", async function() {
-    const bundleStr = fs.readFileSync(path.join(__dirname, "./IbLRUSkcIzpAn93o6KWC946p7XIjdeZiBeTW2JlbZL0"));
-
-    const bundle = new Bundle(bundleStr);
-    console.log(bundle.getRaw().toString().indexOf("As a member of the Alura racing faction"));
-    console.log(bundle.getRaw().slice(3168, 3168+2601).toString());
-    console.log(bundle.getSizes());
-    console.log(bundle.getIds());
-    console.log(bundle.items[0].rawData.slice(1076).toString());
-
-
-
-    console.log(bundle.items[0].rawData.toString());
-    const allIds = bundle.items[0];
-    console.log(allIds.getRaw().toString())
-  });
-
+  // it("should bundle in loop", async function () {
+  //   const signer = new ArweaveSigner(wallet0);
+  //   const tags = [
+  //     {
+  //       name: "Content-Type",
+  //       value: "image/png",
+  //     },
+  //   ];
+  //   const data = {
+  //     tags,
+  //   };
+  //   const items = new Array(25_000).fill(data);
+  //   let now = performance.now();
+  //   const ids = [];
+  //   for (let i = 0; i < 3000; i++) {
+  //     if (i % 1000 === 0) {
+  //       const now2 = performance.now();
+  //       console.log(`${i} - ${now2 - now}ms`);
+  //       now = now2;
+  //     }
+  //     const item = await createData(
+  //       await fs.promises
+  //         .readFile("large_llama.png")
+  //         .then((r) => Buffer.from(r.buffer)),
+  //       signer,
+  //       data
+  //     );
+  //
+  //     const id = base64url(await item.sign(signer));
+  //     ids.push(id);
+  //     items[i] = item;
+  //   }
+  //   console.log(sizeof(items));
+  //
+  //   const bundle = await bundleAndSignData(items, signer);
+  //
+  //   const tx = await bundle.toTransaction(arweave, wallet0);
+  //
+  //   await arweave.transactions.sign(tx, wallet0);
+  //
+  //   const uploader = await arweave.transactions.getUploader(tx);
+  //
+  //   while (!uploader.isComplete) {
+  //     await uploader.uploadChunk();
+  //     console.log(
+  //       `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`
+  //     );
+  //   }
+  //
+  //   console.log(ids.slice(0, 10));
+  // }, 1000000000);
+  //
+  // it("Test unbundle", async function () {
+  //   const signer = new ArweaveSigner(wallet0);
+  //   const tags = [
+  //     {
+  //       name: "Content-Type",
+  //       value: "text/html",
+  //     },
+  //   ];
+  //   const data = { tags };
+  //
+  //   const num = 1;
+  //   const items = new Array(num);
+  //
+  //   for (let i = 0; i < num; i++) {
+  //     items[i] = await createData("hello", signer, data);
+  //   }
+  //   const bundle = await bundleAndSignData(items, signer);
+  //
+  //   console.log(bundle.verify());
+  //
+  //   const tx = await bundle.toTransaction(arweave, wallet0);
+  //
+  //   await arweave.transactions.sign(tx, wallet0);
+  //
+  //   console.log(tx.id);
+  //   console.log(bundle.getIds());
+  //
+  //   const uploader = await arweave.transactions.getUploader(tx);
+  //
+  //   while (!uploader.isComplete) {
+  //     await uploader.uploadChunk();
+  //     console.log(
+  //       `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`
+  //     );
+  //   }
+  // }, 1000000);
+  //
+  // it("should not leak", function() {
+  //
+  //   const myTags = [
+  //     { name: 'App-Name', value: 'myApp' },
+  //     { name: 'App-Version', value: '1.0.0' }
+  //   ];
+  //
+  //   const signer = new ArweaveSigner(wallet0);
+  //
+  //   for (let i = 0; i < 300000000; i++) {
+  //     const opts = { tags: myTags };
+  //     const data = new Uint8Array(1_000_000_000).fill(10);
+  //     const item = createData(data, signer, opts);
+  //     const used = process.memoryUsage();
+  //     console.log(used);
+  //     console.log(item);
+  //   }
+  // });
+  //
+  // it("should send loads", async function() {
+  //   const signer = new ArweaveSigner(wallet0);
+  //   const tags = [{ name: "Content-Type", value: "image/png" }];
+  //   const data = createData(fs.readFileSync("large_llama.png"), signer, { tags });
+  //
+  //   await data.sign(signer);
+  //   for (let i = 0; i < 2; i++) {
+  //     console.log(data.id);
+  //     await data.sendToBundler("http://bundler.arweave.net:10000");
+  //   }
+  // }, 50000);
+  //
+  // it('should parse', function() {
+  //   const output = tagsParser.fromBuffer(Buffer.from("0342104170702d4e616d650a6d79417070164170702d56657273696f6e0a312e302e3000", "hex"));
+  //   console.log(output);
+  // });
+  //
+  // it("should fetch and index", async function() {
+  //   const ardb = new ArDB(arweave);
+  //
+  //   const txs = await ardb.search("transactions")
+  //     .min(770000)
+  //     .max(770010)
+  //     .from("OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs")
+  //     .tags([
+  //       { name: "Bundle-Format", values: "binary" },
+  //       { name: "Bundle-Version", values: "2.0.0" }
+  //     ])
+  //     .findAll();
+  //
+  //   console.log(txs.length);
+  //
+  //   for (const tx of txs) {
+  //     const data = await arweave.transactions.getData(tx.id).then(r => base64url.toBuffer(r as string));
+  //     console.log(typeof data);
+  //     const bundle = new Bundle(Buffer.from(data));
+  //     try {
+  //       console.log(await bundle.verify())
+  //     } catch (e) {
+  //       console.log("Error", false);
+  //     }
+  //   }
+  // }, 1000000);
+  //
+  // it("should index", async function() {
+  //   const bundleStr = fs.readFileSync(path.join(__dirname, "./IbLRUSkcIzpAn93o6KWC946p7XIjdeZiBeTW2JlbZL0"));
+  //
+  //   const bundle = new Bundle(bundleStr);
+  //   console.log(bundle.getRaw().toString().indexOf("As a member of the Alura racing faction"));
+  //   console.log(bundle.getRaw().slice(3168, 3168+2601).toString());
+  //   console.log(bundle.getSizes());
+  //   console.log(bundle.getIds());
+  //   console.log(bundle.items[0].rawData.slice(1076).toString());
+  //
+  //
+  //
+  //   console.log(bundle.items[0].rawData.toString());
+  //   const allIds = bundle.items[0];
+  //   console.log(allIds.getRaw().toString())
+  // });
+  //
   it("should not cause out of memory", async function()  {
-    const bundleStr = await axios.get("https://arweave.net/5bcAKFvMaVbHhigTmN1791dLQazrtw6YA_HT-9Fg4M8", { responseType: "arraybuffer" });
+    const bundleStr = await axios.get("https://arweave.net/gdaxDdsAl6_naCZPzoW0_XeXSsnBtaoio7mCE5O_xig", { responseType: "arraybuffer" });
 
     const bundle = new Bundle(bundleStr.data);
+    console.log(bundle.length);
     console.log(await bundle.verify());
+    console.log(bundle.getIds());
     console.log(bundle.getIds());
     console.log(process.memoryUsage())
   }, 1000000);

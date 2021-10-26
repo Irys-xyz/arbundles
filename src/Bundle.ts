@@ -128,7 +128,6 @@ export default class Bundle implements BundleInterface {
     const bundleStart = this.getBundleStart();
     const dataItemStart = bundleStart + offset;
     const slice = this.binary.subarray(dataItemStart, dataItemStart + dataItemSize + 200);
-    console.log(slice.toString());
     const item = new DataItem(slice);
     item.rawId = this.binary.slice(32 + (64 * index), 64 + (64 * index));
     return item;
