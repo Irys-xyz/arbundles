@@ -28,7 +28,7 @@ class Curve25519 {
         let p = pk;
         if (typeof pk === "string")
             p = base64url_1.default.toBuffer(pk);
-        return ed25519.verify(Buffer.from(message), Buffer.from(signature), Buffer.from(p));
+        return ed25519.verify(Buffer.from(signature), Buffer.from(message), Buffer.from(p));
     }
 }
 exports.default = Curve25519;

@@ -30,6 +30,6 @@ export default class Curve25519 implements Signer {
   ): Promise<boolean> {
     let p = pk;
     if (typeof pk === "string") p = base64url.toBuffer(pk);
-    return ed25519.verify(Buffer.from(message), Buffer.from(signature), Buffer.from(p));
+    return ed25519.verify(Buffer.from(signature), Buffer.from(message), Buffer.from(p));
   }
 }
