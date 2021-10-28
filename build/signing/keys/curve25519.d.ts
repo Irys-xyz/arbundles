@@ -10,6 +10,6 @@ export default class Curve25519 implements Signer {
     readonly signatureType: number;
     constructor(_key: string, pk: string);
     get key(): Uint8Array;
-    sign(message: Uint8Array): Uint8Array;
+    sign(message: Uint8Array): Promise<Uint8Array>;
     static verify(pk: string | Buffer, message: Uint8Array, signature: Uint8Array): Promise<boolean>;
 }
