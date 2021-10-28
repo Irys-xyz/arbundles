@@ -1,6 +1,6 @@
 import { Signer } from '../Signer';
 import base64url from 'base64url';
-import ed25519 from 'ed25519';
+import ed25519 from 'noble-ed25519';
 import { SIG_CONFIG } from '../../constants';
 
 export default class Curve25519 implements Signer {
@@ -19,8 +19,8 @@ export default class Curve25519 implements Signer {
     return new Uint8Array(0);
   }
 
-  sign(message: Uint8Array): Uint8Array {
-    return ed25519.Sign(Buffer.from(message), Buffer.from(this.key));
+  sign(message: Uint8Array): Promise<Uint8Array> {
+    return ed25519.sign(Buffer.from(message), Buffer.from(this.key));
   }
 
   static async verify(
@@ -30,6 +30,6 @@ export default class Curve25519 implements Signer {
   ): Promise<boolean> {
     let p = pk;
     if (typeof pk === "string") p = base64url.toBuffer(pk);
-    return ed25519.Verify(Buffer.from(message), Buffer.from(signature), Buffer.from(p));
+    return ed25519.verify(Buffer.from(message), Buffer.from(signature), Buffer.from(p));
   }
 }
