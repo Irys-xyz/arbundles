@@ -10,7 +10,6 @@ node_modules/
 coverage
 
 # Transpiled files
-build/
 
 # VS Code
 .vscode
@@ -29,8 +28,6 @@ build/
 .DS_Store
 
 package-lock.json
-
-file/
 
 stream/
 lib/
