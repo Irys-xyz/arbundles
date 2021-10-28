@@ -3,13 +3,14 @@ import path from "path";
 import { Buffer } from "buffer";
 import { DataItemCreateOptions } from "../ar-data-base";
 import * as fs from "fs";
-import ArweaveSigner from "../signing/chains/arweave/ArweaveSigner";
+import ArweaveSigner from "../signing/chains/ArweaveSigner";
 import Arweave from "arweave";
 import axios from 'axios';
 import { createData } from "../ar-data-create";
 import DataItem from '../DataItem';
 import { bundleAndSignData } from '../ar-data-bundle';
 import Bundle from '../Bundle';
+import SolanaSigner from '../signing/chains/SolanaSigner';
 // import sizeof from "object-sizeof";
 // import { performance } from "perf_hooks";
 // import base64url from "base64url";
@@ -52,11 +53,6 @@ describe("Creating and indexing a data item", function () {
 
     const d = createData(fs.readFileSync("large_llama.png"), signer, _d);
     await d.sign(signer);
-
-    // const response = await d.sendToBundler().catch(console.log);
-    // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // // @ts-ignore
-    // console.log(response.status);
 
     expect(d.rawData).toStrictEqual(fs.readFileSync("large_llama.png"));
     expect(d.owner).toBe(wallet0.n);
@@ -154,6 +150,7 @@ describe("Creating and indexing a data item", function () {
 
   it("Test Bundle", async function () {
     const signer = new ArweaveSigner(wallet0);
+    const solSigner = new SolanaSigner("rUC3u5oz8W1Y2b8b2tq1K5AUWnXMiVV5o9Fx29yTJepFqFPfYPdwjainQhUvxfNuuhMJAGoawA3qYWzo8QhC5pj");
     const _dataItems = [
       createData(
         "tasty",
@@ -163,11 +160,18 @@ describe("Creating and indexing a data item", function () {
         anchor: "Math.randomgng(36).substring(30)",
         tags: [{ name: "x", value: "y" }],
       }),
+      createData(
+        "tasty",
+        solSigner,
+        {
+        target: "pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A",
+        anchor: "Math.randomgng(36).substring(30)",
+        tags: [{ name: "x", value: "y" }],
+      })
     ];
 
     const bundle = await bundleAndSignData([_dataItems[0], _dataItems[0]], signer);
     const dataItems = bundle.items;
-    console.log(dataItems[0].rawData.toString());
 
     expect(bundle.length).toEqual(2);
     expect(dataItems.length).toEqual(2);

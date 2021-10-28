@@ -1,4 +1,4 @@
-import Curve25519 from '../../keys/curve25519';
+import Curve25519 from '../keys/curve25519';
 import bs58 from "bs58";
 import base58 from 'bs58';
 

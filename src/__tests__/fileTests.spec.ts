@@ -1,7 +1,7 @@
 import { bundleAndSignData, createData, FileDataItem } from "../file";
 import { readFileSync } from "fs";
 import path from "path";
-import ArweaveSigner from "../signing/chains/arweave/ArweaveSigner";
+import ArweaveSigner from "../signing/chains/ArweaveSigner";
 import sizeof from "object-sizeof";
 import * as fs from "fs";
 import DataItem from "../DataItem";
@@ -30,8 +30,8 @@ arweave.wallets
 describe("file tests", function () {
   it("should verify ts file", async function () {
     const signer = new ArweaveSigner(wallet0);
-    const d = fs.readFileSync("Archive/bundler.d.ts");
-    const data = await createData(d, signer);
+    // const d = fs.readFileSync("large_llama.png");
+    const data = await createData(fs.createReadStream("large_llama.png"), signer);
     await data.sign(signer);
 
     expect(await FileDataItem.verify(data.filename)).toBe(true);
@@ -102,13 +102,11 @@ describe("file tests", function () {
         value: "image/png",
       },
     ];
-    const data = {
-      data: await fs.promises
-        .readFile("large_llama.png")
-        .then((r) => Buffer.from(r.buffer)),
-      tags,
-    };
-    const d = new Array(3).fill(data);
+
+    const d = [
+      await createData("", signer, { tags })
+    ]
+
     const bundle = await bundleAndSignData(d, signer);
     const tx = await bundle.toTransaction(arweave, wallet0);
     await arweave.transactions.sign(tx, wallet0);

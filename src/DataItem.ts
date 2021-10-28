@@ -8,7 +8,7 @@ import { Signer } from "./signing/index";
 import { indexToType } from "./signing/index";
 import { getSignatureData } from "./ar-data-base";
 import axios, { AxiosResponse } from "axios";
-import { BUNDLER } from "./constants";
+import { BUNDLER, SIG_CONFIG } from './constants';
 
 export const MIN_BINARY_SIZE = 1044;
 
@@ -60,12 +60,9 @@ export default class DataItem implements BundleItem {
   }
 
   get signatureLength(): number {
-    switch (this.signatureType) {
-      case 1: return 512; // RSA-4096-PSS
-      case 2: return 32;  // curve25519
-    }
-
-    throw new Error("Signature type not supported");
+    const length = SIG_CONFIG[this.signatureType].sigLength;
+    if (!length) throw new Error("Signature type not supported");
+    return length;
   }
 
   get rawOwner(): Buffer {
@@ -77,12 +74,9 @@ export default class DataItem implements BundleItem {
   }
 
   get ownerLength(): number {
-    switch (this.signatureType) {
-      case 1: return 512; // RSA-4096-PSS
-      case 2: return 32;  // curve25519
-    }
-
-    throw new Error("Signature type not supported");
+    const length = SIG_CONFIG[this.signatureType].pubLength;
+    if (!length) throw new Error("Signature type not supported");
+    return length;
   }
 
   get rawTarget(): Buffer {
@@ -279,7 +273,7 @@ export default class DataItem implements BundleItem {
     const signatureData = await getSignatureData(item);
 
     return await Signer.verify(
-      item.owner,
+      item.rawOwner,
       signatureData,
       buffer.subarray(2, 2 + item.signatureLength)
     );
@@ -291,13 +285,11 @@ export default class DataItem implements BundleItem {
    * @private
    */
   private getTagsStart(): number {
-    let tagsStart = 2 + this.signatureLength + this.ownerLength + 2;
     const targetStart = this.getTargetStart()
     const targetPresent = this.binary[targetStart] == 1;
-    tagsStart += targetPresent ? 32 : 0;
-    const anchorPresentByte = targetPresent ? targetStart + 32 : targetStart + 1;
-    const anchorPresent = this.binary[anchorPresentByte] == 1;
-    tagsStart += anchorPresent ? 32 : 0;
+    let tagsStart = targetStart + (targetPresent ? 33 : 1);
+    const anchorPresent = this.binary[tagsStart] == 1;
+    tagsStart += anchorPresent ? 33 : 1;
 
     return tagsStart;
   }

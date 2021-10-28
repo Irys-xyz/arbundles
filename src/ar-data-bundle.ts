@@ -78,6 +78,7 @@ export async function getSignatureAndId(
   signer: Signer,
 ): Promise<{ signature: Buffer; id: Buffer }> {
   const signatureData = await getSignatureData(item);
+
   const signatureBytes = await signer.sign(signatureData);
   const idBytes = await Arweave.crypto.hash(signatureBytes);
 

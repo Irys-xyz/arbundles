@@ -21,10 +21,6 @@ export function createData(
   // TODO: Add asserts
   // Parse all values to a buffer and
   const _owner = signer.publicKey;
-  // assert(
-  //   _owner.byteLength == signer.,
-  //   new Error(`Public key isn't the correct length: ${_owner.byteLength}`)
-  // );
 
   const _target = opts?.target ? base64url.toBuffer(opts.target) : null;
   const target_length = 1 + (_target?.byteLength ?? 0);
@@ -40,13 +36,14 @@ export function createData(
   const length =
     2 +
     signer.signatureLength +
-    _owner.byteLength +
+    signer.ownerLength +
     target_length +
     anchor_length +
     tags_length +
     data_length;
   // Create array with set length
   const bytes = Buffer.alloc(length);
+
 
   bytes.set(shortTo2ByteArray(signer.signatureType), 0);
   // Push bytes for `signature`
@@ -55,7 +52,7 @@ export function createData(
   // bytes.set(EMPTY_ARRAY, 32);
   // Push bytes for `owner`
 
-  assert(_owner.byteLength == signer.ownerLength, new Error(`Owner must be ${signer.signatureLength} bytes`));
+  assert(_owner.byteLength == signer.ownerLength, new Error(`Owner must be ${signer.ownerLength} bytes`));
   bytes.set(_owner, 2 + signer.signatureLength);
 
   const position = 2 + signer.signatureLength + signer.ownerLength;

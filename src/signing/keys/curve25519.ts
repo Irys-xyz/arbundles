@@ -1,14 +1,15 @@
 import { Signer } from '../Signer';
-import { sign, verify } from 'curve25519-js';
 import base64url from 'base64url';
+import ed25519 from 'ed25519';
+import { SIG_CONFIG } from '../../constants';
 
 export default class Curve25519 implements Signer {
-  readonly ownerLength: number = 32;
+  readonly ownerLength: number = SIG_CONFIG[2].pubLength;
+  readonly signatureLength: number = SIG_CONFIG[2].sigLength;
   private readonly _publicKey: Buffer;
   public get publicKey(): Buffer {
         return this._publicKey;
     }
-  readonly signatureLength: number = 64;
   readonly signatureType: number = 2;
 
   constructor(protected _key: string, public pk: string) {
@@ -19,8 +20,7 @@ export default class Curve25519 implements Signer {
   }
 
   sign(message: Uint8Array): Uint8Array {
-    console.log(sign(this.key, message, null).length);
-    return sign(this.key, message, null);
+    return ed25519.Sign(Buffer.from(message), Buffer.from(this.key));
   }
 
   static async verify(
@@ -30,6 +30,6 @@ export default class Curve25519 implements Signer {
   ): Promise<boolean> {
     let p = pk;
     if (typeof pk === "string") p = base64url.toBuffer(pk);
-    return verify(p, message, signature);
+    return ed25519.Verify(Buffer.from(message), Buffer.from(signature), Buffer.from(p));
   }
 }

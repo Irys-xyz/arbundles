@@ -1,3 +1,3 @@
-import ArweaveSigner from "./arweave/ArweaveSigner";
+import ArweaveSigner from "./ArweaveSigner";
 
 export default ArweaveSigner;

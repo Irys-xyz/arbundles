@@ -2,12 +2,14 @@ import { Signer } from "../Signer";
 import * as crypto from "crypto";
 import { constants } from "crypto";
 import Arweave from "arweave";
+import base64url from 'base64url';
+import { SIG_CONFIG } from '../../constants';
 
 export default class Rsa4096Pss implements Signer {
   readonly signatureType: number = 1;
+  readonly ownerLength: number = SIG_CONFIG[1].pubLength;
+  readonly signatureLength: number = SIG_CONFIG[1].sigLength;
   private readonly _publicKey: Buffer;
-  readonly ownerLength: number = 512;
-  readonly signatureLength: number = 512;
   public get publicKey(): Buffer {
         return this._publicKey;
     }
@@ -36,10 +38,10 @@ export default class Rsa4096Pss implements Signer {
   }
 
   static async verify(
-    pk: string,
+    pk: string | Buffer,
     message: Uint8Array,
     signature: Uint8Array
   ): Promise<boolean> {
-    return await Arweave.crypto.verify(pk, message, signature);
+    return await Arweave.crypto.verify(Buffer.isBuffer(pk) ? base64url.encode(pk) : pk, message, signature);
   }
 }
