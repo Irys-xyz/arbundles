@@ -1,6 +1,6 @@
 import { Signer } from '../Signer';
 import base64url from 'base64url';
-import ed25519 from 'noble-ed25519';
+import * as ed25519 from 'noble-ed25519';
 import { SIG_CONFIG } from '../../constants';
 
 export default class Curve25519 implements Signer {
