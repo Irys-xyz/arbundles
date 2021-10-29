@@ -97,6 +97,11 @@ export default class FileDataItem implements BundleItem {
     }
     const Signer = indexToType[sigType];
     const owner = await item.rawOwner();
+
+    let b = Buffer.alloc(0);
+    for await (const chunk of fs.createReadStream(filename, { start: await item.dataStart() })) {
+      b = Buffer.concat([b, chunk]);
+    }
     const signatureData = await deepHash([
       stringToBuffer('dataitem'),
       stringToBuffer('1'),
@@ -109,8 +114,8 @@ export default class FileDataItem implements BundleItem {
         start: await item.dataStart(),
       }),
     ]);
-
-    if (!(await Signer.verify(owner, signatureData, await item.rawSignature()))) {
+    const sig = await item.rawSignature();
+    if (!(await Signer.verify(owner, signatureData, sig))) {
       await handle.close();
       return false;
     }

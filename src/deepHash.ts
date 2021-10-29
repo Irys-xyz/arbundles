@@ -27,7 +27,6 @@ export default async function deepHash(
     const tag = Arweave.utils.concatBuffers([
       Arweave.utils.stringToBuffer("blob"),
       Arweave.utils.stringToBuffer(length.toString()),
-      Arweave.utils.stringToBuffer(length.toString()),
     ]);
 
     const taggedHash = Arweave.utils.concatBuffers([

@@ -275,7 +275,7 @@ export default class DataItem implements BundleItem {
     return await Signer.verify(
       item.rawOwner,
       signatureData,
-      buffer.subarray(2, 2 + item.signatureLength)
+      item.rawSignature
     );
   }
 

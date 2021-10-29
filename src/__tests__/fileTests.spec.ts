@@ -6,6 +6,8 @@ import sizeof from "object-sizeof";
 import * as fs from "fs";
 import DataItem from "../DataItem";
 import Arweave from "arweave";
+import * as crypto from 'crypto';
+import base64url from 'base64url';
 
 const arweave = Arweave.init({
   host: "arweave.net",
@@ -71,7 +73,11 @@ describe("file tests", function () {
     const data = await fs.promises
         .readFile("large_llama.png")
         .then((r) => Buffer.from(r.buffer));
-    const d = new Array(5).fill(await createData(data, signer, { tags }));
+    const d = [
+      await createData(data, signer, { tags }),
+      await createData(data, signer, { tags }),
+      await createData(data, signer, { tags }),
+    ];
     const bundle = await bundleAndSignData(d, signer);
     console.log(sizeof(bundle));
 
@@ -86,6 +92,7 @@ describe("file tests", function () {
     const second = await bundle.get(1);
     const third = await bundle.get(2);
 
+    console.log(await first.isValid());
     expect(await DataItem.verify(fs.readFileSync(first.filename))).toBe(true);
     expect(await DataItem.verify(fs.readFileSync(second.filename))).toBe(true);
     expect(await DataItem.verify(fs.readFileSync(third.filename))).toBe(true);
@@ -193,5 +200,12 @@ describe("file tests", function () {
 
     const response = await d.sendToBundler("http://bundler.arweave.net");
     expect(response.status).toBe(200);
+  });
+
+  it("should index item from S3", async function() {
+    console.log(await DataItem.verify(fs.readFileSync(path.join(__dirname, "./.e5f55c2424dbaf806a15ea722881cea2.part.minio"))));
+    const item = new FileDataItem(path.join(__dirname, "./.e5f55c2424dbaf806a15ea722881cea2.part.minio"));
+    console.log(base64url.encode(crypto.createHash("sha256").update(await item.rawOwner()).digest()));
+    expect(await item.isValid()).toBe(true);
   });
 });
