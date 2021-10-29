@@ -11,7 +11,7 @@ const index_1 = require("./signing/index");
 const ar_data_base_1 = require("./ar-data-base");
 const axios_1 = tslib_1.__importDefault(require("axios"));
 const constants_1 = require("./constants");
-exports.MIN_BINARY_SIZE = 1044;
+exports.MIN_BINARY_SIZE = 80;
 class DataItem {
     binary;
     _id;

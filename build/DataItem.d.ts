@@ -3,7 +3,7 @@ import { Buffer } from "buffer";
 import { BundleItem } from "./BundleItem";
 import { Signer } from "./signing/index";
 import { AxiosResponse } from "axios";
-export declare const MIN_BINARY_SIZE = 1044;
+export declare const MIN_BINARY_SIZE = 80;
 export default class DataItem implements BundleItem {
     private readonly binary;
     private _id;
