@@ -17,7 +17,6 @@ async function deepHash(data) {
         const tag = arweave_1.default.utils.concatBuffers([
             arweave_1.default.utils.stringToBuffer("blob"),
             arweave_1.default.utils.stringToBuffer(length.toString()),
-            arweave_1.default.utils.stringToBuffer(length.toString()),
         ]);
         const taggedHash = arweave_1.default.utils.concatBuffers([
             await arweave_1.default.crypto.hash(tag, "SHA-384"),

@@ -55,8 +55,10 @@ class FileDataItem {
         const tagsStart = await item.getTagsStart();
         const numberOfTags = await read(handle.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart).then((r) => utils_1.byteArrayToLong(r.buffer));
         const numberOfTagsBytes = await read(handle.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart + 8).then((r) => utils_1.byteArrayToLong(r.buffer));
-        if (numberOfTagsBytes > 2048)
+        if (numberOfTagsBytes > 2048) {
+            await handle.close();
             return false;
+        }
         const tagsBytes = await read(handle.fd, Buffer.allocUnsafe(numberOfTagsBytes), 0, numberOfTagsBytes, tagsStart + 16).then((r) => r.buffer);
         if (numberOfTags > 0) {
             try {
@@ -69,6 +71,10 @@ class FileDataItem {
         }
         const Signer = signing_1.indexToType[sigType];
         const owner = await item.rawOwner();
+        let b = Buffer.alloc(0);
+        for await (const chunk of fs.createReadStream(filename, { start: await item.dataStart() })) {
+            b = Buffer.concat([b, chunk]);
+        }
         const signatureData = await index_1.deepHash([
             utils_2.stringToBuffer('dataitem'),
             utils_2.stringToBuffer('1'),
@@ -81,8 +87,11 @@ class FileDataItem {
                 start: await item.dataStart(),
             }),
         ]);
-        if (!(await Signer.verify(owner, signatureData, await item.rawSignature())))
+        const sig = await item.rawSignature();
+        if (!(await Signer.verify(owner, signatureData, sig))) {
+            await handle.close();
             return false;
+        }
         await handle.close();
         return true;
     }
@@ -162,8 +171,10 @@ class FileDataItem {
             return Buffer.allocUnsafe(0);
         const numberOfTagsBytesBuffer = await read(handle.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart + 8).then((r) => r.buffer);
         const numberOfTagsBytes = utils_1.byteArrayToLong(numberOfTagsBytesBuffer);
-        if (numberOfTagsBytes > 2048)
-            throw new Error("Tags too large");
+        if (numberOfTagsBytes > 2048) {
+            await handle.close();
+            throw new Error('Tags too large');
+        }
         const tagsBytes = await read(handle.fd, Buffer.allocUnsafe(numberOfTagsBytes), 0, numberOfTagsBytes, tagsStart + 16).then((r) => r.buffer);
         await handle.close();
         return tagsBytes;

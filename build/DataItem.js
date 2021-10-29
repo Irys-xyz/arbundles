@@ -186,7 +186,7 @@ class DataItem {
         }
         const Signer = index_1.indexToType[sigType];
         const signatureData = await ar_data_base_1.getSignatureData(item);
-        return await Signer.verify(item.rawOwner, signatureData, buffer.subarray(2, 2 + item.signatureLength));
+        return await Signer.verify(item.rawOwner, signatureData, item.rawSignature);
     }
     getTagsStart() {
         const targetStart = this.getTargetStart();
