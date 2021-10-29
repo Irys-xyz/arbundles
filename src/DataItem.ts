@@ -10,7 +10,7 @@ import { getSignatureData } from "./ar-data-base";
 import axios, { AxiosResponse } from "axios";
 import { BUNDLER, SIG_CONFIG } from './constants';
 
-export const MIN_BINARY_SIZE = 1044;
+export const MIN_BINARY_SIZE = 80;
 
 export default class DataItem implements BundleItem {
   private readonly binary: Buffer;
