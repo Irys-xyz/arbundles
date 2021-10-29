@@ -75,7 +75,10 @@ export default class FileDataItem implements BundleItem {
       8,
       tagsStart + 8,
     ).then((r) => byteArrayToLong(r.buffer));
-    if (numberOfTagsBytes > 2048) return false;
+    if (numberOfTagsBytes > 2048) {
+      await handle.close();
+      return false;
+    }
 
     const tagsBytes = await read(
       handle.fd,
@@ -107,7 +110,10 @@ export default class FileDataItem implements BundleItem {
       }),
     ]);
 
-    if (!(await Signer.verify(owner, signatureData, await item.rawSignature()))) return false;
+    if (!(await Signer.verify(owner, signatureData, await item.rawSignature()))) {
+      await handle.close();
+      return false;
+    }
 
     await handle.close();
 
@@ -247,7 +253,10 @@ export default class FileDataItem implements BundleItem {
       tagsStart + 8,
     ).then((r) => r.buffer);
     const numberOfTagsBytes = byteArrayToLong(numberOfTagsBytesBuffer);
-    if (numberOfTagsBytes > 2048) throw new Error("Tags too large");
+    if (numberOfTagsBytes > 2048) {
+      await handle.close();
+      throw new Error('Tags too large');
+    }
     const tagsBytes = await read(
       handle.fd,
       Buffer.allocUnsafe(numberOfTagsBytes),
