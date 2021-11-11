@@ -5,7 +5,6 @@ import { DataItemCreateOptions } from "../ar-data-base";
 import * as fs from "fs";
 import ArweaveSigner from "../signing/chains/ArweaveSigner";
 import Arweave from "arweave";
-import axios from 'axios';
 import { createData } from "../ar-data-create";
 import DataItem from '../DataItem';
 import { bundleAndSignData } from '../ar-data-bundle';
@@ -423,9 +422,9 @@ describe("Creating and indexing a data item", function () {
   // });
   //
   it("should not cause out of memory", async function()  {
-    const bundleStr = await axios.get("https://arweave.net/gdaxDdsAl6_naCZPzoW0_XeXSsnBtaoio7mCE5O_xig", { responseType: "arraybuffer" });
+    const bundleStr = fs.readFileSync("output");
 
-    const bundle = new Bundle(bundleStr.data);
+    const bundle = new Bundle(bundleStr);
     console.log(bundle.length);
     console.log(await bundle.verify());
     console.log(bundle.getIds());

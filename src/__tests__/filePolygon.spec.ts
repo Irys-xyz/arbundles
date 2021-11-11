@@ -1,7 +1,6 @@
 import { DataItemCreateOptions } from '../ar-data-base';
 import { createData as createFileData } from '../file';
 import { createData } from "../ar-data-create";
-import fs from 'fs';
 import PolygonSigner from '../signing/chains/PolygonSigner';
 // import DataItem from '../DataItem';
 
@@ -46,7 +45,7 @@ describe("Polygon signing tests", function() {
 
     const signer = new PolygonSigner("a62a05de6cd346c85cbdf5281532c38fff972558fd02e2cc1d447e435de10f18");
 
-    const d = await createFileData(fs.readFileSync("large_llama.png"), signer, _d);
+    const d = await createFileData("hello", signer, _d);
     await d.sign(signer);
     expect(await d.isValid()).toBe(true);
 
@@ -57,6 +56,6 @@ describe("Polygon signing tests", function() {
     expect(await d.target()).toEqual("OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs");
     expect(await d.anchor()).toEqual("Math.apt'#]gng(36).substring(30)");
     expect(await d.tags()).toEqual([{ name: "Content-Type", value: "image/png" }]);
-    expect(Buffer.compare(fs.readFileSync("large_llama.png"), await d.rawData())).toEqual(0);
+    expect(Buffer.compare(Buffer.from("hello"), await d.rawData())).toEqual(0);
   });
 })

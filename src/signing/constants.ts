@@ -1,7 +1,7 @@
 import Rsa4096Pss from "./keys/Rsa4096Pss";
 import { Signer } from "./Signer";
 import Curve25519 from './keys/curve25519';
-import Secp256k1 from './keys/secp256k1';
+import Ethereum from "./chains/ethereum";
 
 interface IndexToType {
   [key: number]: {
@@ -25,5 +25,5 @@ export const indexToType: IndexToType = {
   2: Curve25519,
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  3: Secp256k1
+  3: Ethereum
 };

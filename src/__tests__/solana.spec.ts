@@ -1,6 +1,5 @@
 import { DataItemCreateOptions } from '../ar-data-base';
 import { createData } from '..';
-import fs from 'fs';
 import SolanaSigner from '../signing/chains/SolanaSigner';
 import base58 from 'bs58';
 
@@ -16,7 +15,7 @@ describe("Solana signing tests", function() {
 
     const signer = new SolanaSigner("rUC3u5oz8W1Y2b8b2tq1K5AUWnXMiVV5o9Fx29yTJepFqFPfYPdwjainQhUvxfNuuhMJAGoawA3qYWzo8QhC5pj");
 
-    const d = createData(fs.readFileSync("large_llama.png"), signer, _d);
+    const d = createData("hello", signer, _d);
     await d.sign(signer);
     expect(await d.isValid()).toBe(true);
     expect(base58.encode(d.rawOwner)).toEqual(signer.pk)
@@ -24,6 +23,6 @@ describe("Solana signing tests", function() {
     expect(d.target).toEqual("OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs");
     expect(d.anchor).toEqual("Math.apt'#]gng(36).substring(30)");
     expect(d.tags).toEqual([{ name: "Content-Type", value: "image/png" }]);
-    expect(Buffer.compare(fs.readFileSync("large_llama.png"), d.rawData)).toEqual(0);
+    expect(d.rawData.toString()).toEqual("hello");
   });
 })

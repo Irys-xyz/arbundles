@@ -8,7 +8,7 @@ import { Signer } from "./signing/index";
 import { indexToType } from "./signing/index";
 import { getSignatureData } from "./ar-data-base";
 import axios, { AxiosResponse } from "axios";
-import { BUNDLER, SIG_CONFIG } from './constants';
+import { SIG_CONFIG } from './constants';
 
 export const MIN_BINARY_SIZE = 80;
 
@@ -60,7 +60,7 @@ export default class DataItem implements BundleItem {
   }
 
   get signatureLength(): number {
-    const length = SIG_CONFIG[this.signatureType].sigLength;
+    const length = SIG_CONFIG[this.signatureType]?.sigLength;
     if (!length) throw new Error("Signature type not supported");
     return length;
   }
@@ -74,7 +74,7 @@ export default class DataItem implements BundleItem {
   }
 
   get ownerLength(): number {
-    const length = SIG_CONFIG[this.signatureType].pubLength;
+    const length = SIG_CONFIG[this.signatureType]?.pubLength;
     if (!length) throw new Error("Signature type not supported");
     return length;
   }
@@ -208,14 +208,14 @@ export default class DataItem implements BundleItem {
     };
   }
 
-  public async sendToBundler(bundler?: string): Promise<AxiosResponse> {
+  public async sendToBundler(bundler: string): Promise<AxiosResponse> {
     const headers = {
       "Content-Type": "application/octet-stream",
     };
 
     if (!this.isSigned())
       throw new Error("You must sign before sending to bundler");
-    const response = await axios.post(`${bundler ?? BUNDLER}/tx`, this.getRaw(), {
+    const response = await axios.post(`${bundler}/tx`, this.getRaw(), {
       headers,
       timeout: 100000,
       maxBodyLength: Infinity,

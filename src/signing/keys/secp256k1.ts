@@ -2,6 +2,7 @@ import { Signer } from '../Signer';
 import base64url from 'base64url';
 import secp256k1 from 'secp256k1';
 import { SIG_CONFIG } from '../../constants';
+import keccak256 from "keccak256";
 
 export default class Secp256k1 implements Signer {
   readonly ownerLength: number = SIG_CONFIG[3].pubLength;
@@ -30,14 +31,14 @@ export default class Secp256k1 implements Signer {
     if (typeof pk === 'string') p = base64url.toBuffer(pk);
     let verified = false;
     try {
-      verified = secp256k1.ecdsaVerify(signature, message.subarray(0, 32), p as Buffer);
+      verified = secp256k1.ecdsaVerify(signature, keccak256(message), p as Buffer);
       // eslint-disable-next-line no-empty
     } catch (e) {}
     return verified;
   }
 
   sign(message: Uint8Array): Uint8Array {
-    return secp256k1.ecdsaSign(Buffer.from(message.subarray(0, 32)), Buffer.from(this.key)).signature;
+    return secp256k1.ecdsaSign(keccak256(message), Buffer.from(this.key)).signature;
   }
 }
 

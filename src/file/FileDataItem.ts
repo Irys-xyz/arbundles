@@ -10,20 +10,20 @@ import Arweave from 'arweave';
 import { promisify } from 'util';
 import { indexToType, Signer } from '../signing';
 import axios, { AxiosResponse } from 'axios';
-import { BUNDLER, SIG_CONFIG } from '../constants';
+import { SIG_CONFIG } from '../constants';
 
 const write = promisify(fs.write);
 const read = promisify(fs.read);
 export default class FileDataItem implements BundleItem {
   public readonly filename: PathLike;
   async signatureLength(): Promise<number> {
-    const length = SIG_CONFIG[await this.signatureType()].sigLength;
+    const length = SIG_CONFIG[await this.signatureType()]?.sigLength;
     if (!length) throw new Error("Signature type not supported");
     return length;
   }
 
   async ownerLength(): Promise<number> {
-    const length = SIG_CONFIG[await this.signatureType()].pubLength;
+    const length = SIG_CONFIG[await this.signatureType()]?.pubLength;
     if (!length) throw new Error("Signature type not supported");
     return length;
   }
@@ -335,7 +335,7 @@ export default class FileDataItem implements BundleItem {
 
     if (!this.isSigned())
       throw new Error('You must sign before sending to bundler');
-    const response = await axios.post(`${bundler ?? BUNDLER}/tx`, fs.createReadStream(this.filename), {
+    const response = await axios.post(`${bundler}/tx`, fs.createReadStream(this.filename), {
       headers,
       timeout: 100000,
       maxBodyLength: Infinity,
