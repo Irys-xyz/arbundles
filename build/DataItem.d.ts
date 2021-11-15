@@ -50,7 +50,7 @@ export default class DataItem implements BundleItem {
             value: string;
         }[];
     };
-    sendToBundler(bundler?: string): Promise<AxiosResponse>;
+    sendToBundler(bundler: string): Promise<AxiosResponse>;
     static verify(buffer: Buffer): Promise<boolean>;
     private getTagsStart;
     private getTargetStart;

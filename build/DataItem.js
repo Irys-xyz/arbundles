@@ -49,7 +49,7 @@ class DataItem {
         return base64url_1.default.encode(this.rawSignature);
     }
     get signatureLength() {
-        const length = constants_1.SIG_CONFIG[this.signatureType].sigLength;
+        const length = constants_1.SIG_CONFIG[this.signatureType]?.sigLength;
         if (!length)
             throw new Error("Signature type not supported");
         return length;
@@ -61,7 +61,7 @@ class DataItem {
         return base64url_1.default.encode(this.rawOwner);
     }
     get ownerLength() {
-        const length = constants_1.SIG_CONFIG[this.signatureType].pubLength;
+        const length = constants_1.SIG_CONFIG[this.signatureType]?.pubLength;
         if (!length)
             throw new Error("Signature type not supported");
         return length;
@@ -151,7 +151,7 @@ class DataItem {
         };
         if (!this.isSigned())
             throw new Error("You must sign before sending to bundler");
-        const response = await axios_1.default.post(`${bundler ?? constants_1.BUNDLER}/tx`, this.getRaw(), {
+        const response = await axios_1.default.post(`${bundler}/tx`, this.getRaw(), {
             headers,
             timeout: 100000,
             maxBodyLength: Infinity,

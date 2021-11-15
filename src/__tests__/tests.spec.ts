@@ -5,6 +5,7 @@ import { DataItemCreateOptions } from "../ar-data-base";
 import * as fs from "fs";
 import ArweaveSigner from "../signing/chains/ArweaveSigner";
 import Arweave from "arweave";
+<<<<<<< HEAD
 import { createData } from "../ar-data-create";
 import DataItem from '../DataItem';
 import { bundleAndSignData } from '../ar-data-bundle';
@@ -17,6 +18,9 @@ import SolanaSigner from '../signing/chains/SolanaSigner';
 // import Bundle from '../Bundle';
 // import ArDB from '@textury/ardb';
 // import axios from 'axios';
+=======
+import axios from 'axios';
+>>>>>>> master
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString()
@@ -52,6 +56,7 @@ describe("Creating and indexing a data item", function () {
 
     const d = createData(fs.readFileSync("large_llama.png"), signer, _d);
     await d.sign(signer);
+    console.log(d.id);
 
     expect(d.rawData).toStrictEqual(fs.readFileSync("large_llama.png"));
     expect(d.owner).toBe(wallet0.n);
@@ -422,12 +427,15 @@ describe("Creating and indexing a data item", function () {
   // });
   //
   it("should not cause out of memory", async function()  {
+<<<<<<< HEAD
     const bundleStr = fs.readFileSync("output");
+=======
+    const bundleStr = await axios.get("https://arweave.net/ZfIWkx201gKSRjtONCoFbjzQ2QKsK9d82KE3KrILecE", { responseType: "arraybuffer" });
+>>>>>>> master
 
     const bundle = new Bundle(bundleStr);
     console.log(bundle.length);
     console.log(await bundle.verify());
-    console.log(bundle.getIds());
     console.log(bundle.getIds());
     console.log(process.memoryUsage())
   }, 1000000);
