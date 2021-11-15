@@ -5,22 +5,10 @@ import { DataItemCreateOptions } from "../ar-data-base";
 import * as fs from "fs";
 import ArweaveSigner from "../signing/chains/ArweaveSigner";
 import Arweave from "arweave";
-<<<<<<< HEAD
 import { createData } from "../ar-data-create";
 import DataItem from '../DataItem';
 import { bundleAndSignData } from '../ar-data-bundle';
-import Bundle from '../Bundle';
 import SolanaSigner from '../signing/chains/SolanaSigner';
-// import sizeof from "object-sizeof";
-// import { performance } from "perf_hooks";
-// import base64url from "base64url";
-// import { tagsParser } from '../parser';
-// import Bundle from '../Bundle';
-// import ArDB from '@textury/ardb';
-// import axios from 'axios';
-=======
-import axios from 'axios';
->>>>>>> master
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString()
@@ -54,11 +42,10 @@ describe("Creating and indexing a data item", function () {
 
     const signer = new ArweaveSigner(wallet0);
 
-    const d = createData(fs.readFileSync("large_llama.png"), signer, _d);
+    const d = createData("hello", signer, _d);
     await d.sign(signer);
-    console.log(d.id);
 
-    expect(d.rawData).toStrictEqual(fs.readFileSync("large_llama.png"));
+    expect(d.rawData.toString()).toEqual("hello");
     expect(d.owner).toBe(wallet0.n);
     expect(d.target).toBe("OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs");
     expect(d.anchor).toEqual("Math.apt'#]gng(36).substring(30)");
@@ -426,17 +413,13 @@ describe("Creating and indexing a data item", function () {
   //   console.log(allIds.getRaw().toString())
   // });
   //
-  it("should not cause out of memory", async function()  {
-<<<<<<< HEAD
-    const bundleStr = fs.readFileSync("output");
-=======
-    const bundleStr = await axios.get("https://arweave.net/ZfIWkx201gKSRjtONCoFbjzQ2QKsK9d82KE3KrILecE", { responseType: "arraybuffer" });
->>>>>>> master
-
-    const bundle = new Bundle(bundleStr);
-    console.log(bundle.length);
-    console.log(await bundle.verify());
-    console.log(bundle.getIds());
-    console.log(process.memoryUsage())
-  }, 1000000);
+  // it("should not cause out of memory", async function()  {
+  //   const bundleStr = await axios.get("https://arweave.net/ZfIWkx201gKSRjtONCoFbjzQ2QKsK9d82KE3KrILecE", { responseType: "arraybuffer" });
+  //
+  //   const bundle = new Bundle(bundleStr.data);
+  //   console.log(bundle.length);
+  //   console.log(await bundle.verify());
+  //   console.log(bundle.getIds());
+  //   console.log(process.memoryUsage())
+  // }, 1000000);
 });
