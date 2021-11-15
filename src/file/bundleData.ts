@@ -6,7 +6,7 @@ import FileBundle from './FileBundle';
 import FileDataItem from './FileDataItem';
 
 export async function bundleAndSignData(
-  dataItems: (FileDataItem)[],
+  dataItems: FileDataItem[],
   signer: Signer,
   dir?: string,
 ): Promise<FileBundle> {

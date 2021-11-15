@@ -4,17 +4,13 @@ import * as fs from "fs";
 import { tmpName } from "tmp-promise";
 import base64url from "base64url";
 import assert from "assert";
-import { Buffer } from "buffer";
 import { longTo8ByteArray, shortTo2ByteArray } from "../utils";
 import { serializeTags } from "../parser";
 import { Signer } from '../signing';
-
-const EMPTY_ARRAY = new Array(512).fill(0);
-const OWNER_LENGTH = 512;
-
+import { pipeline } from 'stream/promises';
 
 export async function createData(
-  data: string | Uint8Array,
+  data: string | Uint8Array | NodeJS.ReadableStream,
   signer: Signer,
   opts?: DataItemCreateOptions
 ): Promise<FileDataItem> {
@@ -24,21 +20,17 @@ export async function createData(
   // TODO: Add asserts
   // Parse all values to a buffer and
   const _owner = signer.publicKey;
-  assert(
-    _owner.byteLength == OWNER_LENGTH,
-    new Error(`Public key isn't the correct length: ${_owner.byteLength}`)
-  );
 
   const _target = opts?.target ? base64url.toBuffer(opts.target) : null;
   const _anchor = opts?.anchor ? Buffer.from(opts.anchor) : null;
   const _tags =
     (opts?.tags?.length ?? 0) > 0 ? await serializeTags(opts.tags) : null;
-  const _data = Buffer.from(data);
 
   stream.write(shortTo2ByteArray(signer.signatureType));
   // Signature
-  stream.write(Uint8Array.from(EMPTY_ARRAY));
+  stream.write(new Uint8Array(signer.signatureLength).fill(0));
 
+  assert(_owner.byteLength == signer.ownerLength, new Error(`Owner must be ${signer.ownerLength} bytes`));
   stream.write(_owner);
   stream.write(_target ? singleItemBuffer(1) : singleItemBuffer(0));
   if (_target) {
@@ -61,7 +53,17 @@ export async function createData(
     stream.write(_tags);
   }
 
-  stream.write(_data);
+  if (
+    typeof data[Symbol.asyncIterator as keyof AsyncIterable<Buffer>] ===
+    "function"
+  ) {
+    await pipeline(
+      data as NodeJS.ReadableStream,
+      stream
+    );
+  } else {
+    stream.write(Buffer.from(data as string | Buffer));
+  }
 
   await new Promise((resolve) => {
     stream.end(resolve);

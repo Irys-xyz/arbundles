@@ -8,9 +8,9 @@ import { Signer } from "./signing/index";
 import { indexToType } from "./signing/index";
 import { getSignatureData } from "./ar-data-base";
 import axios, { AxiosResponse } from "axios";
-import { BUNDLER } from "./constants";
+import { SIG_CONFIG } from './constants';
 
-export const MIN_BINARY_SIZE = 1044;
+export const MIN_BINARY_SIZE = 80;
 
 export default class DataItem implements BundleItem {
   private readonly binary: Buffer;
@@ -52,24 +52,31 @@ export default class DataItem implements BundleItem {
   }
 
   get rawSignature(): Buffer {
-    return this.binary.subarray(2, 514);
+    return this.binary.subarray(2, 2 + this.signatureLength);
   }
 
   get signature(): string {
     return base64url.encode(this.rawSignature);
   }
 
-  get rawOwner(): Buffer {
-    switch (this.signatureType) {
-      case 1:
-        return this.binary.subarray(514, 514 + 512);
-    }
+  get signatureLength(): number {
+    const length = SIG_CONFIG[this.signatureType]?.sigLength;
+    if (!length) throw new Error("Signature type not supported");
+    return length;
+  }
 
-    throw new Error("Not a valid signature type");
+  get rawOwner(): Buffer {
+    return this.binary.subarray(2 + this.signatureLength, 2 + this.signatureLength + this.ownerLength);
   }
 
   get owner(): string {
     return base64url.encode(this.rawOwner);
+  }
+
+  get ownerLength(): number {
+    const length = SIG_CONFIG[this.signatureType]?.pubLength;
+    if (!length) throw new Error("Signature type not supported");
+    return length;
   }
 
   get rawTarget(): Buffer {
@@ -201,14 +208,14 @@ export default class DataItem implements BundleItem {
     };
   }
 
-  public async sendToBundler(bundler?: string): Promise<AxiosResponse> {
+  public async sendToBundler(bundler: string): Promise<AxiosResponse> {
     const headers = {
       "Content-Type": "application/octet-stream",
     };
 
     if (!this.isSigned())
       throw new Error("You must sign before sending to bundler");
-    const response = await axios.post(`${bundler ?? BUNDLER}/tx`, this.getRaw(), {
+    const response = await axios.post(`${bundler}/tx`, this.getRaw(), {
       headers,
       timeout: 100000,
       maxBodyLength: Infinity,
@@ -230,13 +237,9 @@ export default class DataItem implements BundleItem {
     if (buffer.length < MIN_BINARY_SIZE) {
       return false;
     }
-    const sigType = byteArrayToLong(buffer.subarray(0, 2));
-    let tagsStart = 2 + 512 + 512 + 2;
-    const targetPresent = buffer[1026] == 1;
-    tagsStart += targetPresent ? 32 : 0;
-    const anchorPresentByte = targetPresent ? 1059 : 1027;
-    const anchorPresent = buffer[anchorPresentByte] == 1;
-    tagsStart += anchorPresent ? 32 : 0;
+    const item = new DataItem(buffer);
+    const sigType = item.signatureType;
+    const tagsStart = item.getTagsStart();
 
     const numberOfTags = byteArrayToLong(
       buffer.subarray(tagsStart, tagsStart + 8)
@@ -267,13 +270,12 @@ export default class DataItem implements BundleItem {
 
     const Signer = indexToType[sigType];
 
-    const item = new DataItem(buffer);
     const signatureData = await getSignatureData(item);
 
     return await Signer.verify(
-      item.owner,
+      item.rawOwner,
       signatureData,
-      buffer.subarray(2, 514)
+      item.rawSignature
     );
   }
 
@@ -283,12 +285,11 @@ export default class DataItem implements BundleItem {
    * @private
    */
   private getTagsStart(): number {
-    let tagsStart = 2 + 512 + 512 + 2;
-    const targetPresent = this.binary[1026] == 1;
-    tagsStart += targetPresent ? 32 : 0;
-    const anchorPresentByte = targetPresent ? 1059 : 1027;
-    const anchorPresent = this.binary[anchorPresentByte] == 1;
-    tagsStart += anchorPresent ? 32 : 0;
+    const targetStart = this.getTargetStart()
+    const targetPresent = this.binary[targetStart] == 1;
+    let tagsStart = targetStart + (targetPresent ? 33 : 1);
+    const anchorPresent = this.binary[tagsStart] == 1;
+    tagsStart += anchorPresent ? 33 : 1;
 
     return tagsStart;
   }
@@ -299,7 +300,7 @@ export default class DataItem implements BundleItem {
    * @private
    */
   private getTargetStart(): number {
-    return 1026;
+    return 2 + this.signatureLength + this.ownerLength;
   }
 
   /**

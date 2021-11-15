@@ -6,9 +6,6 @@ import DataItem from "./DataItem";
 import { serializeTags } from "./parser";
 import { Signer } from './signing';
 
-const EMPTY_ARRAY = new Array(512).fill(0);
-const OWNER_LENGTH = 512;
-
 /**
  * This will create a single DataItem in binary format (Uint8Array)
  *
@@ -24,10 +21,6 @@ export function createData(
   // TODO: Add asserts
   // Parse all values to a buffer and
   const _owner = signer.publicKey;
-  assert(
-    _owner.byteLength == OWNER_LENGTH,
-    new Error(`Public key isn't the correct length: ${_owner.byteLength}`)
-  );
 
   const _target = opts?.target ? base64url.toBuffer(opts.target) : null;
   const target_length = 1 + (_target?.byteLength ?? 0);
@@ -42,8 +35,8 @@ export function createData(
   // See [https://github.com/joshbenaron/arweave-standards/blob/ans104/ans/ANS-104.md#13-dataitem-format]
   const length =
     2 +
-    512 +
-    _owner.byteLength +
+    signer.signatureLength +
+    signer.ownerLength +
     target_length +
     anchor_length +
     tags_length +
@@ -51,27 +44,29 @@ export function createData(
   // Create array with set length
   const bytes = Buffer.alloc(length);
 
+
   bytes.set(shortTo2ByteArray(signer.signatureType), 0);
   // Push bytes for `signature`
-  bytes.set(EMPTY_ARRAY, 2);
+  bytes.set(new Uint8Array(signer.signatureLength).fill(0), 2);
   // // Push bytes for `id`
   // bytes.set(EMPTY_ARRAY, 32);
   // Push bytes for `owner`
 
-  assert(_owner.byteLength == 512, new Error("Owner must be 512 bytes"));
-  bytes.set(_owner, 514);
+  assert(_owner.byteLength == signer.ownerLength, new Error(`Owner must be ${signer.ownerLength} bytes`));
+  bytes.set(_owner, 2 + signer.signatureLength);
 
+  const position = 2 + signer.signatureLength + signer.ownerLength;
   // Push `presence byte` and push `target` if present
   // 64 + OWNER_LENGTH
-  bytes[1026] = _target ? 1 : 0;
+  bytes[position] = _target ? 1 : 0;
   if (_target) {
     assert(_target.byteLength == 32, new Error("Target must be 32 bytes"));
-    bytes.set(_target, 1027);
+    bytes.set(_target, position + 1);
   }
 
   // Push `presence byte` and push `anchor` if present
   // 64 + OWNER_LENGTH
-  const anchor_start = 1026 + target_length;
+  const anchor_start = position + target_length;
   let tags_start = anchor_start + 1;
   bytes[anchor_start] = _anchor ? 1 : 0;
   if (_anchor) {

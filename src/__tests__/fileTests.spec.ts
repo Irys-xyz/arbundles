@@ -1,11 +1,13 @@
 import { bundleAndSignData, createData, FileDataItem } from "../file";
 import { readFileSync } from "fs";
 import path from "path";
-import ArweaveSigner from "../signing/chains/arweave/ArweaveSigner";
+import ArweaveSigner from "../signing/chains/ArweaveSigner";
 import sizeof from "object-sizeof";
 import * as fs from "fs";
 import DataItem from "../DataItem";
 import Arweave from "arweave";
+import * as crypto from 'crypto';
+import base64url from 'base64url';
 
 const arweave = Arweave.init({
   host: "arweave.net",
@@ -30,8 +32,8 @@ arweave.wallets
 describe("file tests", function () {
   it("should verify ts file", async function () {
     const signer = new ArweaveSigner(wallet0);
-    const d = fs.readFileSync("Archive/bundler.d.ts");
-    const data = await createData(d, signer);
+    // const d = fs.readFileSync("large_llama.png");
+    const data = await createData(fs.createReadStream("large_llama.png"), signer);
     await data.sign(signer);
 
     expect(await FileDataItem.verify(data.filename)).toBe(true);
@@ -71,7 +73,11 @@ describe("file tests", function () {
     const data = await fs.promises
         .readFile("large_llama.png")
         .then((r) => Buffer.from(r.buffer));
-    const d = new Array(5).fill(await createData(data, signer, { tags }));
+    const d = [
+      await createData(data, signer, { tags }),
+      await createData(data, signer, { tags }),
+      await createData(data, signer, { tags }),
+    ];
     const bundle = await bundleAndSignData(d, signer);
     console.log(sizeof(bundle));
 
@@ -86,6 +92,7 @@ describe("file tests", function () {
     const second = await bundle.get(1);
     const third = await bundle.get(2);
 
+    console.log(await first.isValid());
     expect(await DataItem.verify(fs.readFileSync(first.filename))).toBe(true);
     expect(await DataItem.verify(fs.readFileSync(second.filename))).toBe(true);
     expect(await DataItem.verify(fs.readFileSync(third.filename))).toBe(true);
@@ -102,13 +109,11 @@ describe("file tests", function () {
         value: "image/png",
       },
     ];
-    const data = {
-      data: await fs.promises
-        .readFile("large_llama.png")
-        .then((r) => Buffer.from(r.buffer)),
-      tags,
-    };
-    const d = new Array(3).fill(data);
+
+    const d = [
+      await createData("", signer, { tags })
+    ]
+
     const bundle = await bundleAndSignData(d, signer);
     const tx = await bundle.toTransaction(arweave, wallet0);
     await arweave.transactions.sign(tx, wallet0);
@@ -195,5 +200,12 @@ describe("file tests", function () {
 
     const response = await d.sendToBundler("http://bundler.arweave.net");
     expect(response.status).toBe(200);
+  });
+
+  it("should index item from S3", async function() {
+    console.log(await DataItem.verify(fs.readFileSync(path.join(__dirname, "./.e5f55c2424dbaf806a15ea722881cea2.part.minio"))));
+    const item = new FileDataItem(path.join(__dirname, "./.e5f55c2424dbaf806a15ea722881cea2.part.minio"));
+    console.log(base64url.encode(crypto.createHash("sha256").update(await item.rawOwner()).digest()));
+    expect(await item.isValid()).toBe(true);
   });
 });
