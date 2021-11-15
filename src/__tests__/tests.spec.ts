@@ -7,13 +7,6 @@ import * as fs from "fs";
 import ArweaveSigner from "../signing/chains/arweave/ArweaveSigner";
 import Arweave from "arweave";
 import axios from 'axios';
-// import sizeof from "object-sizeof";
-// import { performance } from "perf_hooks";
-// import base64url from "base64url";
-// import { tagsParser } from '../parser';
-// import Bundle from '../Bundle';
-// import ArDB from '@textury/ardb';
-// import axios from 'axios';
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString()
@@ -48,6 +41,7 @@ describe("Creating and indexing a data item", function () {
 
     const d = await createData(fs.readFileSync("large_llama.png"), signer, _d);
     await d.sign(signer);
+    console.log(d.id);
 
     // const response = await d.sendToBundler().catch(console.log);
     // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -415,12 +409,11 @@ describe("Creating and indexing a data item", function () {
   // });
   //
   it("should not cause out of memory", async function()  {
-    const bundleStr = await axios.get("https://arweave.net/gdaxDdsAl6_naCZPzoW0_XeXSsnBtaoio7mCE5O_xig", { responseType: "arraybuffer" });
+    const bundleStr = await axios.get("https://arweave.net/ZfIWkx201gKSRjtONCoFbjzQ2QKsK9d82KE3KrILecE", { responseType: "arraybuffer" });
 
     const bundle = new Bundle(bundleStr.data);
     console.log(bundle.length);
     console.log(await bundle.verify());
-    console.log(bundle.getIds());
     console.log(bundle.getIds());
     console.log(process.memoryUsage())
   }, 1000000);

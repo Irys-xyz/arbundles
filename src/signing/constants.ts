@@ -1,5 +1,5 @@
-import Rsa4096Pss from "./keys/Rsa4096Pss";
 import { Signer } from "./Signer";
+import ArweaveSigner from './chains';
 
 interface IndexToType {
   [key: number]: {
@@ -13,5 +13,5 @@ interface IndexToType {
 }
 
 export const indexToType: IndexToType = {
-  1: Rsa4096Pss,
+  1: ArweaveSigner,
 };
