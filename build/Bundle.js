@@ -58,12 +58,8 @@ class Bundle {
         const items = this.getItems();
         for (const item of items) {
             const valid = await item.isValid();
-            console.log(valid);
             const expected = base64url_1.default(crypto.createHash("sha256").update(item.rawSignature).digest());
             if (!(valid && item.id === expected)) {
-                console.log(valid);
-                console.log(item.id);
-                console.log(expected);
                 return false;
             }
         }

@@ -17,13 +17,13 @@ const read = util_1.promisify(fs.read);
 class FileDataItem {
     filename;
     async signatureLength() {
-        const length = constants_1.SIG_CONFIG[await this.signatureType()].sigLength;
+        const length = constants_1.SIG_CONFIG[await this.signatureType()]?.sigLength;
         if (!length)
             throw new Error("Signature type not supported");
         return length;
     }
     async ownerLength() {
-        const length = constants_1.SIG_CONFIG[await this.signatureType()].pubLength;
+        const length = constants_1.SIG_CONFIG[await this.signatureType()]?.pubLength;
         if (!length)
             throw new Error("Signature type not supported");
         return length;
@@ -226,7 +226,7 @@ class FileDataItem {
         };
         if (!this.isSigned())
             throw new Error('You must sign before sending to bundler');
-        const response = await axios_1.default.post(`${bundler ?? constants_1.BUNDLER}/tx`, fs.createReadStream(this.filename), {
+        const response = await axios_1.default.post(`${bundler}/tx`, fs.createReadStream(this.filename), {
             headers,
             timeout: 100000,
             maxBodyLength: Infinity,

@@ -1,4 +1,5 @@
-/// <reference types="node" />
+
+// <reference types="node" />
 import { BundleInterface } from "../build/BundleInterface";
 import FileDataItem from "./FileDataItem";
 import { PathLike } from "fs";
