@@ -17,6 +17,7 @@ describe("Solana signing tests", function() {
 
     const d = createData("hello", signer, _d);
     await d.sign(signer);
+    console.log(d.id);
     expect(await d.isValid()).toBe(true);
     expect(base58.encode(d.rawOwner)).toEqual(signer.pk)
     expect(d.signatureType).toEqual(2);

@@ -9,6 +9,8 @@ import { createData } from "../ar-data-create";
 import DataItem from '../DataItem';
 import { bundleAndSignData } from '../ar-data-bundle';
 import SolanaSigner from '../signing/chains/SolanaSigner';
+import axios from 'axios';
+import Bundle from '../Bundle';
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString()
@@ -413,13 +415,13 @@ describe("Creating and indexing a data item", function () {
   //   console.log(allIds.getRaw().toString())
   // });
   //
-  // it("should not cause out of memory", async function()  {
-  //   const bundleStr = await axios.get("https://arweave.net/ZfIWkx201gKSRjtONCoFbjzQ2QKsK9d82KE3KrILecE", { responseType: "arraybuffer" });
-  //
-  //   const bundle = new Bundle(bundleStr.data);
-  //   console.log(bundle.length);
-  //   console.log(await bundle.verify());
-  //   console.log(bundle.getIds());
-  //   console.log(process.memoryUsage())
-  // }, 1000000);
+  it("should not cause out of memory", async function()  {
+    const bundleStr = await axios.get("https://arweave.net/YX4M5Hbeg_67bDGA0HapkPlMEwNf5vBAaiPIOk_Rcqg", { responseType: "arraybuffer" });
+
+    const bundle = new Bundle(bundleStr.data);
+    console.log(bundle.length);
+    console.log(await bundle.verify());
+    console.log(bundle.getIds());
+    console.log(process.memoryUsage())
+  }, 1000000);
 });
