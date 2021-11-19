@@ -1,7 +1,7 @@
 // In TypeScript 3.7, could be written as a single type:
 // `type DeepHashChunk = Uint8Array | DeepHashChunk[];`
 import Arweave from "arweave";
-import { createHash } from "crypto-js";
+import { createHash } from "crypto";
 
 type DeepHashChunk = Uint8Array | AsyncIterable<Buffer> | DeepHashChunks;
 type DeepHashChunks = DeepHashChunk[];

@@ -5,23 +5,21 @@ import Transaction from "arweave/node/lib/transaction";
 import Arweave from "arweave";
 import { BundleInterface } from "./BundleInterface";
 import { JWKInterface } from "./interface-jwk";
-import { createHash } from "crypto-js";
+import { createHash } from "crypto";
 
 const HEADER_START = 32;
 
 export default class Bundle implements BundleInterface {
-  readonly binary: Buffer;
+  public length: number;
+  public items: DataItem[];
+  protected binary: Buffer;
 
   constructor(binary: Buffer) {
     this.binary = binary;
+    this.length = this.getDataItemCount();
+    this.items = this.getItems();
   }
 
-  public get length(): number {
-    return this.getDataItemCount();
-  }
-  public get items(): DataItem[] {
-    return this.getItems();
-  }
   public getRaw(): Buffer {
     return this.binary;
   }
@@ -85,10 +83,10 @@ export default class Bundle implements BundleInterface {
   }
 
   public async verify(): Promise<boolean> {
-    const items = this.getItems();
-
-    for (const item of items) {
+    for (const item of this.items) {
+      console.error(item);
       const valid = await item.isValid();
+      console.error({ valid });
       const expected = base64url(
         createHash("sha256").update(item.rawSignature).digest(),
       );

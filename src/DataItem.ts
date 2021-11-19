@@ -8,7 +8,7 @@ import { Signer } from "./signing/index";
 import { indexToType } from "./signing/index";
 import { getSignatureData } from "./ar-data-base";
 import axios, { AxiosResponse } from "axios";
-import { SIG_CONFIG } from './constants';
+import { SignatureConfig, SIG_CONFIG } from "./constants";
 
 export const MIN_BINARY_SIZE = 80;
 
@@ -24,8 +24,25 @@ export default class DataItem implements BundleItem {
     return obj.binary !== undefined;
   }
 
-  get signatureType(): number {
-    return byteArrayToLong(this.binary.subarray(0, 2));
+  get signatureType(): SignatureConfig {
+    const signatureTypeVal: number = byteArrayToLong(
+      this.binary.subarray(0, 2),
+    );
+
+    switch (signatureTypeVal) {
+      case 1: {
+        return SignatureConfig.ARWEAVE;
+      }
+      case 2: {
+        return SignatureConfig.SOLANA;
+      }
+      case 3: {
+        return SignatureConfig.ETHERIUM;
+      }
+      default: {
+        throw new Error("Unknown signature type: " + signatureTypeVal);
+      }
+    }
   }
 
   async isValid(): Promise<boolean> {
@@ -60,13 +77,14 @@ export default class DataItem implements BundleItem {
   }
 
   get signatureLength(): number {
-    const length = SIG_CONFIG[this.signatureType]?.sigLength;
-    if (!length) throw new Error("Signature type not supported");
-    return length;
+    return SIG_CONFIG[this.signatureType].sigLength;
   }
 
   get rawOwner(): Buffer {
-    return this.binary.subarray(2 + this.signatureLength, 2 + this.signatureLength + this.ownerLength);
+    return this.binary.subarray(
+      2 + this.signatureLength,
+      2 + this.signatureLength + this.ownerLength,
+    );
   }
 
   get owner(): string {
@@ -74,9 +92,7 @@ export default class DataItem implements BundleItem {
   }
 
   get ownerLength(): number {
-    const length = SIG_CONFIG[this.signatureType]?.pubLength;
-    if (!length) throw new Error("Signature type not supported");
-    return length;
+    return SIG_CONFIG[this.signatureType].pubLength;
   }
 
   get rawTarget(): Buffer {
@@ -107,7 +123,7 @@ export default class DataItem implements BundleItem {
   get rawTags(): Buffer {
     const tagsStart = this.getTagsStart();
     const tagsSize = byteArrayToLong(
-      this.binary.subarray(tagsStart + 8, tagsStart + 16)
+      this.binary.subarray(tagsStart + 8, tagsStart + 16),
     );
     return this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize);
   }
@@ -115,20 +131,20 @@ export default class DataItem implements BundleItem {
   get tags(): { name: string; value: string }[] {
     const tagsStart = this.getTagsStart();
     const tagsCount = byteArrayToLong(
-      this.binary.subarray(tagsStart, tagsStart + 8)
+      this.binary.subarray(tagsStart, tagsStart + 8),
     );
     if (tagsCount == 0) {
       return [];
     }
 
     const tagsSize = byteArrayToLong(
-      this.binary.subarray(tagsStart + 8, tagsStart + 16)
+      this.binary.subarray(tagsStart + 8, tagsStart + 16),
     );
 
     return tagsParser.fromBuffer(
       Buffer.from(
-        this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize)
-      )
+        this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize),
+      ),
     );
   }
 
@@ -145,7 +161,7 @@ export default class DataItem implements BundleItem {
 
     const numberOfTagBytesArray = this.binary.subarray(
       tagsStart + 8,
-      tagsStart + 16
+      tagsStart + 16,
     );
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
     return tagsStart + 16 + numberOfTagBytes;
@@ -156,7 +172,7 @@ export default class DataItem implements BundleItem {
 
     const numberOfTagBytesArray = this.binary.subarray(
       tagsStart + 8,
-      tagsStart + 16
+      tagsStart + 16,
     );
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
     const dataStart = tagsStart + 16 + numberOfTagBytes;
@@ -222,10 +238,12 @@ export default class DataItem implements BundleItem {
       headers,
       timeout: 100000,
       maxBodyLength: Infinity,
-      validateStatus: (status) => (status > 200 && status < 300) || status !== 402
+      validateStatus: (status) =>
+        (status > 200 && status < 300) || status !== 402,
     });
 
-    if (response.status === 402) throw new Error("Not enough funds to send data");
+    if (response.status === 402)
+      throw new Error("Not enough funds to send data");
 
     return response;
   }
@@ -245,11 +263,11 @@ export default class DataItem implements BundleItem {
     const tagsStart = item.getTagsStart();
 
     const numberOfTags = byteArrayToLong(
-      buffer.subarray(tagsStart, tagsStart + 8)
+      buffer.subarray(tagsStart, tagsStart + 8),
     );
     const numberOfTagBytesArray = buffer.subarray(
       tagsStart + 8,
-      tagsStart + 16
+      tagsStart + 16,
     );
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
 
@@ -259,8 +277,8 @@ export default class DataItem implements BundleItem {
       try {
         const tags: { name: string; value: string }[] = tagsParser.fromBuffer(
           Buffer.from(
-            buffer.subarray(tagsStart + 16, tagsStart + 16 + numberOfTagBytes)
-          )
+            buffer.subarray(tagsStart + 16, tagsStart + 16 + numberOfTagBytes),
+          ),
         );
 
         if (tags.length !== numberOfTags) {
@@ -275,11 +293,7 @@ export default class DataItem implements BundleItem {
 
     const signatureData = await getSignatureData(item);
 
-    return await Signer.verify(
-      item.rawOwner,
-      signatureData,
-      item.rawSignature
-    );
+    return await Signer.verify(item.rawOwner, signatureData, item.rawSignature);
   }
 
   /**
@@ -288,7 +302,7 @@ export default class DataItem implements BundleItem {
    * @private
    */
   private getTagsStart(): number {
-    const targetStart = this.getTargetStart()
+    const targetStart = this.getTargetStart();
     const targetPresent = this.binary[targetStart] == 1;
     let tagsStart = targetStart + (targetPresent ? 33 : 1);
     const anchorPresent = this.binary[tagsStart] == 1;
