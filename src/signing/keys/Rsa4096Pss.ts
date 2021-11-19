@@ -1,9 +1,8 @@
 import { Signer } from "../Signer";
-import * as crypto from "crypto";
-import { constants } from "crypto";
+import { constants, createPublicKey, createSign } from "crypto-js";
 import Arweave from "arweave";
-import base64url from 'base64url';
-import { SIG_CONFIG } from '../../constants';
+import base64url from "base64url";
+import { SIG_CONFIG } from "../../constants";
 
 export default class Rsa4096Pss implements Signer {
   readonly signatureType: number = 1;
@@ -11,17 +10,16 @@ export default class Rsa4096Pss implements Signer {
   readonly signatureLength: number = SIG_CONFIG[1].sigLength;
   private readonly _publicKey: Buffer;
   public get publicKey(): Buffer {
-        return this._publicKey;
-    }
+    return this._publicKey;
+  }
 
   constructor(private _key: string, public pk?: string) {
     if (!pk) {
-      this.pk = crypto
-        .createPublicKey({
-          key: _key,
-          type: "pkcs1",
-          format: "pem",
-        })
+      this.pk = createPublicKey({
+        key: _key,
+        type: "pkcs1",
+        format: "pem",
+      })
         .export({
           format: "pem",
           type: "pkcs1",
@@ -31,7 +29,7 @@ export default class Rsa4096Pss implements Signer {
   }
 
   sign(message: Uint8Array): Uint8Array {
-    return crypto.createSign("sha256").update(message).sign({
+    return createSign("sha256").update(message).sign({
       key: this._key,
       padding: constants.RSA_PKCS1_PSS_PADDING,
     });
@@ -40,8 +38,12 @@ export default class Rsa4096Pss implements Signer {
   static async verify(
     pk: string | Buffer,
     message: Uint8Array,
-    signature: Uint8Array
+    signature: Uint8Array,
   ): Promise<boolean> {
-    return await Arweave.crypto.verify(Buffer.isBuffer(pk) ? base64url.encode(pk) : pk, message, signature);
+    return await Arweave.crypto.verify(
+      Buffer.isBuffer(pk) ? base64url.encode(pk) : pk,
+      message,
+      signature,
+    );
   }
 }
