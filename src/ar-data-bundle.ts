@@ -52,9 +52,7 @@ export async function bundleAndSignData(
       return d.getRaw();
     }),
   ).then((a) => {
-    return a.reduce((previousValue, currentValue) => {
-      return Buffer.concat([previousValue, currentValue]);
-    }, Buffer.allocUnsafe(0));
+    return Buffer.concat(a);
   });
 
   const buffer = Buffer.from([
