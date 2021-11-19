@@ -1,7 +1,7 @@
 import { Signer } from "./Signer";
 import Curve25519 from './keys/curve25519';
 import Ethereum from "./chains/ethereum";
-import ArweaveSigner from './chains';
+import { ArweaveSigner } from './chains';
 
 interface IndexToType {
   [key: number]: {
