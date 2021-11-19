@@ -237,7 +237,7 @@ export default class DataItem implements BundleItem {
    * - the tags are encoded correctly
    */
   static async verify(buffer: Buffer): Promise<boolean> {
-    if (buffer.length < MIN_BINARY_SIZE) {
+    if (buffer.byteLength < MIN_BINARY_SIZE) {
       return false;
     }
     const item = new DataItem(buffer);

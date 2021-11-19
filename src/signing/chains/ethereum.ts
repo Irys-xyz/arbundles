@@ -1,10 +1,21 @@
 import Secp256k1 from "../keys/secp256k1";
+import secp256k1 from 'secp256k1';
 
 export default class Ethereum extends Secp256k1 {
+  get publicKey(): Buffer {
+    return Buffer.from(this.pk, "hex");
+  }
+
+  constructor(key: string) {
+    const b = Buffer.from(key, "hex");
+    const pub = secp256k1.publicKeyCreate(b, false);
+    super(key, Buffer.from(pub));
+  }
+
   sign(message: Uint8Array): Uint8Array {
     return super.sign(Buffer.concat([
       Buffer.from("\x19Ethereum Signed Message:\n"),
-      new Uint8Array(1).fill(message.length),
+      new Uint8Array(1).fill(message.byteLength),
       message
     ]));
   }
@@ -18,7 +29,7 @@ export default class Ethereum extends Secp256k1 {
       pk,
       Buffer.concat([
       Buffer.from("\x19Ethereum Signed Message:\n"),
-      new Uint8Array(1).fill(message.length),
+      new Uint8Array(1).fill(message.byteLength),
       message
     ]),
       signature
