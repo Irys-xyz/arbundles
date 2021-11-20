@@ -1,13 +1,13 @@
 // In TypeScript 3.7, could be written as a single type:
 // `type DeepHashChunk = Uint8Array | DeepHashChunk[];`
 import Arweave from "arweave";
-import * as crypto from "crypto";
+import { createHash } from "crypto";
 
 type DeepHashChunk = Uint8Array | AsyncIterable<Buffer> | DeepHashChunks;
 type DeepHashChunks = DeepHashChunk[];
 
 export default async function deepHash(
-  data: DeepHashChunk
+  data: DeepHashChunk,
 ): Promise<Uint8Array> {
   if (
     typeof data[Symbol.asyncIterator as keyof AsyncIterable<Buffer>] ===
@@ -15,7 +15,7 @@ export default async function deepHash(
   ) {
     const _data = data as AsyncIterable<Buffer>;
 
-    const context = crypto.createHash("sha384");
+    const context = createHash("sha384");
 
     let length = 0;
 
@@ -43,7 +43,7 @@ export default async function deepHash(
 
     return await deepHashChunks(
       data,
-      await Arweave.crypto.hash(tag, "SHA-384")
+      await Arweave.crypto.hash(tag, "SHA-384"),
     );
   }
 
@@ -64,7 +64,7 @@ export default async function deepHash(
 
 async function deepHashChunks(
   chunks: DeepHashChunks,
-  acc: Uint8Array
+  acc: Uint8Array,
 ): Promise<Uint8Array> {
   if (chunks.length < 1) {
     return acc;
@@ -79,9 +79,9 @@ async function deepHashChunks(
 }
 
 export async function hashStream(
-  stream: AsyncIterable<Buffer>
+  stream: AsyncIterable<Buffer>,
 ): Promise<Buffer> {
-  const context = crypto.createHash("sha384");
+  const context = createHash("sha384");
 
   for await (const chunk of stream) {
     context.update(chunk);

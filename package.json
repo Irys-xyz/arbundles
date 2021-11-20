@@ -1,23 +1,17 @@
 {
-  "name": "arbundles",
-  "version": "0.3.0",
+  "name": "@hlolli/arbundles",
+  "version": "0.3.1",
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
-  "files": [
-    "/build/**/*.js",
-    "/build/**/*.ts",
-    "/file/**/*.js",
-    "/file/**/*.ts"
-  ],
+  "files": ["build/**/*.js", "/build/**/*.ts"],
   "scripts": {
     "start": "node build/src/index.js",
     "clean": "rimraf coverage build tmp",
-    "prebuild": "npm run lint",
-    "build": "tsc -p tsconfig.release.json",
-    "build:watch": "tsc -w -p tsconfig.release.json",
+    "build": "yarn run clean && tsc -p tsconfig.json",
+    "build:watch": "tsc -w -p tsconfig.json",
     "lint": "eslint . --ext .ts,.tsx",
     "test": "jest --coverage",
     "test:watch": "jest --watch",

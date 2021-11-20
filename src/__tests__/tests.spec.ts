@@ -6,14 +6,14 @@ import * as fs from "fs";
 import ArweaveSigner from "../signing/chains/ArweaveSigner";
 import Arweave from "arweave";
 import { createData } from "../ar-data-create";
-import DataItem from '../DataItem';
-import { bundleAndSignData } from '../ar-data-bundle';
-import SolanaSigner from '../signing/chains/SolanaSigner';
-import axios from 'axios';
-import Bundle from '../Bundle';
+import DataItem from "../DataItem";
+import { bundleAndSignData } from "../ar-data-bundle";
+import SolanaSigner from "../signing/chains/SolanaSigner";
+import axios from "axios";
+import Bundle from "../Bundle";
 
 const wallet0 = JSON.parse(
-  readFileSync(path.join(__dirname, "test_key0.json")).toString()
+  readFileSync(path.join(__dirname, "test_key0.json")).toString(),
 );
 
 const arweave = Arweave.init({
@@ -37,9 +37,7 @@ describe("Creating and indexing a data item", function () {
     const _d: DataItemCreateOptions = {
       anchor: "Math.apt'#]gng(36).substring(30)",
       target: "OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs",
-      tags: [
-        { name: "Content-Type", value: "image/png" }
-      ]
+      tags: [{ name: "Content-Type", value: "image/png" }],
     };
 
     const signer = new ArweaveSigner(wallet0);
@@ -51,11 +49,8 @@ describe("Creating and indexing a data item", function () {
     expect(d.owner).toBe(wallet0.n);
     expect(d.target).toBe("OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs");
     expect(d.anchor).toEqual("Math.apt'#]gng(36).substring(30)");
-    expect(d.tags).toEqual([
-      { name: "Content-Type", value: "image/png" }
-    ]);
+    expect(d.tags).toEqual([{ name: "Content-Type", value: "image/png" }]);
     expect(await DataItem.verify(d.getRaw())).toEqual(true);
-
   }, 5000000);
 
   it("should create with no target and get", async function () {
@@ -143,27 +138,26 @@ describe("Creating and indexing a data item", function () {
 
   it("Test Bundle", async function () {
     const signer = new ArweaveSigner(wallet0);
-    const solSigner = new SolanaSigner("rUC3u5oz8W1Y2b8b2tq1K5AUWnXMiVV5o9Fx29yTJepFqFPfYPdwjainQhUvxfNuuhMJAGoawA3qYWzo8QhC5pj");
+    const solSigner = new SolanaSigner(
+      "rUC3u5oz8W1Y2b8b2tq1K5AUWnXMiVV5o9Fx29yTJepFqFPfYPdwjainQhUvxfNuuhMJAGoawA3qYWzo8QhC5pj",
+    );
     const _dataItems = [
-      createData(
-        "tasty",
-        signer,
-        {
+      createData("tasty", signer, {
         target: "pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A",
         anchor: "Math.randomgng(36).substring(30)",
         tags: [{ name: "x", value: "y" }],
       }),
-      createData(
-        "tasty",
-        solSigner,
-        {
+      createData("tasty", solSigner, {
         target: "pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A",
         anchor: "Math.randomgng(36).substring(30)",
         tags: [{ name: "x", value: "y" }],
-      })
+      }),
     ];
 
-    const bundle = await bundleAndSignData([_dataItems[0], _dataItems[0]], signer);
+    const bundle = await bundleAndSignData(
+      [_dataItems[0], _dataItems[0]],
+      signer,
+    );
     const dataItems = bundle.items;
 
     expect(bundle.length).toEqual(2);
@@ -171,7 +165,7 @@ describe("Creating and indexing a data item", function () {
     expect(Buffer.from(dataItems[0].rawData).toString()).toBe("tasty");
     expect(dataItems[0].owner).toBe(wallet0.n);
     expect(Buffer.from(dataItems[0].target).toString()).toBe(
-      "pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A"
+      "pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A",
     );
     expect(dataItems[0].anchor).toEqual("Math.randomgng(36).substring(30)");
     expect(dataItems[0].tags).toEqual([{ name: "x", value: "y" }]);
@@ -182,7 +176,7 @@ describe("Creating and indexing a data item", function () {
     const signer = new ArweaveSigner(wallet0);
     const bundle = await bundleAndSignData(
       [createData("1894", signer), createData("4242", signer)],
-      signer
+      signer,
     );
 
     expect(bundle.get(1).rawData).toEqual(Buffer.from("4242"));
@@ -221,12 +215,9 @@ describe("Creating and indexing a data item", function () {
 
     const items = [
       createData("1984", signer, { tags }),
-      createData("4242", signer)
-    ]
-    const bundle = await bundleAndSignData(
-      items,
-      signer
-    );
+      createData("4242", signer),
+    ];
+    const bundle = await bundleAndSignData(items, signer);
 
     expect(await bundle.verify()).toEqual(true);
   });
@@ -415,13 +406,16 @@ describe("Creating and indexing a data item", function () {
   //   console.log(allIds.getRaw().toString())
   // });
   //
-  it("should not cause out of memory", async function()  {
-    const bundleStr = await axios.get("https://arweave.net/YX4M5Hbeg_67bDGA0HapkPlMEwNf5vBAaiPIOk_Rcqg", { responseType: "arraybuffer" });
+  it("should not cause out of memory", async function () {
+    const bundleStr = await axios.get(
+      "https://arweave.net/YX4M5Hbeg_67bDGA0HapkPlMEwNf5vBAaiPIOk_Rcqg",
+      { responseType: "arraybuffer" },
+    );
 
     const bundle = new Bundle(bundleStr.data);
-    console.log(bundle.length);
-    console.log(await bundle.verify());
-    console.log(bundle.getIds());
-    console.log(process.memoryUsage())
+    console.log("Length", bundle.length);
+    console.log("Verify", await bundle.verify());
+    console.log("ids", bundle.getIds());
+    console.log("mem", process.memoryUsage());
   }, 1000000);
 });

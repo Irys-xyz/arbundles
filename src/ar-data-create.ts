@@ -4,7 +4,7 @@ import base64url from "base64url";
 import { longTo8ByteArray, shortTo2ByteArray } from "./utils";
 import DataItem from "./DataItem";
 import { serializeTags } from "./parser";
-import { Signer } from './signing';
+import { Signer } from "./signing";
 
 /**
  * This will create a single DataItem in binary format (Uint8Array)
@@ -44,7 +44,6 @@ export function createData(
   // Create array with set length
   const bytes = Buffer.alloc(length);
 
-
   bytes.set(shortTo2ByteArray(signer.signatureType), 0);
   // Push bytes for `signature`
   bytes.set(new Uint8Array(signer.signatureLength).fill(0), 2);
@@ -52,7 +51,12 @@ export function createData(
   // bytes.set(EMPTY_ARRAY, 32);
   // Push bytes for `owner`
 
-  assert(_owner.byteLength == signer.ownerLength, new Error(`Owner must be ${signer.ownerLength} bytes`));
+  assert(
+    _owner.byteLength == signer.ownerLength,
+    new Error(
+      `Owner must be ${signer.ownerLength} bytes, but was incorrectly ${_owner.byteLength}`,
+    ),
+  );
   bytes.set(_owner, 2 + signer.signatureLength);
 
   const position = 2 + signer.signatureLength + signer.ownerLength;
@@ -60,7 +64,12 @@ export function createData(
   // 64 + OWNER_LENGTH
   bytes[position] = _target ? 1 : 0;
   if (_target) {
-    assert(_target.byteLength == 32, new Error("Target must be 32 bytes"));
+    assert(
+      _target.byteLength == 32,
+      new Error(
+        "Target must be 32 bytes but was incorrectly ${_target.byteLength}",
+      ),
+    );
     bytes.set(_target, position + 1);
   }
 

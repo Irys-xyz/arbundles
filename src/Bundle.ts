@@ -1,24 +1,28 @@
 import base64url from "base64url";
 import { arraybufferEqual, byteArrayToLong } from "./utils";
 import DataItem from "./DataItem";
-import Transaction  from "arweave/node/lib/transaction";
+import Transaction from "arweave/node/lib/transaction";
 import Arweave from "arweave";
-import { BundleInterface } from './BundleInterface';
-import { JWKInterface } from './interface-jwk';
-import * as crypto from 'crypto';
+import { BundleInterface } from "./BundleInterface";
+import { JWKInterface } from "./interface-jwk";
+import { createHash } from "crypto";
 
 const HEADER_START = 32;
 
 export default class Bundle implements BundleInterface {
-  readonly binary: Buffer;
+  public length: number;
+  public items: DataItem[];
+  protected binary: Buffer;
 
   constructor(binary: Buffer) {
     this.binary = binary;
+    this.length = this.getDataItemCount();
+    this.items = this.getItems();
   }
 
-  public get length(): number { return this.getDataItemCount(); }
-  public get items(): DataItem[] { return this.getItems(); }
-  public getRaw(): Buffer { return this.binary; }
+  public getRaw(): Buffer {
+    return this.binary;
+  }
 
   /**
    * Get a DataItem by index (`number`) or by txId (`string`)
@@ -38,8 +42,8 @@ export default class Bundle implements BundleInterface {
 
   public getSizes(): number[] {
     const ids = [];
-    for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
-      ids.push(byteArrayToLong(this.binary.subarray(i, i + 32)))
+    for (let i = HEADER_START; i < HEADER_START + 64 * this.length; i += 64) {
+      ids.push(byteArrayToLong(this.binary.subarray(i, i + 32)));
     }
 
     return ids;
@@ -47,8 +51,8 @@ export default class Bundle implements BundleInterface {
 
   public getIds(): string[] {
     const ids = [];
-    for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
-      ids.push(base64url.encode(this.binary.subarray(i + 32, i + 64)))
+    for (let i = HEADER_START; i < HEADER_START + 64 * this.length; i += 64) {
+      ids.push(base64url.encode(this.binary.subarray(i + 32, i + 64)));
     }
 
     return ids;
@@ -59,26 +63,32 @@ export default class Bundle implements BundleInterface {
       throw new RangeError("Index of bundle out of range");
     }
 
-    const start = 64 + (64 * index);
+    const start = 64 + 64 * index;
     return base64url.encode(this.binary.subarray(start, start + 32));
   }
 
-  public async toTransaction(arweave: Arweave, jwk: JWKInterface): Promise<Transaction> {
-    const tx = await arweave.createTransaction({
-      data: this.binary
-    }, jwk);
+  public async toTransaction(
+    arweave: Arweave,
+    jwk: JWKInterface,
+  ): Promise<Transaction> {
+    const tx = await arweave.createTransaction(
+      {
+        data: this.binary,
+      },
+      jwk,
+    );
     tx.addTag("Bundle-Format", "binary");
     tx.addTag("Bundle-Version", "2.0.0");
     return tx;
   }
 
   public async verify(): Promise<boolean> {
-    const items = this.getItems();
-
-    for (const item of items) {
+    for (const item of this.items) {
       const valid = await item.isValid();
-      const expected = base64url(crypto.createHash("sha256").update(item.rawSignature).digest());
-      if(!(valid && item.id === expected)) {
+      const expected = base64url(
+        createHash("sha256").update(item.rawSignature).digest(),
+      );
+      if (!(valid && item.id === expected)) {
         return false;
       }
     }
@@ -86,13 +96,12 @@ export default class Bundle implements BundleInterface {
     return true;
   }
 
-  private getOffset(id: Uint8Array): { startOffset: number, size: number } {
+  private getOffset(id: Uint8Array): { startOffset: number; size: number } {
     let offset = 0;
-    for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
-      const _offset = byteArrayToLong(this.binary.subarray(i, i + 32))
+    for (let i = HEADER_START; i < HEADER_START + 64 * this.length; i += 64) {
+      const _offset = byteArrayToLong(this.binary.subarray(i, i + 32));
       offset += _offset;
       const _id = this.binary.subarray(i + 32, i + 64);
-
 
       if (arraybufferEqual(_id, id)) {
         return { startOffset: offset, size: _offset };
@@ -111,11 +120,13 @@ export default class Bundle implements BundleInterface {
   private getByIndex(index: number) {
     let offset = 0;
 
-    const headerStart = 32 + (64 * index);
-    const dataItemSize = byteArrayToLong(this.binary.subarray(headerStart, headerStart + 32))
+    const headerStart = 32 + 64 * index;
+    const dataItemSize = byteArrayToLong(
+      this.binary.subarray(headerStart, headerStart + 32),
+    );
 
     let counter = 0;
-    for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
+    for (let i = HEADER_START; i < HEADER_START + 64 * this.length; i += 64) {
       if (counter == index) {
         break;
       }
@@ -126,12 +137,14 @@ export default class Bundle implements BundleInterface {
       counter++;
     }
 
-
     const bundleStart = this.getBundleStart();
     const dataItemStart = bundleStart + offset;
-    const slice = this.binary.subarray(dataItemStart, dataItemStart + dataItemSize + 200);
+    const slice = this.binary.subarray(
+      dataItemStart,
+      dataItemStart + dataItemSize + 200,
+    );
     const item = new DataItem(slice);
-    item.rawId = this.binary.slice(32 + (64 * index), 64 + (64 * index));
+    item.rawId = this.binary.slice(32 + 64 * index, 64 + 64 * index);
     return item;
   }
 
@@ -145,7 +158,9 @@ export default class Bundle implements BundleInterface {
 
     const bundleStart = this.getBundleStart();
     const dataItemStart = bundleStart + offset.startOffset;
-    return new DataItem(this.binary.subarray(dataItemStart, dataItemStart + offset.size))
+    return new DataItem(
+      this.binary.subarray(dataItemStart, dataItemStart + offset.size),
+    );
   }
 
   private getDataItemCount(): number {
@@ -153,7 +168,7 @@ export default class Bundle implements BundleInterface {
   }
 
   private getBundleStart(): number {
-    return 32 + (64 * this.length);
+    return 32 + 64 * this.length;
   }
 
   private getItems(): DataItem[] {
@@ -162,12 +177,15 @@ export default class Bundle implements BundleInterface {
     const bundleStart = this.getBundleStart();
 
     let counter = 0;
-    for (let i = HEADER_START; i < (HEADER_START + (64 * this.length)); i+=64) {
-      const _offset = byteArrayToLong(this.binary.subarray(i, i + 32))
+    for (let i = HEADER_START; i < HEADER_START + 64 * this.length; i += 64) {
+      const _offset = byteArrayToLong(this.binary.subarray(i, i + 32));
       const _id = this.binary.subarray(i + 32, i + 64);
 
       const dataItemStart = bundleStart + offset;
-      const bytes = this.binary.subarray(dataItemStart, dataItemStart + _offset);
+      const bytes = this.binary.subarray(
+        dataItemStart,
+        dataItemStart + _offset,
+      );
 
       offset += _offset;
 
