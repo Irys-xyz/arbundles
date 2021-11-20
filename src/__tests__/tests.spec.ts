@@ -13,7 +13,6 @@ const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString(),
 );
 
-
 describe("Creating and indexing a data item", function () {
   it("should create with all and get", async function () {
     // await arweave.wallets.ownerToAddress(wallet0.n)
