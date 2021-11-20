@@ -84,9 +84,7 @@ export default class Bundle implements BundleInterface {
 
   public async verify(): Promise<boolean> {
     for (const item of this.items) {
-      console.error(item);
       const valid = await item.isValid();
-      console.error({ valid });
       const expected = base64url(
         createHash("sha256").update(item.rawSignature).digest(),
       );
