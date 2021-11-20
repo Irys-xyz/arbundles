@@ -406,7 +406,7 @@ describe("Creating and indexing a data item", function () {
   //   console.log(allIds.getRaw().toString())
   // });
   //
-  it("should not cause out of memory", async function () {
+  it.skip("should not cause out of memory", async function () {
     const bundleStr = await axios.get(
       "https://arweave.net/YX4M5Hbeg_67bDGA0HapkPlMEwNf5vBAaiPIOk_Rcqg",
       { responseType: "arraybuffer" },
