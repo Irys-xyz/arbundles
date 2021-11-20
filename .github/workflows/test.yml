@@ -1,0 +1,19 @@
+name: "Tests"
+on:
+  pull_request:
+    branches: ["**"]
+  push:
+    branches:
+      - master
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: lint
+        run: yarn lint
+      - name: test
+        run: yarn test
