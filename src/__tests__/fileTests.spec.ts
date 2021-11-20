@@ -17,15 +17,6 @@ const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString()
 );
 
-arweave.wallets
-  .getAddress(wallet0)
-  .then(async (address) => {
-    return address;
-  })
-  .then(async (address) =>
-    console.log(await arweave.wallets.getBalance(address))
-  );
-
 describe("file tests", function () {
   it("should verify ts file", async function () {
     const signer = new ArweaveSigner(wallet0);
