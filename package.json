@@ -1,5 +1,5 @@
 {
-  "name": "@hlolli/arbundles",
+  "name": "arbundles",
   "version": "0.3.1",
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
@@ -8,15 +8,9 @@
   "types": "build/index.d.ts",
   "files": ["build/**/*.js", "/build/**/*.ts"],
   "scripts": {
-    "start": "node build/src/index.js",
-    "clean": "rimraf coverage build tmp",
-    "build": "yarn run clean && tsc -p tsconfig.json",
-    "build:watch": "tsc -w -p tsconfig.json",
+    "build": "rm -rf file && tsc && mv build/file ./ && cp -a build/signing file && rm -rf build/__tests__",
     "lint": "eslint . --ext .ts,.tsx",
-    "test": "jest --coverage",
-    "test:watch": "jest --watch",
-    "prepublish": "tsc",
-    "build:push": "tsc && git add lib && git commit -m \"Build and push new version\" && git push"
+    "test": "jest --coverage"
   },
   "devDependencies": {
     "@textury/ardb": "^1.1.3",
