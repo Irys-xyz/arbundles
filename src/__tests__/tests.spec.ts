@@ -4,27 +4,14 @@ import { Buffer } from "buffer";
 import { DataItemCreateOptions } from "../ar-data-base";
 import * as fs from "fs";
 import ArweaveSigner from "../signing/chains/ArweaveSigner";
-import Arweave from "arweave";
 import { createData } from "../ar-data-create";
 import DataItem from "../DataItem";
 import { bundleAndSignData } from "../ar-data-bundle";
 import SolanaSigner from "../signing/chains/SolanaSigner";
-import axios from "axios";
-import Bundle from "../Bundle";
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString(),
 );
-
-const arweave = Arweave.init({
-  host: "arweave.net",
-  port: 443,
-  protocol: "https",
-});
-
-arweave.wallets.ownerToAddress(wallet0.n).then((r) => {
-  arweave.wallets.getBalance(r).then(console.log);
-});
 
 describe("Creating and indexing a data item", function () {
   it("should create with all and get", async function () {
@@ -406,16 +393,16 @@ describe("Creating and indexing a data item", function () {
   //   console.log(allIds.getRaw().toString())
   // });
   //
-  it.skip("should not cause out of memory", async function () {
-    const bundleStr = await axios.get(
-      "https://arweave.net/YX4M5Hbeg_67bDGA0HapkPlMEwNf5vBAaiPIOk_Rcqg",
-      { responseType: "arraybuffer" },
-    );
-
-    const bundle = new Bundle(bundleStr.data);
-    console.log("Length", bundle.length);
-    console.log("Verify", await bundle.verify());
-    console.log("ids", bundle.getIds());
-    console.log("mem", process.memoryUsage());
-  }, 1000000);
+  // it("should not cause out of memory", async function () {
+  //   const bundleStr = await axios.get(
+  //     "https://arweave.net/YX4M5Hbeg_67bDGA0HapkPlMEwNf5vBAaiPIOk_Rcqg",
+  //     { responseType: "arraybuffer" },
+  //   );
+  //
+  //   const bundle = new Bundle(bundleStr.data);
+  //   console.log("Length", bundle.length);
+  //   console.log("Verify", await bundle.verify());
+  //   console.log("ids", bundle.getIds());
+  //   console.log("mem", process.memoryUsage());
+  // }, 1000000);
 });

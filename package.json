@@ -1,6 +1,6 @@
 {
   "name": "arbundles",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
@@ -8,7 +8,8 @@
   "types": "build/index.d.ts",
   "files": [
     "build/**/*.js",
-    "/build/**/*.ts"
+    "/build/**/*.ts",
+    "file/**/*"
   ],
   "scripts": {
     "build": "rm -rf file && tsc && mv build/file ./ && cp -a build/signing file && rm -rf build/__tests__",

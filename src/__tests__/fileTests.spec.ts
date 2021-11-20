@@ -14,17 +14,8 @@ const arweave = Arweave.init({
 });
 
 const wallet0 = JSON.parse(
-  readFileSync(path.join(__dirname, "test_key0.json")).toString()
+  readFileSync(path.join(__dirname, "test_key0.json")).toString(),
 );
-
-arweave.wallets
-  .getAddress(wallet0)
-  .then(async (address) => {
-    return address;
-  })
-  .then(async (address) =>
-    console.log(await arweave.wallets.getBalance(address))
-  );
 
 describe("file tests", function () {
   it("should verify ts file", async function () {
@@ -49,7 +40,7 @@ describe("file tests", function () {
     expect(await data.signatureType()).toEqual(1);
     expect(await data.owner()).toEqual(wallet0.n);
     expect(await data.rawAnchor().then((r) => r.toString())).toEqual(
-      "fgggggggggggggggggggggggggllllll"
+      "fgggggggggggggggggggggggggllllll",
     );
     expect(await data.tags()).toEqual([]);
     expect(await data.target()).toEqual("");
@@ -94,9 +85,7 @@ describe("file tests", function () {
       },
     ];
 
-    const d = [
-      await createData("", signer, { tags })
-    ]
+    const d = [await createData("", signer, { tags })];
 
     const bundle = await bundleAndSignData(d, signer);
     const tx = await bundle.toTransaction(arweave, wallet0);
