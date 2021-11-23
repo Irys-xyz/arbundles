@@ -39,6 +39,9 @@ export default class DataItem implements BundleItem {
       case 3: {
         return SignatureConfig.ETHERIUM;
       }
+      case 4: {
+        return SignatureConfig.INJECTEDETHEREUMSIGNER;
+      }
       default: {
         throw new Error("Unknown signature type: " + signatureTypeVal);
       }
@@ -194,7 +197,6 @@ export default class DataItem implements BundleItem {
 
   public async sign(signer: Signer): Promise<Buffer> {
     this._id = await sign(this, signer);
-
     return this.rawId;
   }
 
@@ -292,7 +294,6 @@ export default class DataItem implements BundleItem {
     const Signer = indexToType[sigType];
 
     const signatureData = await getSignatureData(item);
-
     return await Signer.verify(item.rawOwner, signatureData, item.rawSignature);
   }
 
