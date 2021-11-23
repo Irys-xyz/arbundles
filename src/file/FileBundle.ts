@@ -17,6 +17,7 @@ import {
   createTransactionAsync,
   uploadTransactionAsync,
 } from "arweave-stream-tx";
+import { CreateTransactionInterface } from "arweave/node/common";
 // import { Readable } from 'stream';
 // import { createTransactionAsync } from 'arweave-stream';
 // import { pipeline } from 'stream/promises';
@@ -36,8 +37,9 @@ export default class FileBundle implements BundleInterface {
       .readdir(dir)
       .then((r) =>
         r.filter(
-          async (f) => !(await fs.promises.stat(f).then((s) => s.isDirectory()))
-        )
+          async (f) =>
+            !(await fs.promises.stat(f).then((s) => s.isDirectory())),
+        ),
       );
     return new FileBundle(dir + "/header", txs);
   }
@@ -49,7 +51,7 @@ export default class FileBundle implements BundleInterface {
       Buffer.allocUnsafe(32),
       0,
       32,
-      0
+      0,
     ).then((r) => r.buffer);
     await handle.close();
     return byteArrayToLong(lengthBuffer);
@@ -99,8 +101,9 @@ export default class FileBundle implements BundleInterface {
   }
 
   async toTransaction(
+    attributes: Partial<Omit<CreateTransactionInterface, "data">>,
     arweave: Arweave,
-    jwk: JWKInterface
+    jwk: JWKInterface,
   ): Promise<Transaction> {
     const streams = [
       fs.createReadStream(this.headerFile),
@@ -109,7 +112,10 @@ export default class FileBundle implements BundleInterface {
 
     const stream = MultiStream.obj(streams);
 
-    const tx = await pipeline(stream, createTransactionAsync({}, arweave, jwk));
+    const tx = await pipeline(
+      stream,
+      createTransactionAsync(attributes, arweave, jwk),
+    );
     tx.addTag("Bundle-Format", "binary");
     tx.addTag("Bundle-Version", "2.0.0");
 
@@ -119,9 +125,9 @@ export default class FileBundle implements BundleInterface {
   async signAndSubmit(
     arweave: Arweave,
     jwk: JWKInterface,
-    tags: { name: string; value: string }[] = []
+    tags: { name: string; value: string }[] = [],
   ): Promise<Transaction> {
-    const tx = await this.toTransaction(arweave, jwk);
+    const tx = await this.toTransaction({}, arweave, jwk);
     tx.addTag("Bundle-Format", "binary");
     tx.addTag("Bundle-Version", "2.0.0");
     for (const { name, value } of tags) {
@@ -148,16 +154,12 @@ export default class FileBundle implements BundleInterface {
       yield {
         offset: byteArrayToLong(
           await read(handle.fd, Buffer.allocUnsafe(32), 0, 32, i).then(
-            (r) => r.buffer
-          )
+            (r) => r.buffer,
+          ),
         ),
-        id: await read(
-          handle.fd,
-          Buffer.allocUnsafe(32),
-          0,
-          32,
-          i + 32
-        ).then((r) => base64url.encode(r.buffer)),
+        id: await read(handle.fd, Buffer.allocUnsafe(32), 0, 32, i + 32).then(
+          (r) => base64url.encode(r.buffer),
+        ),
       };
     }
     await handle.close();

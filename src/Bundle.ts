@@ -6,6 +6,7 @@ import Arweave from "arweave";
 import { BundleInterface } from "./BundleInterface";
 import { JWKInterface } from "./interface-jwk";
 import { createHash } from "crypto";
+import { CreateTransactionInterface } from "arweave/node/common";
 
 const HEADER_START = 32;
 
@@ -68,15 +69,11 @@ export default class Bundle implements BundleInterface {
   }
 
   public async toTransaction(
+    attributes: Partial<Omit<CreateTransactionInterface, "data">>,
     arweave: Arweave,
     jwk: JWKInterface,
   ): Promise<Transaction> {
-    const tx = await arweave.createTransaction(
-      {
-        data: this.binary,
-      },
-      jwk,
-    );
+    const tx = await arweave.createTransaction(attributes, jwk);
     tx.addTag("Bundle-Format", "binary");
     tx.addTag("Bundle-Version", "2.0.0");
     return tx;
