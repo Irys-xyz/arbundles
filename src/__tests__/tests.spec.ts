@@ -233,15 +233,12 @@ describe("Creating and indexing a data item", function () {
 
     const img = fs.readFileSync("/media/josh/Extra/large/large.jpg");
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 2; i++) {
       const item = createData(img, signer, { tags });
       items.push(item);
     }
 
-    const bundle = await bundleAndSignData(
-      items,
-      signer
-    );
+    const bundle = await bundleAndSignData(items, signer);
 
     expect(await bundle.verify()).toEqual(true);
   });
