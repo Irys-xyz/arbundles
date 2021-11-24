@@ -224,6 +224,28 @@ describe("Creating and indexing a data item", function () {
     expect(await DataItem.verify(data.getRaw())).toEqual(true);
   });
 
+  it("should verify large bundle", async function () {
+    const signer = new ArweaveSigner(wallet0);
+
+    const tags = [{ name: "gdf", value: "gfgdf" }];
+
+    const items = [];
+
+    const img = fs.readFileSync("/media/josh/Extra/large/large.jpg");
+
+    for (let i = 0; i < 100; i++) {
+      const item = createData(img, signer, { tags });
+      items.push(item);
+    }
+
+    const bundle = await bundleAndSignData(
+      items,
+      signer
+    );
+
+    expect(await bundle.verify()).toEqual(true);
+  });
+
   // it("should bundle in loop", async function () {
   //   const signer = new ArweaveSigner(wallet0);
   //   const tags = [

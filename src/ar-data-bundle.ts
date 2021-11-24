@@ -3,7 +3,6 @@ import { longTo32ByteArray } from './utils';
 import DataItem from './DataItem';
 import Arweave from 'arweave';
 import Bundle from './Bundle';
-import { Buffer } from 'buffer';
 import { Signer } from './signing/Signer';
 
 /**
@@ -49,16 +48,17 @@ export async function bundleAndSignData(
       // Add header to array of headers
       headers.set(header, 64 * index);
       // Convert to array for flattening
+      console.log("Returning");
       return d.getRaw();
     }),
   ).then((a) => {
     return Buffer.concat(a);
   });
 
-  const buffer = Buffer.from([
-    ...longTo32ByteArray(dataItems.length),
-    ...headers,
-    ...binaries,
+  const buffer = Buffer.concat([
+    longTo32ByteArray(dataItems.length),
+    headers,
+    binaries,
   ]);
 
   return new Bundle(buffer);
