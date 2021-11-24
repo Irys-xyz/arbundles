@@ -69,15 +69,16 @@ export default class Bundle implements BundleInterface {
   }
 
   public async toTransaction(
-    attributes: Partial<CreateTransactionInterface>,
+    attributes: Partial<Omit<CreateTransactionInterface, "data">>,
     arweave: Arweave,
     jwk: JWKInterface,
   ): Promise<Transaction> {
-    attributes.data = this.binary;
-    const tx = await arweave.createTransaction(attributes, jwk);
+    const tx = await arweave.createTransaction(
+      { data: this.binary, ...attributes },
+      jwk,
+    );
     tx.addTag("Bundle-Format", "binary");
     tx.addTag("Bundle-Version", "2.0.0");
-    console.log(tx);
     return tx;
   }
 
