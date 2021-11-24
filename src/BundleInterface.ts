@@ -13,7 +13,7 @@ export interface BundleInterface {
   getIds(): string[] | Promise<string[]>;
   getRaw(): ResolvesTo<Buffer>;
   toTransaction(
-    attributes: Partial<Omit<CreateTransactionInterface, "data">>,
+    attributes: Partial<CreateTransactionInterface>,
     arweave: Arweave,
     jwk: JWKInterface,
   ): Promise<Transaction>;

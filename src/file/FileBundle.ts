@@ -101,7 +101,7 @@ export default class FileBundle implements BundleInterface {
   }
 
   async toTransaction(
-    attributes: Partial<Omit<CreateTransactionInterface, "data">>,
+    attributes: Partial<CreateTransactionInterface>,
     arweave: Arweave,
     jwk: JWKInterface,
   ): Promise<Transaction> {
