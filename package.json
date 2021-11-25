@@ -16,7 +16,8 @@
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
     "test": "jest --coverage",
     "prepare": "husky install",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "prepare": "npm run tsc"
   },
   "devDependencies": {
     "@textury/ardb": "^1.1.3",
