@@ -1,10 +1,9 @@
-import { getSignatureData } from './ar-data-base';
-import { longTo32ByteArray } from './utils';
-import DataItem from './DataItem';
-import Arweave from 'arweave';
-import Bundle from './Bundle';
-import { Buffer } from 'buffer';
-import { Signer } from './signing/Signer';
+import { getSignatureData } from "./ar-data-base";
+import { longTo32ByteArray } from "./utils";
+import DataItem from "./DataItem";
+import Arweave from "arweave";
+import Bundle from "./Bundle";
+import { Signer } from "./signing/Signer";
 
 /**
  * Unbundles a transaction into an Array of DataItems.
@@ -55,10 +54,10 @@ export async function bundleAndSignData(
     return Buffer.concat(a);
   });
 
-  const buffer = Buffer.from([
-    ...longTo32ByteArray(dataItems.length),
-    ...headers,
-    ...binaries,
+  const buffer = Buffer.concat([
+    longTo32ByteArray(dataItems.length),
+    headers,
+    binaries,
   ]);
 
   return new Bundle(buffer);
