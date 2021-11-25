@@ -14,7 +14,6 @@ export default class InjectedEthereumSigner implements Signer {
 
   constructor(provider: ethers.providers.Web3Provider) {
     this.signer = provider.getSigner();
-    this.setPublicKey();
   }
 
   async setPublicKey(): Promise<void> {
