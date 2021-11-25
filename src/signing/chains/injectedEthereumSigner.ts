@@ -14,11 +14,14 @@ export default class InjectedEthereumSigner implements Signer {
 
   constructor(provider: ethers.providers.Web3Provider) {
     this.signer = provider.getSigner();
+    this.setPublicKey();
   }
 
   async setPublicKey(): Promise<void> {
     const address = await this.signer.getAddress();
-    const signedMsg = await this.signer.signMessage(address);
+    const signedMsg = await this.signer.signMessage(
+      "sign this message to connect to the Bundlr Network",
+    );
     const hash = await ethers.utils.hashMessage(address);
     const recoveredKey = ethers.utils.recoverPublicKey(
       ethers.utils.arrayify(hash),
