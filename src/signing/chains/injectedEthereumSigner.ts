@@ -31,6 +31,9 @@ export default class InjectedEthereumSigner implements Signer {
   }
 
   async sign(message: Uint8Array): Promise<Uint8Array> {
+    if (!this.publicKey) {
+      await this.setPublicKey();
+    }
     const sig = await this.signer.signMessage(message);
     return Buffer.from(sig.slice(2), "hex");
   }
