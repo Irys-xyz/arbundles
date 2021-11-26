@@ -15,7 +15,9 @@
     "build": "rm -rf file && tsc && mv file ./ && cp -a build/signing file && rm -rf build/__tests__",
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
     "test": "jest --coverage",
-    "prepare": "(node -e \"if (! require('fs').existsSync('./.git')) {process.exit(1)}\" || npm run build) && husky install"
+    "husky-install": "(node -e \"if (!require('fs').existsSync('./.git')) {process.exit(1)}\" && husky install || true)",
+    "ensure-build": "(node -e \"if (!require('fs').existsSync('./build')) {process.exit(1)}\" || yarn run build)",
+    "prepare": "husky install && yarn run ensure-build"
   },
   "devDependencies": {
     "@textury/ardb": "^1.1.3",
