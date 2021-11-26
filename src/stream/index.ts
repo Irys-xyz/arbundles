@@ -1,10 +1,12 @@
-import { Readable } from "stream";
+import { Readable, Transform } from "stream";
 import { byteArrayToLong } from "../utils";
 import base64url from "base64url";
-import { MIN_BINARY_SIZE } from "../index";
+import { indexToType, MIN_BINARY_SIZE } from "../index";
 import { SIG_CONFIG } from "../constants";
 import { tagsParser } from "../parser";
-import * as fs from "fs";
+import * as crypto from "crypto";
+import { stringToBuffer } from "arweave/web/lib/utils";
+import { deepHash } from "../deepHash";
 
 export async function* verifyAndIndexStream(
   stream: Readable,
@@ -29,8 +31,6 @@ export async function* verifyAndIndexStream(
   let offsetSum = 32 + headersLength;
 
   for (const [length, id] of headers) {
-    const now = performance.now();
-
     bytes = await hasEnough(reader, bytes, MIN_BINARY_SIZE);
 
     // Get sig type
@@ -78,12 +78,31 @@ export async function* verifyAndIndexStream(
     bytes = bytes.subarray(8);
 
     bytes = await hasEnough(reader, bytes, tagsBytesLength);
+    const tagsBytes = bytes.subarray(0, tagsBytesLength);
     const tags =
       tagsLength !== 0 && tagsBytesLength !== 0
-        ? tagsParser.fromBuffer(Buffer.from(bytes.subarray(0, tagsBytesLength)))
+        ? tagsParser.fromBuffer(Buffer.from(tagsBytes))
         : [];
     if (tags.length !== tagsLength) throw new Error("Tags lengths don't match");
     bytes = bytes.subarray(tagsBytesLength);
+
+    const transform = new Transform();
+    transform._transform = function (chunk, _, done) {
+      this.push(chunk);
+      done();
+    };
+
+    // Verify signature
+    const signatureData = deepHash([
+      stringToBuffer("dataitem"),
+      stringToBuffer("1"),
+      stringToBuffer(signatureType.toString()),
+      owner,
+      target,
+      anchor,
+      tagsBytes,
+      transform,
+    ]);
 
     // Get offset of data start and length of data
     const dataOffset =
@@ -96,29 +115,45 @@ export async function* verifyAndIndexStream(
       tagsBytesLength;
     const dataSize = length - dataOffset;
 
-    const beforeSkip = performance.now();
     if (bytes.byteLength > dataSize) {
+      transform.write(bytes.subarray(0, dataSize));
       bytes = bytes.subarray(dataSize);
     } else {
-      let skipped = Math.min(dataSize, bytes.byteLength);
-      // TODO: Skip data
-      let data = bytes;
+      let skipped = bytes.byteLength;
+      transform.write(bytes);
       while (dataSize > skipped) {
         bytes = (await reader.next()).value;
         if (!bytes) {
-          fs.writeFileSync("dump", data);
           throw new Error(
             `Not enough data bytes  expected: ${dataSize} received: ${skipped}`,
           );
         }
-        data = Buffer.concat([data, bytes]);
 
         skipped += bytes.byteLength;
+
+        if (skipped > dataSize) {
+          transform.write(
+            bytes.subarray(0, bytes.byteLength - (skipped - dataSize)),
+          );
+        } else {
+          transform.write(bytes);
+        }
       }
       bytes = bytes.subarray(bytes.byteLength - (skipped - dataSize));
     }
-    const afterSkip = performance.now();
-    console.log(`Skip took ${afterSkip - beforeSkip}`);
+
+    transform.end();
+
+    // Check id
+    if (
+      id !== base64url(crypto.createHash("sha256").update(signature).digest())
+    )
+      throw new Error("ID doesn't match signature");
+
+    const Signer = indexToType[signatureType];
+
+    if (!(await Signer.verify(owner, (await signatureData) as any, signature)))
+      throw new Error("Invalid signature");
 
     yield {
       id,
@@ -131,7 +166,6 @@ export async function* verifyAndIndexStream(
     };
 
     offsetSum += dataOffset + dataSize;
-    console.log(`Index item took ${performance.now() - now}`);
   }
 }
 
@@ -149,7 +183,36 @@ async function hasEnough(
 
 async function* getReader(s: Readable): AsyncGenerator<Buffer> {
   for await (const chunk of s) {
-    console.log(chunk.length);
     yield chunk;
   }
 }
+
+// async function deepHash(
+//   data: DeepHashChunk,
+// ): Promise<Uint8Array> {
+//   if (Array.isArray(data)) {
+//     const tag = Arweave.utils.concatBuffers([
+//       Arweave.utils.stringToBuffer('list'),
+//       Arweave.utils.stringToBuffer(data.length.toString()),
+//     ]);
+//
+//     return await deepHashChunks(
+//       data,
+//       await Arweave.crypto.hash(tag, 'SHA-384'),
+//     );
+//   }
+//
+//   const _data = data as Uint8Array;
+//
+//   const tag = Arweave.utils.concatBuffers([
+//     Arweave.utils.stringToBuffer('blob'),
+//     Arweave.utils.stringToBuffer(_data.byteLength.toString()),
+//   ]);
+//
+//   const taggedHash = Arweave.utils.concatBuffers([
+//     await Arweave.crypto.hash(tag, 'SHA-384'),
+//     await Arweave.crypto.hash(_data, 'SHA-384'),
+//   ]);
+//
+//   return await Arweave.crypto.hash(taggedHash, 'SHA-384');
+// }
