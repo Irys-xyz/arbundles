@@ -35,3 +35,6 @@ build
 output
 lib
 file
+
+# npm/yarn artifacts
+*.tgz
