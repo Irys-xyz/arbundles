@@ -131,13 +131,11 @@ export async function* verifyAndIndexStream(
 
         skipped += bytes.byteLength;
 
-        if (skipped > dataSize) {
+        if (skipped > dataSize)
           transform.write(
             bytes.subarray(0, bytes.byteLength - (skipped - dataSize)),
           );
-        } else {
-          transform.write(bytes);
-        }
+        else transform.write(bytes);
       }
       bytes = bytes.subarray(bytes.byteLength - (skipped - dataSize));
     }

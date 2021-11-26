@@ -3,12 +3,10 @@
 import Arweave from "arweave";
 import { createHash } from "crypto";
 
-type DeepHashChunk = Uint8Array | AsyncIterable<Buffer> | DeepHashChunks;
-type DeepHashChunks = DeepHashChunk[];
+export type DeepHashChunk = Uint8Array | AsyncIterable<Buffer> | DeepHashChunks;
+export type DeepHashChunks = DeepHashChunk[];
 
-export default async function deepHash(
-  data: DeepHashChunk,
-): Promise<Uint8Array> {
+export async function deepHash(data: DeepHashChunk): Promise<Uint8Array> {
   if (
     typeof data[Symbol.asyncIterator as keyof AsyncIterable<Buffer>] ===
     "function"
@@ -62,7 +60,7 @@ export default async function deepHash(
   return await Arweave.crypto.hash(taggedHash, "SHA-384");
 }
 
-async function deepHashChunks(
+export async function deepHashChunks(
   chunks: DeepHashChunks,
   acc: Uint8Array,
 ): Promise<Uint8Array> {
