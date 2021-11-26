@@ -33,3 +33,4 @@ stream
 lib
 build
 file
+src/__tests__/test.ts
