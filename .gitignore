@@ -28,6 +28,7 @@ coverage
 .DS_Store
 
 package-lock.json
+build
 output
 lib
 src/__tests__/test.ts
