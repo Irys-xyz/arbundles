@@ -17,9 +17,8 @@ export default class InjectedEthereumSigner implements Signer {
   }
 
   async setPublicKey(): Promise<void> {
-    const signedMsg = await this.signer.signMessage(
-      "sign this message to connect to the Bundlr Network",
-    );
+    const msg = "sign this message to connect to Bundlr Network";
+    const signedMsg = await this.signer.signMessage(msg);
     const hash = await ethers.utils.hashMessage(signedMsg);
     const recoveredKey = ethers.utils.recoverPublicKey(
       ethers.utils.arrayify(hash),
