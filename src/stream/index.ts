@@ -8,9 +8,9 @@ import * as crypto from "crypto";
 import { stringToBuffer } from "arweave/web/lib/utils";
 import { deepHash } from "../deepHash";
 
-export async function* verifyAndIndexStream(
+export async function verifyAndIndexStream(
   stream: Readable,
-): AsyncGenerator<Record<string, any>> {
+): Promise<Record<string, any>[]> {
   const reader = getReader(stream);
   let bytes: Uint8Array = (await reader.next()).value;
   bytes = await hasEnough(reader, bytes, 32);
@@ -29,6 +29,8 @@ export async function* verifyAndIndexStream(
   bytes = bytes.subarray(headersLength);
 
   let offsetSum = 32 + headersLength;
+
+  const items = new Array(Math.min(itemCount, 1000));
 
   for (const [length, id] of headers) {
     bytes = await hasEnough(reader, bytes, MIN_BINARY_SIZE);
@@ -153,7 +155,7 @@ export async function* verifyAndIndexStream(
     if (!(await Signer.verify(owner, (await signatureData) as any, signature)))
       throw new Error("Invalid signature");
 
-    yield {
+    items.push({
       id,
       signature: base64url(Buffer.from(signature)),
       target: base64url(Buffer.from(target)),
@@ -161,10 +163,12 @@ export async function* verifyAndIndexStream(
       owner: base64url(Buffer.from(owner)),
       tags,
       dataOffset: offsetSum + dataOffset,
-    };
+    });
 
     offsetSum += dataOffset + dataSize;
   }
+
+  return items;
 }
 
 async function hasEnough(
