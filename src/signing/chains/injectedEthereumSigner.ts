@@ -17,9 +17,9 @@ export default class InjectedEthereumSigner implements Signer {
   }
 
   async setPublicKey(): Promise<void> {
-    const msg = "sign this message to connect to Bundlr Network";
-    const signedMsg = await this.signer.signMessage(msg);
-    const hash = await ethers.utils.hashMessage(signedMsg);
+    const address = "sign this message to connect to Bundlr.Network";
+    const signedMsg = await this.signer.signMessage(address);
+    const hash = await ethers.utils.hashMessage(address);
     const recoveredKey = ethers.utils.recoverPublicKey(
       ethers.utils.arrayify(hash),
       signedMsg,
@@ -40,7 +40,7 @@ export default class InjectedEthereumSigner implements Signer {
     message: Uint8Array,
     signature: Uint8Array,
   ): boolean {
-    const address = ethers.utils.computeAddress(pk);
+    const address = ethers.utils.computeAddress(Buffer.from(pk));
     return ethers.utils.verifyMessage(message, signature) === address;
   }
 }
