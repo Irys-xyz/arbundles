@@ -30,7 +30,7 @@ describe("Polygon signing tests", function () {
 
   it("should verify file", async function () {
     const data = fs.readFileSync(
-      "/home/josh/Downloads/9QyUfc2QSrzWRpeOZPz_VHEq5hZD1pyNpYgp_NNyQ_Q",
+      "/home/josh/Downloads/jCn54Fbjagz-gnnpJ2uITSGBmONTowUs6mfJw2TAfwg",
     );
     data.set(Buffer.from([3, 0]), 0);
     const item = new DataItem(data);
