@@ -22,7 +22,7 @@ export const SIG_CONFIG: Record<SignatureConfig, SignatureMeta> = {
   },
   // Ethereum
   [SignatureConfig.ETHERIUM]: {
-    sigLength: 64,
+    sigLength: 65,
     pubLength: 65,
   },
 };

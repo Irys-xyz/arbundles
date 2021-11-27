@@ -188,33 +188,3 @@ async function* getReader(s: Readable): AsyncGenerator<Buffer> {
     yield chunk;
   }
 }
-
-// async function deepHash(
-//   data: DeepHashChunk,
-// ): Promise<Uint8Array> {
-//   if (Array.isArray(data)) {
-//     const tag = Arweave.utils.concatBuffers([
-//       Arweave.utils.stringToBuffer('list'),
-//       Arweave.utils.stringToBuffer(data.length.toString()),
-//     ]);
-//
-//     return await deepHashChunks(
-//       data,
-//       await Arweave.crypto.hash(tag, 'SHA-384'),
-//     );
-//   }
-//
-//   const _data = data as Uint8Array;
-//
-//   const tag = Arweave.utils.concatBuffers([
-//     Arweave.utils.stringToBuffer('blob'),
-//     Arweave.utils.stringToBuffer(_data.byteLength.toString()),
-//   ]);
-//
-//   const taggedHash = Arweave.utils.concatBuffers([
-//     await Arweave.crypto.hash(tag, 'SHA-384'),
-//     await Arweave.crypto.hash(_data, 'SHA-384'),
-//   ]);
-//
-//   return await Arweave.crypto.hash(taggedHash, 'SHA-384');
-// }

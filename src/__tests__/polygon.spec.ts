@@ -1,6 +1,8 @@
 import { DataItemCreateOptions } from "../ar-data-base";
 import { createData } from "..";
 import { PolygonSigner } from "..";
+import DataItem from "../DataItem";
+import * as fs from "fs";
 
 describe("Polygon signing tests", function () {
   it("should sign and verify", async function () {
@@ -24,5 +26,15 @@ describe("Polygon signing tests", function () {
     expect(d.anchor).toEqual("Math.apt'#]gng(36).substring(30)");
     expect(d.tags).toEqual([{ name: "Content-Type", value: "image/png" }]);
     expect(d.rawData.toString()).toEqual("hello");
+  });
+
+  it("should verify file", async function () {
+    const data = fs.readFileSync(
+      "/home/josh/Downloads/9QyUfc2QSrzWRpeOZPz_VHEq5hZD1pyNpYgp_NNyQ_Q",
+    );
+    data.set(Buffer.from([3, 0]), 0);
+    const item = new DataItem(data);
+
+    expect(await item.isValid()).toEqual(true);
   });
 });
