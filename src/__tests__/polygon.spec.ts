@@ -1,8 +1,6 @@
 import { DataItemCreateOptions } from "../ar-data-base";
 import { createData } from "..";
 import { PolygonSigner } from "..";
-import DataItem from "../DataItem";
-import * as fs from "fs";
 
 describe("Polygon signing tests", function () {
   it("should sign and verify", async function () {
@@ -28,25 +26,25 @@ describe("Polygon signing tests", function () {
     expect(d.rawData.toString()).toEqual("hello");
   });
 
-  it("should verify file", async function () {
-    const data = fs.readFileSync(
-      "/home/josh/Downloads/jCn54Fbjagz-gnnpJ2uITSGBmONTowUs6mfJw2TAfwg",
-    );
-    const item = new DataItem(data);
-
-    const signer = new PolygonSigner(
-      "29c17feb590ef5471d4f1d203e3525cbcb3073ccbdc593cd39a9cfff2415eeb0",
-    );
-
-    const d = createData(
-      fs.readFileSync("/home/josh/Documents/photo_2021-11-15_17-18-34.jpg"),
-      signer,
-      { tags: [{ name: "Content-Type", value: "image/png" }] },
-    );
-    await d.sign(signer);
-
-    console.log({ ...d.toJSON(), data: undefined });
-
-    expect(await item.isValid()).toEqual(true);
-  });
+  // it("should verify file", async function () {
+  //   const data = fs.readFileSync(
+  //     "/home/josh/Downloads/jCn54Fbjagz-gnnpJ2uITSGBmONTowUs6mfJw2TAfwg",
+  //   );
+  //   const item = new DataItem(data);
+  //
+  //   const signer = new PolygonSigner(
+  //     "29c17feb590ef5471d4f1d203e3525cbcb3073ccbdc593cd39a9cfff2415eeb0",
+  //   );
+  //
+  //   const d = createData(
+  //     fs.readFileSync("/home/josh/Documents/photo_2021-11-15_17-18-34.jpg"),
+  //     signer,
+  //     { tags: [{ name: "Content-Type", value: "image/png" }] },
+  //   );
+  //   await d.sign(signer);
+  //
+  //   console.log({ ...d.toJSON(), data: undefined });
+  //
+  //   expect(await item.isValid()).toEqual(true);
+  // });
 });

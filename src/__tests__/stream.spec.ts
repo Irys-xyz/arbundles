@@ -17,13 +17,15 @@ describe("stream tests", function () {
       signer,
     );
     const bundle = await bundleAndSignData([item], signer);
-    console.log(bundle.items[0].id);
-    console.log(bundle.getRaw().length);
-    console.log(bundle.getRaw().slice(32 + 64, 32 + 64 + 2));
 
     fs.writeFileSync("test", bundle.getRaw());
 
-    for await (const item of verifyAndIndexStream(
+    console.log(
+      await verifyAndIndexStream(
+        fs.createReadStream("test", { highWaterMark: 1024 * 10 }),
+      ),
+    );
+    for await (const item of await verifyAndIndexStream(
       fs.createReadStream("test", { highWaterMark: 1024 * 10 }),
     )) {
       console.log(item);

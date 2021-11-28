@@ -264,11 +264,6 @@ export default class DataItem implements BundleItem {
     const sigType = item.signatureType;
     const tagsStart = item.getTagsStart();
 
-    console.log(item.signature);
-    console.log(item.owner);
-    console.log(item.tags);
-    console.log(item.target);
-
     const numberOfTags = byteArrayToLong(
       buffer.subarray(tagsStart, tagsStart + 8),
     );

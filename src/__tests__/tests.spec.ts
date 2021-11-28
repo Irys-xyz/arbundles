@@ -169,26 +169,6 @@ describe("Creating and indexing a data item", function () {
     expect(bundle.get(1).rawData).toEqual(Buffer.from("4242"));
   });
 
-  it("Test file verification", async function () {
-    const signer = new ArweaveSigner(wallet0);
-    const _d: DataItemCreateOptions = {
-      anchor: "Math.apt'#]gng(36).substring(30)",
-      tags: [
-        {
-          name: "test",
-          value: "hbjhjh",
-        },
-      ],
-    };
-
-    const d = await createData("tasty", signer, _d);
-    await d.sign(signer);
-    const binary = d.getRaw();
-    fs.writeFileSync("test", binary);
-    const fileBinary = fs.readFileSync("test");
-    expect(fileBinary).toEqual(binary);
-  });
-
   it("Test failed file verification", async function () {
     fs.writeFileSync("test", Buffer.from("hi"));
     const fileBinary = fs.readFileSync("test");

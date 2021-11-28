@@ -26,7 +26,6 @@ export default class EthereumSigner extends Secp256k1 {
     signature: Uint8Array,
   ): Promise<boolean> {
     const address = ethers.utils.computeAddress(pk);
-    console.log(ethers.utils.verifyMessage(message, signature));
     return ethers.utils.verifyMessage(message, signature) === address;
   }
 }
