@@ -14,7 +14,7 @@ export default class EthereumSigner extends Secp256k1 {
   }
 
   sign(message: Uint8Array): Uint8Array {
-    const wallet = new ethers.Wallet(this.key);
+    const wallet = new ethers.Wallet(this._key);
     return wallet
       .signMessage(message)
       .then((r) => Buffer.from(r.slice(2), "hex")) as any;
@@ -25,7 +25,8 @@ export default class EthereumSigner extends Secp256k1 {
     message: Uint8Array,
     signature: Uint8Array,
   ): Promise<boolean> {
-    const address = ethers.utils.computeAddress(Buffer.from(pk));
+    const address = ethers.utils.computeAddress(pk);
+    console.log(ethers.utils.verifyMessage(message, signature));
     return ethers.utils.verifyMessage(message, signature) === address;
   }
 }

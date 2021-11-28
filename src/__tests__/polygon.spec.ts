@@ -32,8 +32,20 @@ describe("Polygon signing tests", function () {
     const data = fs.readFileSync(
       "/home/josh/Downloads/jCn54Fbjagz-gnnpJ2uITSGBmONTowUs6mfJw2TAfwg",
     );
-    data.set(Buffer.from([3, 0]), 0);
     const item = new DataItem(data);
+
+    const signer = new PolygonSigner(
+      "29c17feb590ef5471d4f1d203e3525cbcb3073ccbdc593cd39a9cfff2415eeb0",
+    );
+
+    const d = createData(
+      fs.readFileSync("/home/josh/Documents/photo_2021-11-15_17-18-34.jpg"),
+      signer,
+      { tags: [{ name: "Content-Type", value: "image/png" }] },
+    );
+    await d.sign(signer);
+
+    console.log({ ...d.toJSON(), data: undefined });
 
     expect(await item.isValid()).toEqual(true);
   });

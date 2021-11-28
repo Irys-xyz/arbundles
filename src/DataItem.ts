@@ -4,11 +4,10 @@ import base64url from "base64url";
 import { Buffer } from "buffer";
 import { sign } from "./ar-data-bundle";
 import { BundleItem } from "./BundleItem";
-import { Signer } from "./signing/index";
-import { indexToType } from "./signing/index";
+import { indexToType, Signer } from "./signing/index";
 import { getSignatureData } from "./ar-data-base";
 import axios, { AxiosResponse } from "axios";
-import { SignatureConfig, SIG_CONFIG } from "./constants";
+import { SIG_CONFIG, SignatureConfig } from "./constants";
 
 export const MIN_BINARY_SIZE = 80;
 
@@ -34,9 +33,12 @@ export default class DataItem implements BundleItem {
         return SignatureConfig.ARWEAVE;
       }
       case 2: {
-        return SignatureConfig.SOLANA;
+        return SignatureConfig.ED25519;
       }
       case 3: {
+        return SignatureConfig.ETHERIUM;
+      }
+      case 4: {
         return SignatureConfig.ETHERIUM;
       }
       default: {
@@ -261,6 +263,11 @@ export default class DataItem implements BundleItem {
     const item = new DataItem(buffer);
     const sigType = item.signatureType;
     const tagsStart = item.getTagsStart();
+
+    console.log(item.signature);
+    console.log(item.owner);
+    console.log(item.tags);
+    console.log(item.target);
 
     const numberOfTags = byteArrayToLong(
       buffer.subarray(tagsStart, tagsStart + 8),
