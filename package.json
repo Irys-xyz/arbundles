@@ -16,12 +16,7 @@
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
     "test": "jest --coverage",
     "prepare": "tsc",
-    "dev": "tsc --watch",
-    "husky-install": "(node -e \"if (!require('fs').existsSync(__dirname + '/.git')) {process.exit(1)}\" && husky install || true)",
-    "ensure-build": "(node -e \"if (!require('fs').existsSync(__dirname + '/build')) {console.error('DOESNT EXIST'); process.exit(1)} else {console.error('IT EXISTS ALREADY')}\" || yarn run build)",
-    "postinstall": "yarn run ensure-build",
-    "prepack": "yarn run ensure-build",
-    "prepare": "yarn run husky-install"
+    "dev": "tsc --watch"
   },
   "devDependencies": {
     "@textury/ardb": "^1.1.3",
