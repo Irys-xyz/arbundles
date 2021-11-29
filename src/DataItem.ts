@@ -4,11 +4,10 @@ import base64url from "base64url";
 import { Buffer } from "buffer";
 import { sign } from "./ar-data-bundle";
 import { BundleItem } from "./BundleItem";
-import { Signer } from "./signing/index";
-import { indexToType } from "./signing/index";
+import { indexToType, Signer } from "./signing/index";
 import { getSignatureData } from "./ar-data-base";
 import axios, { AxiosResponse } from "axios";
-import { SignatureConfig, SIG_CONFIG } from "./constants";
+import { SIG_CONFIG, SignatureConfig } from "./constants";
 
 export const MIN_BINARY_SIZE = 80;
 
@@ -34,7 +33,7 @@ export default class DataItem implements BundleItem {
         return SignatureConfig.ARWEAVE;
       }
       case 2: {
-        return SignatureConfig.SOLANA;
+        return SignatureConfig.ED25519;
       }
       case 3: {
         return SignatureConfig.ETHERIUM;

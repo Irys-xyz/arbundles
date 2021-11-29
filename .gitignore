@@ -28,8 +28,13 @@ coverage
 .DS_Store
 
 package-lock.json
-output
-stream
-lib
+src/__tests__/test.ts
+
+# build dirs
 build
+output
+lib
 file
+
+# npm/yarn artifacts
+*.tgz
