@@ -46,7 +46,7 @@ describe("file tests", function () {
     expect(await data.target()).toEqual("");
     expect((await data.rawData()).toString()).toEqual("tasty");
     expect(await FileDataItem.verify(data.filename)).toEqual(true);
-  });
+  }, 10000000);
 
   it("should bundle correctly", async function () {
     const signer = new ArweaveSigner(wallet0);

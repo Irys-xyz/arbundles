@@ -12,9 +12,14 @@
     "file/**/*"
   ],
   "scripts": {
-    "build": "rm -rf file && tsc && mv file ./ && cp -a build/signing file && rm -rf build/__tests__",
+    "build": "rm -rf file lib build && tsc",
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "husky-install": "(node -e \"if (!require('fs').existsSync(__dirname + '/.git')) {process.exit(1)}\" && husky install || true)",
+    "ensure-build": "(node -e \"if (!require('fs').existsSync(__dirname + '/build')) {console.error('DOESNT EXIST'); process.exit(1)} else {console.error('IT EXISTS ALREADY')}\" || yarn run build)",
+    "postinstall": "yarn run ensure-build",
+    "prepack": "yarn run ensure-build",
+    "prepare": "yarn run husky-install"
   },
   "devDependencies": {
     "@textury/ardb": "^1.1.3",
@@ -55,6 +60,7 @@
     "bs58": "^4.0.1",
     "combined-stream2": "^1.1.2",
     "curve25519-js": "^0.0.4",
+    "ethers": "^5.5.1",
     "keccak256": "^1.0.3",
     "multistream": "^4.1.0",
     "noble-ed25519": "^1.2.6",

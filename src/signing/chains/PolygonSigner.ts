@@ -1,3 +1,3 @@
-import Ethereum from "./ethereum";
+import EthereumSigner from "./ethereumSigner";
 
-export default class PolygonSigner extends Ethereum {}
+export default class PolygonSigner extends EthereumSigner {}
