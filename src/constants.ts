@@ -2,7 +2,6 @@ export enum SignatureConfig {
   ARWEAVE = 1,
   ED25519,
   ETHERIUM,
-  INJECTEDETHEREUMSIGNER,
 }
 
 interface SignatureMeta {
@@ -23,10 +22,6 @@ export const SIG_CONFIG: Record<SignatureConfig, SignatureMeta> = {
   },
   // Ethereum
   [SignatureConfig.ETHERIUM]: {
-    sigLength: 65,
-    pubLength: 65,
-  },
-  [SignatureConfig.INJECTEDETHEREUMSIGNER]: {
     sigLength: 65,
     pubLength: 65,
   },
