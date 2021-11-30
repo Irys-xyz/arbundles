@@ -8,7 +8,7 @@
     "allowJs": true,
     "declaration": true,
     "outDir": "build",
-    "lib": ["es2020", "es2021", "dom"],
+    "lib": ["es2019", "dom"],
     "esModuleInterop": true,
     "alwaysStrict": true,
     "sourceMap": true,
