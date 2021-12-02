@@ -1,7 +1,8 @@
 import { Readable, Transform } from "stream";
 import { byteArrayToLong } from "../utils";
 import base64url from "base64url";
-import { indexToType, MIN_BINARY_SIZE } from "../index";
+import { indexToType } from "../signing/constants";
+import { MIN_BINARY_SIZE } from "../index";
 import { SIG_CONFIG } from "../constants";
 import { tagsParser } from "../parser";
 import * as crypto from "crypto";
