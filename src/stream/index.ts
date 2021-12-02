@@ -30,9 +30,8 @@ export async function verifyAndIndexStream(
 
   let offsetSum = 32 + headersLength;
 
-  const items = new Array(Math.min(itemCount, 1000));
+  const items = [];
 
-  let count = 0;
   for (const [length, id] of headers) {
     bytes = await hasEnough(reader, bytes, MIN_BINARY_SIZE);
 
@@ -156,7 +155,7 @@ export async function verifyAndIndexStream(
     if (!(await Signer.verify(owner, (await signatureData) as any, signature)))
       throw new Error("Invalid signature");
 
-    items[count] = {
+    items.push({
       id,
       signature: base64url(Buffer.from(signature)),
       target: base64url(Buffer.from(target)),
@@ -165,10 +164,9 @@ export async function verifyAndIndexStream(
       tags,
       dataOffset: offsetSum + dataOffset,
       dataSize,
-    };
+    });
 
     offsetSum += dataOffset + dataSize;
-    count++;
   }
 
   return items;
