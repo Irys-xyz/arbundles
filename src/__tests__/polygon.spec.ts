@@ -1,6 +1,6 @@
+import PolygonSigner from "../signing/chains/PolygonSigner";
 import { DataItemCreateOptions } from "../ar-data-base";
 import { createData } from "..";
-import { PolygonSigner } from "..";
 
 describe("Polygon signing tests", function () {
   it("should sign and verify", async function () {
