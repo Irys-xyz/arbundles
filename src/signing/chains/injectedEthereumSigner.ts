@@ -5,10 +5,10 @@ import { SignatureConfig, SIG_CONFIG } from "../../constants";
 export default class InjectedEthereumSigner implements Signer {
   private signer: ethers.providers.JsonRpcSigner;
   public publicKey: Buffer;
-  readonly ownerLength: number = SIG_CONFIG[SignatureConfig.ETHERIUM].pubLength;
+  readonly ownerLength: number = SIG_CONFIG[SignatureConfig.ETHEREUM].pubLength;
   readonly signatureLength: number =
-    SIG_CONFIG[SignatureConfig.ETHERIUM].sigLength;
-  readonly signatureType: SignatureConfig = SignatureConfig.ETHERIUM;
+    SIG_CONFIG[SignatureConfig.ETHEREUM].sigLength;
+  readonly signatureType: SignatureConfig = SignatureConfig.ETHEREUM;
 
   constructor(provider: ethers.providers.Web3Provider) {
     this.signer = provider.getSigner();
