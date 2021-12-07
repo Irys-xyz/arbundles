@@ -1,6 +1,6 @@
 export enum SignatureConfig {
   ARWEAVE = 1,
-  SOLANA,
+  ED25519,
   ETHERIUM,
 }
 
@@ -16,13 +16,13 @@ export const SIG_CONFIG: Record<SignatureConfig, SignatureMeta> = {
     pubLength: 512,
   },
   // ed25519 - Solana
-  [SignatureConfig.SOLANA]: {
+  [SignatureConfig.ED25519]: {
     sigLength: 64,
     pubLength: 32,
   },
   // Ethereum
   [SignatureConfig.ETHERIUM]: {
-    sigLength: 64,
+    sigLength: 65,
     pubLength: 65,
   },
 };
