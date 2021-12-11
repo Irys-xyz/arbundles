@@ -5,10 +5,10 @@ import { SignatureConfig, SIG_CONFIG } from "../../constants";
 import keccak256 from "keccak256";
 
 export default class Secp256k1 implements Signer {
-  readonly ownerLength: number = SIG_CONFIG[SignatureConfig.ETHERIUM].pubLength;
+  readonly ownerLength: number = SIG_CONFIG[SignatureConfig.ETHEREUM].pubLength;
   readonly signatureLength: number =
-    SIG_CONFIG[SignatureConfig.ETHERIUM].sigLength;
-  readonly signatureType: SignatureConfig = SignatureConfig.ETHERIUM;
+    SIG_CONFIG[SignatureConfig.ETHEREUM].sigLength;
+  readonly signatureType: SignatureConfig = SignatureConfig.ETHEREUM;
   public readonly pk: string;
 
   constructor(protected _key: string, pk: Buffer) {

@@ -2,5 +2,5 @@ import ArweaveSigner from "./ArweaveSigner";
 export * from "./ethereumSigner";
 import PolygonSigner from "./PolygonSigner";
 export * from "./SolanaSigner";
-
-export { ArweaveSigner, PolygonSigner };
+import InjectedEthereumSigner from "./injectedEthereumSigner";
+export { ArweaveSigner, PolygonSigner, InjectedEthereumSigner };
