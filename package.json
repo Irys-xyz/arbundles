@@ -4,9 +4,11 @@
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
   "files": [
+    "(index|file|stream)*.ts",
+    "(index|file|stream)*.js",
     "build/**/*.js",
     "/build/**/*.ts",
     "file/**/*"
