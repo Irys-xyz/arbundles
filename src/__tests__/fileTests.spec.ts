@@ -88,7 +88,7 @@ describe("file tests", function () {
     const d = [await createData("", signer, { tags })];
 
     const bundle = await bundleAndSignData(d, signer);
-    const tx = await bundle.toTransaction(arweave, wallet0);
+    const tx = await bundle.toTransaction({}, arweave, wallet0);
     await arweave.transactions.sign(tx, wallet0);
     const response = await arweave.transactions.post(tx);
 
