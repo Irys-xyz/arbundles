@@ -38,3 +38,5 @@ file
 
 # npm/yarn artifacts
 *.tgz
+.devcontainer/devcontainer.json
+.devcontainer/Dockerfile
