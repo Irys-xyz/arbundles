@@ -41,14 +41,14 @@ export async function verifyAndIndexStream(
     const signatureType = byteArrayToLong(bytes.subarray(0, 2));
     bytes = bytes.subarray(2);
 
+    const { sigLength, pubLength, sigName } = SIG_CONFIG[signatureType];
+
     // Get sig
-    const sigLength = SIG_CONFIG[signatureType].sigLength;
     bytes = await hasEnough(reader, bytes, sigLength);
     const signature = bytes.subarray(0, sigLength);
     bytes = bytes.subarray(sigLength);
 
     // Get owner
-    const pubLength = SIG_CONFIG[signatureType].pubLength;
     bytes = await hasEnough(reader, bytes, pubLength);
     const owner = bytes.subarray(0, pubLength);
     bytes = bytes.subarray(pubLength);
@@ -158,6 +158,7 @@ export async function verifyAndIndexStream(
 
     items.push({
       id,
+      sigName,
       signature: base64url(Buffer.from(signature)),
       target: base64url(Buffer.from(target)),
       anchor: base64url(Buffer.from(anchor)),
