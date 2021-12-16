@@ -34,11 +34,11 @@ export default class InjectedEthereumSigner implements Signer {
   }
 
   static verify(
-    pk: string,
+    pk: Buffer,
     message: Uint8Array,
     signature: Uint8Array,
   ): boolean {
-    const address = ethers.utils.computeAddress(Buffer.from(pk));
+    const address = ethers.utils.computeAddress(pk);
     return ethers.utils.verifyMessage(message, signature) === address;
   }
 }
