@@ -1,13 +1,13 @@
 import { Readable, Transform } from "stream";
-import { byteArrayToLong } from "../utils";
+import { byteArrayToLong } from "../src/utils";
 import base64url from "base64url";
-import { indexToType } from "../signing/constants";
-import { MIN_BINARY_SIZE } from "../index";
-import { SIG_CONFIG } from "../constants";
-import { tagsParser } from "../parser";
+import { indexToType } from "../src/signing/constants";
+import { MIN_BINARY_SIZE } from "../src/index";
+import { SIG_CONFIG } from "../src/constants";
+import { tagsParser } from "../src/parser";
 import * as crypto from "crypto";
 import { stringToBuffer } from "arweave/web/lib/utils";
-import { deepHash } from "../deepHash";
+import { deepHash } from "../src/deepHash";
 
 export async function verifyAndIndexStream(
   stream: Readable,

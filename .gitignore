@@ -43,7 +43,9 @@ output
 src/**/*.js
 src/**/*.js.map
 src/**/*.d.ts
+stream/**/*.js
 stream/**/*.js.map
 stream/**/*.d.ts
+file/**/*.js
 file/**/*.js.map
 file/**/*.d.ts
