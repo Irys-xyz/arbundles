@@ -1,4 +1,4 @@
-import { bundleAndSignData, createData, FileDataItem } from "../file";
+import { bundleAndSignData, createData, FileDataItem } from "../../file";
 import { readFileSync } from "fs";
 import path from "path";
 import ArweaveSigner from "../signing/chains/ArweaveSigner";

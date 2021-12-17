@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { promisify } from "util";
-import { byteArrayToLong } from "../utils";
-import { tagsParser } from "../parser";
+import { byteArrayToLong } from "../src/utils";
+import { tagsParser } from "../src/parser";
 import base64url from "base64url";
 import { FileHandle } from "fs/promises";
 
@@ -27,7 +27,7 @@ export async function fileToJson(filename: string): Promise<Transaction> {
   let tagsStart = 512 + 512 + 2;
 
   const targetPresent = await read(fd, Buffer.alloc(1), 1024, 64, null).then(
-    (value) => value.buffer[0] == 1
+    (value) => value.buffer[0] == 1,
   );
   tagsStart += targetPresent ? 32 : 0;
   const anchorPresentByte = targetPresent ? 1057 : 1025;
@@ -36,14 +36,14 @@ export async function fileToJson(filename: string): Promise<Transaction> {
     Buffer.alloc(1),
     anchorPresentByte,
     64,
-    null
+    null,
   ).then((value) => value.buffer[0] == 1);
   tagsStart += anchorPresent ? 32 : 0;
 
   const numberOfTags = byteArrayToLong(
     await read(fd, Buffer.alloc(8), tagsStart, 8, 0).then(
-      (value) => value.buffer
-    )
+      (value) => value.buffer,
+    ),
   );
 
   let tags = [];
@@ -53,7 +53,7 @@ export async function fileToJson(filename: string): Promise<Transaction> {
       Buffer.alloc(8),
       tagsStart + 8,
       8,
-      0
+      0,
     ).then((value) => value.buffer);
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
 
@@ -62,7 +62,7 @@ export async function fileToJson(filename: string): Promise<Transaction> {
       Buffer.alloc(8),
       tagsStart + 16,
       numberOfTagBytes,
-      0
+      0,
     ).then((value) => value.buffer);
     tags = tagsParser.fromBuffer(tagBytes);
   }
@@ -89,7 +89,7 @@ export async function numberOfItems(file: File): Promise<number> {
   const fd = await fileToFd(file);
 
   const headerBuffer = await read(fd.fd, Buffer.allocUnsafe(32), 0, 32, 0).then(
-    (v) => v.buffer
+    (v) => v.buffer,
   );
   await fd.close();
   return byteArrayToLong(headerBuffer);
@@ -102,7 +102,7 @@ interface DataItemHeader {
 
 export async function getHeaderAt(
   file: File,
-  index: number
+  index: number,
 ): Promise<DataItemHeader> {
   const fd = await fileToFd(file);
 
@@ -111,7 +111,7 @@ export async function getHeaderAt(
     Buffer.alloc(64),
     0,
     64,
-    32 + 64 * index
+    32 + 64 * index,
   ).then((v) => v.buffer);
   return {
     offset: byteArrayToLong(headerBuffer.subarray(0, 32)),
@@ -120,7 +120,7 @@ export async function getHeaderAt(
 }
 
 export async function* getHeaders(
-  file: string
+  file: string,
 ): AsyncGenerator<DataItemHeader> {
   const count = await numberOfItems(file);
   for (let i = 0; i < count; i++) {
@@ -130,7 +130,7 @@ export async function* getHeaders(
 
 export async function getId(
   file: File,
-  options?: { offset: number }
+  options?: { offset: number },
 ): Promise<Buffer> {
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;
@@ -140,7 +140,7 @@ export async function getId(
     Buffer.allocUnsafe(512),
     offset,
     512,
-    null
+    null,
   ).then((r) => r.buffer);
   await fd.close();
   return buffer;
@@ -148,7 +148,7 @@ export async function getId(
 
 export async function getSignature(
   file: File,
-  options?: { offset: number }
+  options?: { offset: number },
 ): Promise<Buffer> {
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;
@@ -158,7 +158,7 @@ export async function getSignature(
     Buffer.allocUnsafe(512),
     offset,
     512,
-    null
+    null,
   ).then((r) => r.buffer);
   await fd.close();
   return buffer;
@@ -166,7 +166,7 @@ export async function getSignature(
 
 export async function getOwner(
   file: File,
-  options?: { offset: number }
+  options?: { offset: number },
 ): Promise<string> {
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;
@@ -176,7 +176,7 @@ export async function getOwner(
     Buffer.allocUnsafe(512),
     offset + 512,
     512,
-    null
+    null,
   ).then((r) => r.buffer);
   await fd.close();
 
@@ -185,7 +185,7 @@ export async function getOwner(
 
 export async function getTarget(
   file: File,
-  options?: { offset: number }
+  options?: { offset: number },
 ): Promise<string | undefined> {
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;
@@ -196,7 +196,7 @@ export async function getTarget(
     Buffer.allocUnsafe(1),
     targetStart,
     1,
-    null
+    null,
   ).then((value) => value.buffer[0] == 1);
   if (!targetPresent) {
     return undefined;
@@ -207,7 +207,7 @@ export async function getTarget(
     Buffer.allocUnsafe(32),
     targetStart + 1,
     32,
-    null
+    null,
   ).then((r) => r.buffer);
   await fd.close();
 
@@ -216,7 +216,7 @@ export async function getTarget(
 
 export async function getAnchor(
   file: File,
-  options?: { offset: number }
+  options?: { offset: number },
 ): Promise<string | undefined> {
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;
@@ -226,7 +226,7 @@ export async function getAnchor(
     Buffer.allocUnsafe(1),
     1024,
     1,
-    null
+    null,
   ).then((value) => value.buffer[0] == 1);
 
   let anchorStart = offset + 1025;
@@ -239,7 +239,7 @@ export async function getAnchor(
     Buffer.allocUnsafe(1),
     anchorStart,
     1,
-    null
+    null,
   ).then((value) => value.buffer[0] == 1);
   if (!anchorPresent) {
     return undefined;
@@ -250,7 +250,7 @@ export async function getAnchor(
     Buffer.allocUnsafe(32),
     anchorStart + 1,
     32,
-    null
+    null,
   ).then((r) => r.buffer);
   await fd.close();
 
@@ -259,7 +259,7 @@ export async function getAnchor(
 
 export async function getTags(
   file: File,
-  options?: { offset: number }
+  options?: { offset: number },
 ): Promise<{ name: string; value: string }[]> {
   const fd = await fileToFd(file);
 
@@ -271,7 +271,7 @@ export async function getTags(
     Buffer.allocUnsafe(1),
     0,
     1,
-    offset + 1024
+    offset + 1024,
   ).then((value) => value.buffer[0] == 1);
   tagsStart += targetPresent ? 32 : 0;
   const anchorPresentByte = offset + (targetPresent ? 1057 : 1025);
@@ -280,14 +280,14 @@ export async function getTags(
     Buffer.allocUnsafe(1),
     0,
     1,
-    anchorPresentByte
+    anchorPresentByte,
   ).then((value) => value.buffer[0] == 1);
   tagsStart += anchorPresent ? 32 : 0;
 
   const numberOfTags = byteArrayToLong(
     await read(fd.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart).then(
-      (value) => value.buffer
-    )
+      (value) => value.buffer,
+    ),
   );
 
   if (numberOfTags == 0) {
@@ -299,7 +299,7 @@ export async function getTags(
     Buffer.allocUnsafe(8),
     0,
     8,
-    tagsStart + 8
+    tagsStart + 8,
   ).then((value) => value.buffer);
   const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
 
@@ -308,7 +308,7 @@ export async function getTags(
     Buffer.allocUnsafe(numberOfTagBytes),
     0,
     numberOfTagBytes,
-    tagsStart + 16
+    tagsStart + 16,
   ).then((value) => value.buffer);
   await fd.close();
 

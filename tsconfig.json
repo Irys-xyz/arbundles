@@ -7,7 +7,6 @@
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "declaration": true,
-    "outDir": "build",
     "lib": ["es2019", "dom"],
     "esModuleInterop": true,
     "alwaysStrict": true,
@@ -21,6 +20,6 @@
     "noImplicitThis": false,
     "strictNullChecks": false
   },
-  "include": ["src/**/*", "index.ts", "file.ts", "stream.ts"],
+  "include": ["src/**/*", "file/**/*", "stream/**/*"],
   "exclude": ["src/__tests__/**"]
 }

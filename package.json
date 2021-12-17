@@ -4,17 +4,17 @@
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
-  "main": "index.js",
+  "main": "src/index.js",
   "types": "index.d.ts",
   "files": [
-    "(index|file|stream)*.ts",
-    "(index|file|stream)*.js",
     "build/**/*.js",
     "/build/**/*.ts",
+    "file/**/*",
+    "stream/**/*",
     "file/**/*"
   ],
   "scripts": {
-    "build": "rm -rf file lib build && tsc",
+    "build": "tsc",
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
     "test": "jest --coverage",
     "husky-install": "(node -e \"if (!require('fs').existsSync(__dirname + '/.git')) {process.exit(1)}\" && husky install || true)",

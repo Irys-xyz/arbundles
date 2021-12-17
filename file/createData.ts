@@ -1,18 +1,18 @@
 import FileDataItem from "./FileDataItem";
-import { DataItemCreateOptions } from "../ar-data-base";
+import { DataItemCreateOptions } from "../src/ar-data-base";
 import * as fs from "fs";
 import { tmpName } from "tmp-promise";
 import base64url from "base64url";
 import assert from "assert";
-import { longTo8ByteArray, shortTo2ByteArray } from "../utils";
-import { serializeTags } from "../parser";
-import { Signer } from '../signing';
-import { pipeline } from 'stream/promises';
+import { longTo8ByteArray, shortTo2ByteArray } from "../src/utils";
+import { serializeTags } from "../src/parser";
+import { Signer } from "../src/signing";
+import { pipeline } from "stream/promises";
 
 export async function createData(
   data: string | Uint8Array | NodeJS.ReadableStream,
   signer: Signer,
-  opts?: DataItemCreateOptions
+  opts?: DataItemCreateOptions,
 ): Promise<FileDataItem> {
   const filename = await tmpName();
   const stream = fs.createWriteStream(filename);
@@ -30,7 +30,10 @@ export async function createData(
   // Signature
   stream.write(new Uint8Array(signer.signatureLength).fill(0));
 
-  assert(_owner.byteLength == signer.ownerLength, new Error(`Owner must be ${signer.ownerLength} bytes`));
+  assert(
+    _owner.byteLength == signer.ownerLength,
+    new Error(`Owner must be ${signer.ownerLength} bytes`),
+  );
   stream.write(_owner);
   stream.write(_target ? singleItemBuffer(1) : singleItemBuffer(0));
   if (_target) {
@@ -57,10 +60,7 @@ export async function createData(
     typeof data[Symbol.asyncIterator as keyof AsyncIterable<Buffer>] ===
     "function"
   ) {
-    await pipeline(
-      data as NodeJS.ReadableStream,
-      stream
-    );
+    await pipeline(data as NodeJS.ReadableStream, stream);
   } else {
     stream.write(Buffer.from(data as string | Buffer));
   }

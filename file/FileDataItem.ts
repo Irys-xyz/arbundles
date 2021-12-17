@@ -1,16 +1,16 @@
 import base64url from "base64url";
 import * as fs from "fs";
 import { PathLike } from "fs";
-import { byteArrayToLong } from "../utils";
-import { tagsParser } from "../parser";
-import { BundleItem } from "../BundleItem";
-import { deepHash } from "../index";
+import { byteArrayToLong } from "../src/utils";
+import { tagsParser } from "../src/parser";
+import { BundleItem } from "../src/BundleItem";
+import { deepHash } from "../src";
 import { stringToBuffer } from "arweave/web/lib/utils";
 import Arweave from "arweave";
 import { promisify } from "util";
-import { indexToType, Signer } from "../signing";
+import { indexToType, Signer } from "../src/signing";
 import axios, { AxiosResponse } from "axios";
-import { SIG_CONFIG } from "../constants";
+import { SIG_CONFIG } from "../src/constants";
 
 const write = promisify(fs.write);
 const read = promisify(fs.read);
