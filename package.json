@@ -1,6 +1,6 @@
 {
   "name": "arbundles",
-  "version": "0.5.5",
+  "version": "0.6.4",
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
@@ -66,7 +66,6 @@
     "keccak256": "^1.0.3",
     "multistream": "^4.1.0",
     "noble-ed25519": "^1.2.6",
-    "package.json": "^2.0.1",
     "secp256k1": "^4.0.2",
     "starkbank-ecdsa": "^1.1.2",
     "stream-chunker": "^1.2.8",
