@@ -26,8 +26,8 @@
     "test": "jest --coverage",
     "husky-install": "(node -e \"if (!require('fs').existsSync(__dirname + '/.git')) {process.exit(1)}\" && husky install || true)",
     "ensure-build": "(node -e \"if (!require('fs').existsSync(__dirname + '/build')) {process.exit(1)}\" || yarn run build)",
-    "postinstall": "yarn run ensure-build",
-    "prepack": "yarn run ensure-build"
+    "prepack": "yarn run ensure-build",
+    "prepare": "yarn run ensure-build"
   },
   "devDependencies": {
     "@textury/ardb": "^1.1.3",
