@@ -20,6 +20,6 @@
     "noImplicitThis": false,
     "strictNullChecks": false
   },
-  "include": ["src/**/*", "file/**/*", "stream/**/*"],
+  "include": ["src/**/*", "file/**/*", "stream/**/*", "index.ts"],
   "exclude": ["src/__tests__/**"]
 }

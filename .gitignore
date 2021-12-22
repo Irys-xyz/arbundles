@@ -49,3 +49,6 @@ stream/**/*.d.ts
 file/**/*.js
 file/**/*.js.map
 file/**/*.d.ts
+index.js
+index.d.ts
+index.js.map
