@@ -20,15 +20,10 @@ export function serializeTags(
   if (tags!.length == 0) {
     return new Uint8Array(0);
   }
-
-  let tagsBuffer;
-  try {
-    tagsBuffer = tagsParser.toBuffer(tags);
-  } catch (e) {
+  if (!tagsParser.isValid(tags)) {
     throw new Error(
       "Incorrect tag format used. Make sure your tags are { name: string!, name: string! }[]",
     );
   }
-
-  return Uint8Array.from(tagsBuffer);
+  return Uint8Array.from(tagsParser.toBuffer(tags));
 }
