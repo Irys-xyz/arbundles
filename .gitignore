@@ -52,3 +52,4 @@ file/**/*.d.ts
 index.js
 index.d.ts
 index.js.map
+test

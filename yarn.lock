@@ -1365,10 +1365,12 @@ available-typed-arrays@^1.0.5:
   resolved "https://registry.yarnpkg.com/available-typed-arrays/-/available-typed-arrays-1.0.5.tgz#92f95616501069d07d10edb2fc37d3e1c65123b7"
   integrity sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==
 
-avsc@^5.7.1:
-  version "5.7.3"
-  resolved "https://registry.yarnpkg.com/avsc/-/avsc-5.7.3.tgz#c5a57147c0c7f6d9cbbdf6f02576eda94d293cd9"
-  integrity sha512-uUbetCWczQHbsKyX1C99XpQHBM8SWfovvaZhPIj23/1uV7SQf0WeRZbiLpw0JZm+LHTChfNgrLfDJOVoU2kU+A==
+avro-js@^1.11.0:
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/avro-js/-/avro-js-1.11.0.tgz#fb4613f05e4df5b88c8b631ec400fbb82ea65ec5"
+  integrity sha512-ndeGph6lECwNvIcpA4YfRxMaZNMR/Eiw+QX77ibxouYm+jC51Ha2aAIxYD6eg1EABlQU5yErprtA+N2YP3G2BQ==
+  dependencies:
+    underscore "^1.12.0"
 
 axios@*:
   version "0.24.0"
@@ -4465,6 +4467,11 @@ unbox-primitive@^1.0.1:
     has-bigints "^1.0.1"
     has-symbols "^1.0.2"
     which-boxed-primitive "^1.0.2"
+
+underscore@^1.12.0:
+  version "1.13.2"
+  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.13.2.tgz#276cea1e8b9722a8dbed0100a407dda572125881"
+  integrity sha512-ekY1NhRzq0B08g4bGuX4wd2jZx5GnKz6mKSqFL4nqBlfyMGiG10gDFhDTMEfYmDL6Jy0FUIZp7wiRB+0BP7J2g==
 
 universalify@^0.1.2:
   version "0.1.2"
