@@ -180,10 +180,12 @@ async function hasEnough(
   length: number,
 ): Promise<Uint8Array> {
   if (buffer.byteLength > length) return buffer;
-  buffer = Buffer.concat([buffer, (await reader.next()).value]);
-  if (buffer.byteLength > length) return buffer;
 
-  return buffer;
+  return hasEnough(
+    reader,
+    Buffer.concat([buffer, (await reader.next()).value]),
+    length,
+  );
 }
 
 async function* getReader(s: Readable): AsyncGenerator<Buffer> {
