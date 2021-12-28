@@ -9,7 +9,7 @@ import * as crypto from "crypto";
 import { stringToBuffer } from "arweave/web/lib/utils";
 import { deepHash } from "../src/deepHash";
 
-export async function verifyAndIndexStream(
+export default async function processStream(
   stream: Readable,
 ): Promise<Record<string, any>[]> {
   const reader = getReader(stream);
@@ -181,11 +181,12 @@ async function hasEnough(
 ): Promise<Uint8Array> {
   if (buffer.byteLength > length) return buffer;
 
-  return hasEnough(
-    reader,
-    Buffer.concat([buffer, (await reader.next()).value]),
-    length,
-  );
+  const { done, value } = await reader.next();
+
+  if (done && buffer.byteLength < length)
+    throw new Error("Invalid buffer");
+
+  return hasEnough(reader, Buffer.concat([buffer, value]), length);
 }
 
 async function* getReader(s: Readable): AsyncGenerator<Buffer> {

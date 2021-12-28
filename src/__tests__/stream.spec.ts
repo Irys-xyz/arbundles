@@ -2,7 +2,7 @@ import { bundleAndSignData, createData } from "../index";
 import { readFileSync } from "fs";
 import path from "path";
 import { ArweaveSigner } from "../signing";
-import { verifyAndIndexStream } from "../../stream";
+import processStream from "../../stream";
 import { Readable } from "stream";
 
 const wallet0 = JSON.parse(
@@ -16,7 +16,7 @@ describe("stream tests", function () {
     const bundle = await bundleAndSignData([item], signer);
 
     const stream = Readable.from(bundle.getRaw());
-    for await (const item of await verifyAndIndexStream(stream)) {
+    for await (const item of await processStream(stream)) {
       console.log(item);
     }
   });
