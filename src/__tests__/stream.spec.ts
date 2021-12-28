@@ -2,7 +2,7 @@ import { bundleAndSignData, createData } from "../index";
 import { readFileSync } from "fs";
 import path from "path";
 import { ArweaveSigner } from "../signing";
-import { verifyAndIndexStream } from "../stream";
+import { verifyAndIndexStream } from "../../stream";
 import { Readable } from "stream";
 
 const wallet0 = JSON.parse(

@@ -1,9 +1,9 @@
-import { file } from 'tmp-promise';
-import * as fs from 'fs';
-import { longTo32ByteArray } from '../utils';
-import { Signer } from '../signing/index';
-import FileBundle from './FileBundle';
-import FileDataItem from './FileDataItem';
+import { file } from "tmp-promise";
+import * as fs from "fs";
+import { longTo32ByteArray } from "../src/utils";
+import { Signer } from "../src/signing";
+import FileBundle from "./FileBundle";
+import FileDataItem from "./FileDataItem";
 
 export async function bundleAndSignData(
   dataItems: FileDataItem[],

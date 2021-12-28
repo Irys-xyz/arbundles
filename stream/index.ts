@@ -1,13 +1,13 @@
 import { Readable, Transform } from "stream";
-import { byteArrayToLong } from "../utils";
+import { byteArrayToLong } from "../src/utils";
 import base64url from "base64url";
-import { indexToType } from "../signing/constants";
-import { MIN_BINARY_SIZE } from "../index";
-import { SIG_CONFIG } from "../constants";
-import { tagsParser } from "../parser";
+import { indexToType } from "../src/signing/constants";
+import { MIN_BINARY_SIZE } from "../src/index";
+import { SIG_CONFIG } from "../src/constants";
+import { tagsParser } from "../src/parser";
 import * as crypto from "crypto";
 import { stringToBuffer } from "arweave/web/lib/utils";
-import { deepHash } from "../deepHash";
+import { deepHash } from "../src/deepHash";
 
 export async function verifyAndIndexStream(
   stream: Readable,
@@ -41,14 +41,14 @@ export async function verifyAndIndexStream(
     const signatureType = byteArrayToLong(bytes.subarray(0, 2));
     bytes = bytes.subarray(2);
 
+    const { sigLength, pubLength, sigName } = SIG_CONFIG[signatureType];
+
     // Get sig
-    const sigLength = SIG_CONFIG[signatureType].sigLength;
     bytes = await hasEnough(reader, bytes, sigLength);
     const signature = bytes.subarray(0, sigLength);
     bytes = bytes.subarray(sigLength);
 
     // Get owner
-    const pubLength = SIG_CONFIG[signatureType].pubLength;
     bytes = await hasEnough(reader, bytes, pubLength);
     const owner = bytes.subarray(0, pubLength);
     bytes = bytes.subarray(pubLength);
@@ -158,6 +158,7 @@ export async function verifyAndIndexStream(
 
     items.push({
       id,
+      sigName,
       signature: base64url(Buffer.from(signature)),
       target: base64url(Buffer.from(target)),
       anchor: base64url(Buffer.from(anchor)),
