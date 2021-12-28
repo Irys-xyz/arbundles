@@ -1,6 +1,6 @@
 {
   "name": "arbundles",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
