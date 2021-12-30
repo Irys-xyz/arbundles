@@ -183,7 +183,7 @@ async function readBytes(
 
   const { done, value } = await reader.next();
 
-  if (done && buffer.byteLength < length) throw new Error("Invalid buffer");
+  if (done && !value) throw new Error("Invalid buffer");
 
   return readBytes(reader, Buffer.concat([buffer, value]), length);
 }
