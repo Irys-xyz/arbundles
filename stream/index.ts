@@ -9,16 +9,16 @@ import * as crypto from "crypto";
 import { stringToBuffer } from "arweave/web/lib/utils";
 import { deepHash } from "../src/deepHash";
 
-export async function verifyAndIndexStream(
+export default async function processStream(
   stream: Readable,
 ): Promise<Record<string, any>[]> {
   const reader = getReader(stream);
   let bytes: Uint8Array = (await reader.next()).value;
-  bytes = await hasEnough(reader, bytes, 32);
+  bytes = await readBytes(reader, bytes, 32);
   const itemCount = byteArrayToLong(bytes.subarray(0, 32));
   bytes = bytes.subarray(32);
   const headersLength = 64 * itemCount;
-  bytes = await hasEnough(reader, bytes, headersLength);
+  bytes = await readBytes(reader, bytes, headersLength);
   const headers: [number, string][] = new Array(itemCount);
   for (let i = 0; i < headersLength; i += 64) {
     headers[i / 64] = [
@@ -34,53 +34,53 @@ export async function verifyAndIndexStream(
   const items = [];
 
   for (const [length, id] of headers) {
-    bytes = await hasEnough(reader, bytes, MIN_BINARY_SIZE);
+    bytes = await readBytes(reader, bytes, MIN_BINARY_SIZE);
 
     // Get sig type
-    bytes = await hasEnough(reader, bytes, 2);
+    bytes = await readBytes(reader, bytes, 2);
     const signatureType = byteArrayToLong(bytes.subarray(0, 2));
     bytes = bytes.subarray(2);
 
     const { sigLength, pubLength, sigName } = SIG_CONFIG[signatureType];
 
     // Get sig
-    bytes = await hasEnough(reader, bytes, sigLength);
+    bytes = await readBytes(reader, bytes, sigLength);
     const signature = bytes.subarray(0, sigLength);
     bytes = bytes.subarray(sigLength);
 
     // Get owner
-    bytes = await hasEnough(reader, bytes, pubLength);
+    bytes = await readBytes(reader, bytes, pubLength);
     const owner = bytes.subarray(0, pubLength);
     bytes = bytes.subarray(pubLength);
 
     // Get target
-    bytes = await hasEnough(reader, bytes, 1);
+    bytes = await readBytes(reader, bytes, 1);
     const targetPresent = bytes[0] === 1;
-    if (targetPresent) bytes = await hasEnough(reader, bytes, 33);
+    if (targetPresent) bytes = await readBytes(reader, bytes, 33);
     const target = targetPresent
       ? bytes.subarray(1, 33)
       : Buffer.allocUnsafe(0);
     bytes = bytes.subarray(targetPresent ? 33 : 1);
 
     // Get anchor
-    bytes = await hasEnough(reader, bytes, 1);
+    bytes = await readBytes(reader, bytes, 1);
     const anchorPresent = bytes[0] === 1;
-    if (anchorPresent) bytes = await hasEnough(reader, bytes, 33);
+    if (anchorPresent) bytes = await readBytes(reader, bytes, 33);
     const anchor = anchorPresent
       ? bytes.subarray(1, 33)
       : Buffer.allocUnsafe(0);
     bytes = bytes.subarray(anchorPresent ? 33 : 1);
 
     // Get tags
-    bytes = await hasEnough(reader, bytes, 8);
+    bytes = await readBytes(reader, bytes, 8);
     const tagsLength = byteArrayToLong(bytes.subarray(0, 8));
     bytes = bytes.subarray(8);
 
-    bytes = await hasEnough(reader, bytes, 8);
+    bytes = await readBytes(reader, bytes, 8);
     const tagsBytesLength = byteArrayToLong(bytes.subarray(0, 8));
     bytes = bytes.subarray(8);
 
-    bytes = await hasEnough(reader, bytes, tagsBytesLength);
+    bytes = await readBytes(reader, bytes, tagsBytesLength);
     const tagsBytes = bytes.subarray(0, tagsBytesLength);
     const tags =
       tagsLength !== 0 && tagsBytesLength !== 0
@@ -174,16 +174,18 @@ export async function verifyAndIndexStream(
   return items;
 }
 
-async function hasEnough(
+async function readBytes(
   reader: AsyncGenerator<Buffer>,
   buffer: Uint8Array,
   length: number,
 ): Promise<Uint8Array> {
   if (buffer.byteLength > length) return buffer;
-  buffer = Buffer.concat([buffer, (await reader.next()).value]);
-  if (buffer.byteLength > length) return buffer;
 
-  return buffer;
+  const { done, value } = await reader.next();
+
+  if (done && !value) throw new Error("Invalid buffer");
+
+  return readBytes(reader, Buffer.concat([buffer, value]), length);
 }
 
 async function* getReader(s: Readable): AsyncGenerator<Buffer> {
