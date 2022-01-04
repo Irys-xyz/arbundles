@@ -8,6 +8,7 @@ import { indexToType, Signer } from "./signing/index";
 import { getSignatureData } from "./ar-data-base";
 import axios, { AxiosResponse } from "axios";
 import { SIG_CONFIG, SignatureConfig } from "./constants";
+import * as crypto from "crypto";
 
 export const MIN_BINARY_SIZE = 80;
 
@@ -57,10 +58,7 @@ export default class DataItem implements BundleItem {
   }
 
   get rawId(): Buffer {
-    if (!this._id) {
-      throw new Error("To get the data item id you must sign the item first");
-    }
-    return this._id;
+    return crypto.createHash("sha256").update(this.rawSignature).digest();
   }
 
   set rawId(id: Buffer) {
@@ -287,10 +285,15 @@ export default class DataItem implements BundleItem {
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const Signer = indexToType[sigType];
 
     const signatureData = await getSignatureData(item);
     return await Signer.verify(item.rawOwner, signatureData, item.rawSignature);
+  }
+
+  public async getSignatureData(): Promise<Uint8Array> {
+    return getSignatureData(this);
   }
 
   /**
