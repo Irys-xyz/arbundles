@@ -1,18 +1,24 @@
 import { Signer } from "..";
 import * as ed25519 from "noble-ed25519";
 import base64url from "base64url";
+import { SIG_CONFIG } from "../../constants";
+import { MessageSignerWalletAdapter } from "@solana/wallet-adapter-base";
 
 export default class InjectedSolanaSigner implements Signer {
-  publicKey: Buffer;
-  signatureType: number;
-  signatureLength: number;
-  ownerLength: number;
+  private readonly _publicKey: Buffer;
+  readonly ownerLength: number = SIG_CONFIG[2].pubLength;
+  readonly signatureLength: number = SIG_CONFIG[2].sigLength;
+  readonly signatureType: number = 2;
   pem?: string | Buffer;
-  provider;
+  provider: MessageSignerWalletAdapter;
 
   constructor(provider) {
     this.provider = provider;
-    this.publicKey = this.provider.publicKey;
+    this._publicKey = this.provider.publicKey.toBuffer();
+  }
+
+  public get publicKey(): Buffer {
+    return this._publicKey;
   }
 
   async sign(message: Uint8Array): Promise<Uint8Array> {
