@@ -34,7 +34,7 @@ export default class Secp256k1 implements Signer {
     try {
       verified = secp256k1.ecdsaVerify(
         signature,
-        keccak256(message),
+        keccak256(Buffer.from(message)),
         p as Buffer,
       );
       // eslint-disable-next-line no-empty
@@ -43,7 +43,7 @@ export default class Secp256k1 implements Signer {
   }
 
   sign(message: Uint8Array): Uint8Array {
-    return secp256k1.ecdsaSign(keccak256(message), Buffer.from(this.key))
+    return secp256k1.ecdsaSign(keccak256(Buffer.from(message)), Buffer.from(this.key))
       .signature;
   }
 }
