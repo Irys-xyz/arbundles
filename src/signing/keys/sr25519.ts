@@ -3,9 +3,11 @@ import {
   sr25519Sign as sign,
   sr25519Verify as verify,
   sr25519PairFromSeed as fromSeed,
+  cryptoWaitReady,
 } from "@polkadot/util-crypto";
 import { Keypair } from "@polkadot/util-crypto/types";
 import { SIG_CONFIG } from "../../constants";
+// import base58 from "bs58";
 
 export default class Sr25519 implements Signer {
   readonly signatureType: number = 2;
@@ -14,9 +16,9 @@ export default class Sr25519 implements Signer {
   pem?: string | Buffer;
   protected keyPair: Keypair;
   protected pk: Buffer;
+  protected _pk;
   constructor(privateKey: string) {
-    this.keyPair = fromSeed(privateKey);
-    this.pk = Buffer.from(this.keyPair.publicKey);
+    this._pk = privateKey;
   }
 
   public get publicKey(): Buffer {
@@ -25,6 +27,11 @@ export default class Sr25519 implements Signer {
 
   sign(message: Uint8Array): Uint8Array | Promise<Uint8Array> {
     return sign(message, this.keyPair);
+  }
+  public async ready(): Promise<void> {
+    await cryptoWaitReady();
+    this.keyPair = fromSeed(this._pk);
+    this.pk = Buffer.from(this.keyPair.publicKey);
   }
 
   static async verify(
