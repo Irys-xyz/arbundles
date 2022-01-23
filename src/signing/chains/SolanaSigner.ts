@@ -1,6 +1,5 @@
-import Curve25519 from '../keys/curve25519';
+import Curve25519 from "../keys/curve25519";
 import bs58 from "bs58";
-import base58 from 'bs58';
 
 export default class SolanaSigner extends Curve25519 {
   get publicKey(): Buffer {
@@ -13,6 +12,6 @@ export default class SolanaSigner extends Curve25519 {
 
   constructor(_key: string) {
     const b = bs58.decode(_key);
-    super(base58.encode(b.subarray(0, 32)), base58.encode(b.subarray(32, 64)));
+    super(bs58.encode(b.subarray(0, 32)), bs58.encode(b.subarray(32, 64)));
   }
 }
