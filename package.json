@@ -71,6 +71,7 @@
     "ethers": "^5.5.1",
     "keccak256": "^1.0.3",
     "multistream": "^4.1.0",
+    "near-api-js": "^0.44.2",
     "noble-ed25519": "^1.2.6",
     "secp256k1": "^4.0.2",
     "starkbank-ecdsa": "^1.1.2",
