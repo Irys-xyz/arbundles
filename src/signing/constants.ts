@@ -1,5 +1,6 @@
 import { Signer } from "./Signer";
 import Curve25519 from "./keys/curve25519";
+import PolkadotSigner from "./chains/PolkadotSigner";
 import EthereumSigner from "./chains/ethereumSigner";
 import { ArweaveSigner } from "./chains";
 
@@ -26,4 +27,7 @@ export const indexToType: IndexToType = {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   3: EthereumSigner,
+   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  4: PolkadotSigner,
 };

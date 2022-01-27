@@ -1,22 +1,20 @@
 import { Signer } from "../Signer";
-import {
-  sr25519Sign as sign,
-  sr25519Verify as verify,
-  sr25519PairFromSeed as fromSeed,
-  cryptoWaitReady,
-} from "@polkadot/util-crypto";
+import { Keyring } from "@polkadot/keyring";
+import { cryptoWaitReady, signatureVerify, encodeAddress } from "@polkadot/util-crypto";
 import { Keypair } from "@polkadot/util-crypto/types";
 import { SIG_CONFIG } from "../../constants";
 // import base58 from "bs58";
 
 export default class Sr25519 implements Signer {
-  readonly signatureType: number = 2;
-  readonly ownerLength: number = SIG_CONFIG[2].pubLength;
-  readonly signatureLength: number = SIG_CONFIG[2].sigLength;
+  readonly signatureType: number = 4;
+  readonly ownerLength: number = SIG_CONFIG[4].pubLength;
+  readonly signatureLength: number = SIG_CONFIG[4].sigLength;
   pem?: string | Buffer;
   protected keyPair: Keypair;
   protected pk: Buffer;
   protected _pk;
+  protected keyring;
+  protected signature;
   constructor(privateKey: string) {
     this._pk = privateKey;
   }
@@ -26,11 +24,15 @@ export default class Sr25519 implements Signer {
   }
 
   sign(message: Uint8Array): Uint8Array | Promise<Uint8Array> {
-    return sign(message, this.keyPair);
+      const signer = this.signature
+      return signer.sign(message);
   }
+
   public async ready(): Promise<void> {
     await cryptoWaitReady();
-    this.keyPair = fromSeed(this._pk);
+    this.keyring = new Keyring({ type: "sr25519", ss58Format: 0 });
+    this.signature = this.keyring.createFromUri(this._pk, { name: "sr25519" });
+    this.keyPair = this.signature;
     this.pk = Buffer.from(this.keyPair.publicKey);
   }
 
@@ -39,6 +41,7 @@ export default class Sr25519 implements Signer {
     message: Uint8Array,
     signature: Uint8Array,
   ): Promise<boolean> {
-    return verify(message, signature, pk);
+    const { isValid } = signatureVerify(message, signature, pk);
+    return (isValid ? true : false);
   }
 }
