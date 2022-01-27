@@ -1,7 +1,8 @@
 import { Signer } from "../Signer";
 import { Keyring } from "@polkadot/keyring";
-import { cryptoWaitReady, signatureVerify, encodeAddress } from "@polkadot/util-crypto";
+import { cryptoWaitReady, signatureVerify } from "@polkadot/util-crypto";
 import { Keypair } from "@polkadot/util-crypto/types";
+// import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { SIG_CONFIG } from "../../constants";
 // import base58 from "bs58";
 
@@ -23,7 +24,7 @@ export default class Sr25519 implements Signer {
     return this.pk;
   }
 
-  sign(message: Uint8Array): Uint8Array | Promise<Uint8Array> {
+  sign(message: Uint8Array): Uint8Array | Promise<Uint8Array>{
       const signer = this.signature
       return signer.sign(message);
   }
