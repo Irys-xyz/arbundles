@@ -15,7 +15,7 @@ export default class Sr25519 implements Signer {
   protected pk: Buffer;
   protected _pk;
   protected keyring;
-  protected signature;
+  signature;
   constructor(privateKey: string) {
     this._pk = privateKey;
   }
