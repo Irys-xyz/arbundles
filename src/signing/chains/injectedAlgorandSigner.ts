@@ -1,51 +1,48 @@
-// import { ethers } from "ethers";
-import MyAlgoConnect from "@randlabs/myalgo-connect";
-import * as algosdk from "algosdk";
-import { Signer } from "..";
-import { SignatureConfig, SIG_CONFIG } from "../../constants";
-import * as ed25519 from "noble-ed25519";
-// import base64url from "base64url";
+// import MyAlgoConnect from "@randlabs/myalgo-connect";
+// import * as algosdk from "algosdk";
+// import { Signer } from "..";
+// import { SignatureConfig, SIG_CONFIG } from "../../constants";
+// import * as ed25519 from "noble-ed25519";
 
-export default class InjectedAlgorandSigner implements Signer {
-  // private signer: ethers.providers.JsonRpcSigner;
-  private signer: MyAlgoConnect;
-  public publicKey: Buffer;
-  readonly ownerLength: number = SIG_CONFIG[SignatureConfig.ETHEREUM].pubLength;
-  readonly signatureLength: number =
-    SIG_CONFIG[SignatureConfig.ETHEREUM].sigLength;
-  readonly signatureType: SignatureConfig = SignatureConfig.ETHEREUM;
+// export default class InjectedAlgorandSigner implements Signer {
 
-  constructor() {
-    const myAlgoWallet = new MyAlgoConnect();
-    this.signer = myAlgoWallet;
-  }
+//   private signer: MyAlgoConnect;
+//   public publicKey: Buffer;
+  
+//   readonly ownerLength: number = SIG_CONFIG[SignatureConfig.ED25519].pubLength;
+//   readonly signatureLength: number = SIG_CONFIG[SignatureConfig.ED25519].sigLength;
+//   readonly signatureType: number = 2;
 
-  async setPublicKey(): Promise<void> {
-    const accounts = await this.signer.connect();
-    const pub = algosdk.decodeAddress(accounts[0].address);
-    this.publicKey = Buffer.from(pub.publicKey);
-  }
+//   constructor() {
+//     const myAlgoWallet = new MyAlgoConnect();
+//     this.signer = myAlgoWallet;
+//   }
 
-  async sign(message: any): Promise<Uint8Array> {
-    if (!this.publicKey) {
-      await this.setPublicKey();
-    }
-    const sig = await this.signer.signTransaction(message);
-    console.log(sig);
-    return Buffer.from(sig.blob);
-  }
+//   async setPublicKey(): Promise<void> {
+//     const accounts = await this.signer.connect();
+//     const pub = algosdk.decodeAddress(accounts[0].address);
+//     this.publicKey = Buffer.from(pub.publicKey);
+//   }
 
-  static verify(
-    pk: Buffer,
-    message: Uint8Array,
-    signature: Uint8Array,
-  ): Promise<boolean> {
-    // let p = pk;
-    // if (typeof pk === "string") p = base64url.toBuffer(pk);
-    return ed25519.verify(
-      Buffer.from(signature),
-      Buffer.from(message),
-      Buffer.from(pk),
-    );
-  }
-}
+//   public async sign(message: any): Promise<any> {
+//     if (!this.publicKey) {
+//       await this.setPublicKey();
+//     }
+//     const sig = await this.signer.signTransaction(message);
+//     return sig;
+//   }
+
+//   static verify(
+//     pk: Buffer,
+//     message: Uint8Array,
+//     signature: Uint8Array,
+//   ): Promise<boolean> {
+//     // let p = pk;
+//     // if (typeof pk === "string") p = base64url.toBuffer(pk);
+//     return ed25519.verify(
+//       Buffer.from(signature),
+//       Buffer.from(message),
+//       Buffer.from(pk),
+//     );
+//   }
+// }
