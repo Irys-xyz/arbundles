@@ -1,6 +1,6 @@
 {
   "name": "arbundles",
-  "version": "0.6.13",
+  "version": "0.6.14",
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
@@ -70,7 +70,7 @@
     "process": "^0.11.10",
     "secp256k1": "^4.0.2",
     "tmp-promise": "^3.0.2",
-    "tslib": "^2.3.0",
-    "ts-node": "^10.5.0"
+    "ts-node": "^10.5.0",
+    "tslib": "^2.3.0"
   }
 }
