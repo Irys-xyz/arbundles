@@ -1,6 +1,5 @@
 import Curve25519 from "../keys/curve25519";
 export default class AlgorandSigner extends Curve25519 {
-  
   get publicKey(): Buffer {
     return Buffer.from(this.pk);
   }
@@ -9,7 +8,7 @@ export default class AlgorandSigner extends Curve25519 {
     return Buffer.from(this._key);
   }
 
-  constructor(_key: any, pk: any) {
-    super(_key.subarray(0, 32), pk);
+  constructor(key: any, pk: any) {
+    super(key.subarray(0, 32), pk);
   }
 }
