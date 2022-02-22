@@ -1,6 +1,6 @@
 {
   "name": "arbundles",
-  "version": "0.6.14",
+  "version": "0.6.15",
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
@@ -59,7 +59,7 @@
     "algosdk": "^1.13.1",
     "arweave": "^1.10.18",
     "arweave-stream-tx": "^1.1.0",
-    "avsc": "git://github.com/JesseTheRobot/avsc#csp-fixes",
+    "avsc": "https://github.com/Bundlr-Network/avsc#csp-fixes",
     "axios": "^0.21.3",
     "base64url": "^3.0.1",
     "bs58": "^4.0.1",
