@@ -1501,9 +1501,9 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha1-x57Zf380y48robyXkLzDZkdLS3k=
 
-"avsc@git://github.com/JesseTheRobot/avsc#csp-fixes":
+"avsc@https://github.com/Bundlr-Network/avsc#csp-fixes":
   version "5.4.7"
-  resolved "git://github.com/JesseTheRobot/avsc#a730cc8018b79e114b6a3381bbb57760a24c6cef"
+  resolved "https://github.com/Bundlr-Network/avsc#a730cc8018b79e114b6a3381bbb57760a24c6cef"
 
 axios@*:
   version "0.24.0"
