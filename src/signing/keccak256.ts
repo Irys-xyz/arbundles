@@ -97,4 +97,4 @@ if (typeof window !== "undefined") {
   (window as any).keccak256 = keccak256;
 }
 
-export = keccak256;
+export default keccak256;

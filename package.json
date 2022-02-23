@@ -21,7 +21,7 @@
     "file/**/*.d.ts"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && webpack",
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
     "test": "jest --coverage",
     "husky-install": "(node -e \"if (!require('fs').existsSync(__dirname + '/.git')) {process.exit(1)}\" && husky install || true)",
@@ -35,6 +35,7 @@
     "@typescript-eslint/eslint-plugin": "~4.25.0",
     "@typescript-eslint/parser": "~4.25.0",
     "buffer": "npm:buffer",
+    "clean-webpack-plugin": "^4.0.0",
     "eslint": "~7.27.0",
     "eslint-config-prettier": "~8.3.0",
     "eslint-plugin-jest": "~24.3.6",
@@ -47,7 +48,10 @@
     "rimraf": "~3.0.2",
     "ts-jest": "~27.0.2",
     "tsutils": "~3.21.0",
-    "typescript": "~4.3.2"
+    "typescript": "~4.3.2",
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2",
+    "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
     "@randlabs/myalgo-connect": "^1.1.2",
@@ -59,17 +63,23 @@
     "algosdk": "^1.13.1",
     "arweave": "^1.10.18",
     "arweave-stream-tx": "^1.1.0",
+    "assert": "^2.0.0",
     "avsc": "https://github.com/Bundlr-Network/avsc#csp-fixes",
     "axios": "^0.21.3",
     "base64url": "^3.0.1",
+    "browserify-zlib": "^0.2.0",
     "bs58": "^4.0.1",
+    "crypto-browserify": "^3.12.0",
     "ethers": "^5.5.1",
     "keccak": "^3.0.2",
     "multistream": "^4.1.0",
     "noble-ed25519": "^1.2.6",
+    "path-browserify": "^1.0.1",
     "process": "^0.11.10",
     "secp256k1": "^4.0.2",
+    "stream-browserify": "^3.0.0",
     "tmp-promise": "^3.0.2",
+    "ts-loader": "^9.2.6",
     "ts-node": "^10.5.0",
     "tslib": "^2.3.0"
   }
