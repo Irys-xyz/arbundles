@@ -9,3 +9,4 @@ export { default as InjectedSolanaSigner } from "./injectedSolanaSigner";
 export { ArweaveSigner, PolygonSigner, InjectedEthereumSigner };
 export { default as NearSigner } from "./NearSigner";
 export { default as AlgorandSigner } from "./AlgorandSigner";
+export { default as CosmosSigner } from "./CosmosSigner";
