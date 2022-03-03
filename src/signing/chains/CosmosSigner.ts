@@ -1,12 +1,9 @@
-// import Secp256k1 from "../keys/secp256k1";
-// import secp256k1 from "secp256k1";
 import { Signer } from "../Signer";
 import { SignatureConfig, SIG_CONFIG } from "../../constants";
-import { Secp256k1, Secp256k1Signature, sha256 } from "@cosmjs/crypto";
-// import * as signingcosmos from "@cosmjs/proto-signing";
+import { Secp256k1, sha256, Bip39, Slip10, stringToPath, Slip10Curve, EnglishMnemonic, ExtendedSecp256k1Signature } from "@cosmjs/crypto";
 import * as aminocosmos from "@cosmjs/amino";
-import * as encode from "@cosmjs/encoding";
-
+// import * as signingcosmos from "@cosmjs/proto-signing";
+// import * as encode from "@cosmjs/encoding";
 
 export default class CosmosSigner implements Signer {
   readonly ownerLength: number = SIG_CONFIG[SignatureConfig.COSMOS].pubLength;
@@ -18,7 +15,8 @@ export default class CosmosSigner implements Signer {
   protected keyring;
   public keyPair;
   public pk;
-
+  public signingKp;
+  
   constructor(key: string) {
     this.wallet = key;
   }
@@ -32,49 +30,28 @@ export default class CosmosSigner implements Signer {
     const [first] = await this.keyring.getAccounts();
     this.keyPair = first;
     this.pk = this.keyPair.pubkey;
+
+    const walletSeed = await Bip39.mnemonicToSeed(new EnglishMnemonic(this.wallet));
+    const path = stringToPath("m/44'/118'/0'/0");
+    const slip = Slip10.derivePath(Slip10Curve.Secp256k1, walletSeed ,path);
+    this.signingKp = await Secp256k1.makeKeypair(slip.privkey);
+    
   }
 
-  async sign(_message: Uint8Array): Promise<Uint8Array> {
-    const signDoc = {
-      msgs: [{
-        type: "SignMsg",
-        value: "message"
-      }],
-      fee: {
-        amount: [],
-        gas: "1" },
-      chain_id: "vega-testnet",
-      memo: "",
-      account_number: "0",
-      sequence: "0",
-    };
-
-    const { /*  signed, */ signature } = await this.keyring.signAmino(this.keyPair.address, signDoc);
-    return Buffer.from(signature.signature);
+  async sign(message: Uint8Array): Promise<Uint8Array> {
+    const signature = await Secp256k1.createSignature(sha256(message), this.signingKp.privkey);
+    return signature.toFixedLength();
   }
 
   static async verify(
     pk: string | Buffer,
-    _message: Uint8Array,
+    message: Uint8Array,
     signature: Uint8Array,
   ): Promise<boolean> {
-    const signDoc = {
-      msgs: [{
-        type: "SignMsg",
-        value: "message"
-      }],
-      fee: {
-        amount: [],
-        gas: "1" },
-      chain_id: "vega-testnet",
-      memo: "",
-      account_number: "0",
-      sequence: "0",
-    };
-    return await Secp256k1.verifySignature(
-      Secp256k1Signature.fromFixedLength(encode.fromBase64(signature.toString())),
-      sha256(aminocosmos.serializeSignDoc(signDoc)),
-      Buffer.from(pk),
-    ); 
+    if(typeof pk === "string"){
+      pk = Buffer.from(pk);
+    }
+    const fromFixed = ExtendedSecp256k1Signature.fromFixedLength(signature); 
+    return await Secp256k1.verifySignature(fromFixed, sha256(message), pk);
   }
 }
