@@ -28,7 +28,7 @@ export const SIG_CONFIG: Record<SignatureConfig, SignatureMeta> = {
     sigName: "ethereum",
   },
   [SignatureConfig.COSMOS]: {
-    sigLength: 65,
+    sigLength: 64,
     pubLength: 33,
     sigName: "cosmos",
   },
