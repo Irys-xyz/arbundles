@@ -11,9 +11,11 @@ export default class CosmosSigner implements Signer {
   protected wallet;
   public pk;
   public signingKp;
+  public coinpath;
   
-  constructor(key: string) {
+  constructor(key: string, coin: string) {
     this.wallet = key;
+    this.coinpath = coin;
   }
 
   public get publicKey(): Buffer {
@@ -22,7 +24,7 @@ export default class CosmosSigner implements Signer {
 
   public async ready(): Promise<void> {
     const walletSeed = await Bip39.mnemonicToSeed(new EnglishMnemonic(this.wallet));
-    const path = stringToPath("m/44'/118'/0'/0/0");
+    const path = stringToPath(`m/44'/${this.coinpath}'/0'/0/0`);
     const slip = Slip10.derivePath(Slip10Curve.Secp256k1, walletSeed ,path);
     this.signingKp = await Secp256k1.makeKeypair(slip.privkey);
     this.pk = Secp256k1.compressPubkey(this.signingKp.pubkey);
