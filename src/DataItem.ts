@@ -40,7 +40,7 @@ export default class DataItem implements BundleItem {
         return SignatureConfig.ETHEREUM;
       }
       case 4: {
-        return SignatureConfig.PHANTOM;
+        return SignatureConfig.SOLANA;
       }
       default: {
         throw new Error("Unknown signature type: " + signatureTypeVal);
