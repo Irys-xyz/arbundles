@@ -1,7 +1,7 @@
 import { Signer } from "./Signer";
 import Curve25519 from "./keys/curve25519";
 import EthereumSigner from "./chains/ethereumSigner";
-import { ArweaveSigner, PolygonSigner } from "./chains";
+import { ArweaveSigner, PhantomSigner } from "./chains";
 
 interface IndexToType {
   [key: number]: {
@@ -28,5 +28,5 @@ export const indexToType: IndexToType = {
   3: EthereumSigner,
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  4: PolygonSigner,
+  4: PhantomSigner,
 };

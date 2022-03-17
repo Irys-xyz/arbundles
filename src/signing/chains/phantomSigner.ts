@@ -3,7 +3,7 @@ import InjectedSolanaSigner from "./injectedSolanaSigner";
 import * as ed25519 from "noble-ed25519";
 
 export default class PhantomSigner extends InjectedSolanaSigner {
-  signatureType = 3; // for Phantom signer type
+  signatureType = 4; // for Phantom signer type
 
   constructor(provider) {
     super(provider);
@@ -22,7 +22,7 @@ export default class PhantomSigner extends InjectedSolanaSigner {
     if (typeof pk === "string") p = base64url.toBuffer(pk);
     return ed25519.verify(
       Buffer.from(signature),
-      Buffer.from(message).toString("hex"),
+      Buffer.from(Buffer.from(message).toString("hex")),
       Buffer.from(p),
     );
   }
