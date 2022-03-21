@@ -1,5 +1,6 @@
-import SolanaSigner from "./SolanaSigner";
-export default class PhantomSigner extends SolanaSigner {
+import InjectedSolanaSigner from "./injectedSolanaSigner";
+
+export default class HexSolanaSigner extends InjectedSolanaSigner {
   signatureType = 4; // for solana sig type
 
   constructor(provider) {
