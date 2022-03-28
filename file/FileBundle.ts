@@ -9,7 +9,7 @@ import MultiStream from "multistream";
 // import { pipeline } from 'stream/promises';
 // import { createTransactionAsync } from 'arweave-stream';
 import { JWKInterface } from "../src/interface-jwk";
-import { promisify } from "util";
+
 import base64url from "base64url";
 import { pipeline } from "stream/promises";
 
@@ -21,7 +21,8 @@ import { CreateTransactionInterface } from "arweave/node/common";
 // import { Readable } from 'stream';
 // import { createTransactionAsync } from 'arweave-stream';
 // import { pipeline } from 'stream/promises';
-const read = promisify(fs.read);
+
+import { read } from "./file";
 
 export default class FileBundle implements BundleInterface {
   public readonly headerFile: PathLike;

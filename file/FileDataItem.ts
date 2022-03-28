@@ -7,13 +7,13 @@ import { BundleItem } from "../src/BundleItem";
 import { deepHash } from "../src";
 import { stringToBuffer } from "arweave/web/lib/utils";
 import Arweave from "arweave";
-import { promisify } from "util";
+
 import { indexToType, Signer } from "../src/signing";
 import axios, { AxiosResponse } from "axios";
 import { SIG_CONFIG } from "../src/constants";
 
-const write = promisify(fs.write);
-const read = promisify(fs.read);
+import { read, write } from "./file";
+
 export default class FileDataItem implements BundleItem {
   public readonly filename: PathLike;
   async signatureLength(): Promise<number> {

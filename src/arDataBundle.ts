@@ -1,4 +1,4 @@
-import { getSignatureData } from "./ar-data-base";
+import { getSignatureData } from "./arDataBase";
 import { longTo32ByteArray } from "./utils";
 import DataItem from "./DataItem";
 import Arweave from "arweave";

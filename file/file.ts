@@ -1,12 +1,45 @@
 import * as fs from "fs";
-import { promisify } from "util";
 import { byteArrayToLong } from "../src/utils";
 import { tagsParser } from "../src/parser";
 import base64url from "base64url";
 import { FileHandle } from "fs/promises";
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 type File = string | FileHandle;
-const read = promisify(fs.read);
+
+export const read = async (
+  fd: number,
+  buffer,
+  offset: number,
+  length: number,
+  position: fs.ReadPosition,
+): Promise<{ buffer: Buffer; bytesRead: number }> => {
+  return new Promise((res, rej) => {
+    fs.read(fd, buffer, offset, length, position, (err, bytesRead, buffer) => {
+      if (err) {
+        rej(err);
+      }
+      res({ bytesRead, buffer });
+    });
+  });
+};
+
+export const write = async (
+  fd: number,
+  buffer,
+  offset: number,
+  length: number,
+  position: number,
+): Promise<{ buffer: Buffer; written: number }> => {
+  return new Promise((res, rej) => {
+    fs.write(fd, buffer, offset, length, position, (err, written, buffer) => {
+      if (err) {
+        rej(err);
+      }
+      res({ written, buffer });
+    });
+  });
+};
 
 interface Transaction {
   id: string;

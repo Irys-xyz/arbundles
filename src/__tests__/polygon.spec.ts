@@ -1,5 +1,5 @@
 import PolygonSigner from "../signing/chains/PolygonSigner";
-import { DataItemCreateOptions } from "../ar-data-base";
+import { DataItemCreateOptions } from "../arDataBase";
 import { createData } from "..";
 
 describe("Polygon signing tests", function () {

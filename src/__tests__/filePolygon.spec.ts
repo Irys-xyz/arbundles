@@ -1,6 +1,6 @@
-import { DataItemCreateOptions } from "../ar-data-base";
+import { DataItemCreateOptions } from "../arDataBase";
 import { createData as createFileData } from "../../file";
-import { createData } from "../ar-data-create";
+import { createData } from "../arDataCreate";
 import PolygonSigner from "../signing/chains/PolygonSigner";
 // import DataItem from '../DataItem';
 
