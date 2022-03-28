@@ -3,7 +3,7 @@ import BN from "bn.js";
 import { Buffer } from "buffer";
 import createKeccakHash from "keccak";
 
-function keccak256(value: Buffer | BN | string | number) {
+export default function keccak256(value: Buffer | BN | string | number) {
   value = toBuffer(value);
   return createKeccakHash("keccak256")
     .update(value as Buffer)
@@ -96,5 +96,3 @@ function intToHex(i: number) {
 if (typeof window !== "undefined") {
   (window as any).keccak256 = keccak256;
 }
-
-export = keccak256;
