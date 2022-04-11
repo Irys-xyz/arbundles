@@ -3,6 +3,7 @@ export enum SignatureConfig {
   ED25519,
   ETHEREUM,
   COSMOS,
+  HARMONY
 }
 
 interface SignatureMeta {
@@ -31,5 +32,10 @@ export const SIG_CONFIG: Record<SignatureConfig, SignatureMeta> = {
     sigLength: 64,
     pubLength: 33,
     sigName: "cosmos",
+  },
+  [SignatureConfig.HARMONY]: {
+    sigLength: 172,
+    pubLength: 68,
+    sigName: "harmony",
   },
 };

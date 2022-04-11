@@ -10,3 +10,4 @@ export { ArweaveSigner, PolygonSigner, InjectedEthereumSigner };
 export { default as NearSigner } from "./NearSigner";
 export { default as AlgorandSigner } from "./AlgorandSigner";
 export { default as CosmosSigner } from "./CosmosSigner";
+export { default as HarmonySigner } from "./HarmonySigner";

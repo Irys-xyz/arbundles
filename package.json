@@ -54,6 +54,7 @@
     "@cosmjs/crypto": "^0.27.1",
     "@cosmjs/proto-signing": "^0.27.1",
     "@cosmjs/stargate": "^0.27.1",
+    "@harmony-js/crypto": "^0.1.56",
     "@randlabs/myalgo-connect": "^1.1.2",
     "@solana/wallet-adapter-base": "^0.9.2",
     "@types/axios": "^0.14.0",
