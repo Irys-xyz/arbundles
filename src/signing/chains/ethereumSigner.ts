@@ -1,6 +1,8 @@
 import Secp256k1 from "../keys/secp256k1";
 import secp256k1 from "secp256k1";
-import { ethers } from "ethers";
+// import { Wallet, utils } from "ethers"
+import { personalSign, recoverPersonalSignature } from "@metamask/eth-sig-util";
+import keccak256 from "../keccak256";
 
 export default class EthereumSigner extends Secp256k1 {
   get publicKey(): Buffer {
@@ -14,10 +16,16 @@ export default class EthereumSigner extends Secp256k1 {
   }
 
   sign(message: Uint8Array): Uint8Array {
-    const wallet = new ethers.Wallet(this._key);
-    return wallet
-      .signMessage(message)
-      .then((r) => Buffer.from(r.slice(2), "hex")) as any;
+    return Buffer.from(
+      personalSign({
+        privateKey: Buffer.from(this._key, "hex"),
+        data: message,
+      }).slice(2),
+    );
+    // const wallet = new Wallet(this._key);
+    // const sig = wallet
+    //   .signMessage(message)
+    //   .then((r) => Buffer.from(r.slice(2), "hex")) as any;
   }
 
   static async verify(
@@ -25,7 +33,14 @@ export default class EthereumSigner extends Secp256k1 {
     message: Uint8Array,
     signature: Uint8Array,
   ): Promise<boolean> {
-    const address = ethers.utils.computeAddress(pk);
-    return ethers.utils.verifyMessage(message, signature) === address;
+    // const address = utils.computeAddress(pk);
+    // return utils.verifyMessage(message, signature) === address;
+    const address = "0x" + keccak256(pk.slice(1)).slice(-20).toString("hex");
+    return (
+      recoverPersonalSignature({
+        data: message,
+        signature: Buffer.from(signature).toString("hex"),
+      }) === address
+    );
   }
 }

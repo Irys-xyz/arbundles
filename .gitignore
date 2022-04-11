@@ -56,7 +56,6 @@ test
 
 package/
 esm/
-bundle.js.map
-bundle.js.LICENSE.txt
-bundle.js
+shim.js
 shim.d.ts
+shim.js.map
