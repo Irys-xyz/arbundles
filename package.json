@@ -31,7 +31,8 @@
     "standaloneShim.js/map"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json && tsc -p esm.tsconfig.json && webpack",
+    "dev:build": "tsc -p tsconfig.json && tsc -p esm.tsconfig.json ",
+    "build": "yarn run dev:build && webpack",
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
     "test": "jest --coverage",
     "husky-install": "(node -e \"if (!require('fs').existsSync(__dirname + '/.git')) {process.exit(1)}\" && husky install || true)",
@@ -83,6 +84,7 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
+    "@metamask/eth-sig-util": "^4.0.0",
     "@noble/ed25519": "^1.6.0",
     "arweave": "^1.10.18",
     "arweave-stream-tx": "^1.1.0",
