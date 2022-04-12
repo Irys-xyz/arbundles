@@ -36,10 +36,21 @@ export default class EthereumSigner extends Secp256k1 {
     // const address = utils.computeAddress(pk);
     // return utils.verifyMessage(message, signature) === address;
     const address = "0x" + keccak256(pk.slice(1)).slice(-20).toString("hex");
+
+    let _message = Buffer.from(message).toString("hex");
+    if (_message.slice(0, 2) != "0x") {
+      _message = "0x" + _message;
+    }
+
+    let _signature = Buffer.from(signature).toString("hex");
+    if (_signature.slice(0, 2) != "0x") {
+      _signature = "0x" + _signature;
+    }
+
     return (
       recoverPersonalSignature({
-        data: message,
-        signature: Buffer.from(signature).toString("hex"),
+        data: _message,
+        signature: _signature,
       }) === address
     );
   }
