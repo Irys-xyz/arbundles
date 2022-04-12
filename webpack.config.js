@@ -19,8 +19,8 @@ const base = {
     ],
   },
   externals: {
-    Buffer: "Buffer",
-    crypto: "injCrypto",
+    // Buffer: "Buffer",
+    // crypto: "injCrypto",
     // "process": "process",
     // "stream": "stream",
     // "path": "path",
@@ -33,13 +33,15 @@ const base = {
       // stream: "stream-browserify",
     },
     fallback: {
-      // "crypto": require.resolve("crypto-browserify"),
-      // "assert": require.resolve("assert/"),
+      path: require.resolve("path-browserify"),
+      zlib: require.resolve("browserify-zlib"),
+      crypto: require.resolve("crypto-browserify"),
       stream: require.resolve("stream-browserify"),
+      buffer: require.resolve("buffer/"),
+      // "assert": require.resolve("assert/"),
       // "process": require.resolve("process/browser"),
       // "util": require.resolve("util"),
       // "events": require.resolve("events/"),
-      // "buffer": require.resolve('buffer/'),
       // "zlib": require.resolve("browserify-zlib"),
       // "path": require.resolve("path-browserify")
       // "crypto": false,
@@ -49,8 +51,6 @@ const base = {
       // "util": require.resolve("util"),
       // "events": require.resolve("events/"),
       // "buffer": require.resolve('buffer/'),
-      path: require.resolve("path-browserify"),
-      zlib: require.resolve("browserify-zlib"),
     },
   },
   plugins: [

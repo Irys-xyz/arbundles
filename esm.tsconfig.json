@@ -21,6 +21,13 @@
     "strictNullChecks": false,
     "outDir": "esm"
   },
-  "include": ["src/**/*", "file/**/*", "stream/**/*", "index.ts", "shim.ts"],
+  "include": [
+    "src/**/*",
+    "file/**/*",
+    "stream/**/*",
+    "index.ts",
+    "shim.ts",
+    "standaloneShim.ts"
+  ],
   "exclude": ["src/__tests__/**"]
 }

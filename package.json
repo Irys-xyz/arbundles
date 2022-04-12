@@ -25,7 +25,10 @@
     "esm/**/*.d.ts",
     "shim.js",
     "shim.d.ts",
-    "shim.js.map"
+    "shim.js.map",
+    "standaloneShim.js",
+    "standaloneShim.d.ts",
+    "standaloneShim.js/map"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p esm.tsconfig.json && webpack",

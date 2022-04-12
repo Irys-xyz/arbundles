@@ -59,3 +59,6 @@ esm/
 shim.js
 shim.d.ts
 shim.js.map
+standaloneShim.js.map
+standaloneShim.js
+standaloneShim.d.ts
