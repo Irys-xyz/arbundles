@@ -34,9 +34,9 @@
     "spaced-comment": "error",
     "arrow-spacing": "error",
     "@typescript-eslint/naming-convention": [
-      "error",
-      { "selector": "class", "format": ["StrictPascalCase"] },
-      { "selector": "interface", "format": ["StrictPascalCase"] },
+      "warning",
+      { "selector": "class", "format": ["PascalCase"] },
+      { "selector": "interface", "format": ["PascalCase","camelCase"] },
       {
         "selector": "classProperty",
         "format": ["camelCase"],
