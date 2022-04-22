@@ -21,9 +21,9 @@ Using yarn:
 ```ts
 import { bundleAndSignData, createData } from "arbundles";
 
-const dataItems = [createData("some data"), createData("some other data")];
-
 const signer = new ArweaveSigner(jwk);
+
+const dataItems = [createData("some data", signer), createData("some other data", signer)];
 
 const bundle = await bundleAndSignData(dataItems, signer);
 ```
