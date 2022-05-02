@@ -1,6 +1,6 @@
 {
   "name": "arbundles",
-  "version": "0.6.17-rc1",
+  "version": "0.6.17",
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
@@ -62,7 +62,6 @@
     "axios": "^0.21.3",
     "base64url": "^3.0.1",
     "bs58": "^4.0.1",
-    "buffer": "npm:buffer",
     "ethers": "^5.5.1",
     "keccak": "^3.0.2",
     "multistream": "^4.1.0",
