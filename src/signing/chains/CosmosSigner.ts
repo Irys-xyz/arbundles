@@ -1,9 +1,8 @@
 import { SignatureConfig, SIG_CONFIG } from "../../constants";
 import Secp256k1 from "../keys/secp256k1";
 import secp256k1 from "secp256k1";
-import keccak256 from "../keccak256";
 import base64url from "base64url";
-
+import Crypto from "crypto";
 export default class CosmosSigner extends Secp256k1 {
   declare sk: Uint8Array;
   readonly ownerLength: number = SIG_CONFIG[SignatureConfig.COSMOS].pubLength;
@@ -30,12 +29,17 @@ export default class CosmosSigner extends Secp256k1 {
     signature: Uint8Array,
   ): Promise<boolean> {
     let p = pk;
+    console.log("PK: ",pk);
     if (typeof pk === "string") p = base64url.toBuffer(pk);
     let verified = false;
     try {
+      console.log("PK try:", p);
+      console.log("Signature try:", signature);
+      console.log("Message try:", message);
+      
       verified = secp256k1.ecdsaVerify(
         signature,
-        keccak256(Buffer.from(message)),
+        Crypto.createHash("sha256").update(Buffer.from(message)).digest(),
         p as Buffer,
       );
       // eslint-disable-next-line no-empty
@@ -45,7 +49,7 @@ export default class CosmosSigner extends Secp256k1 {
 
   sign(message: Uint8Array): Uint8Array {
     return secp256k1.ecdsaSign(
-      keccak256(Buffer.from(message)),
+      Crypto.createHash("sha256").update(Buffer.from(message)).digest(),
       Buffer.from(this.sk),
     ).signature;
   }
