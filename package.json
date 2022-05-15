@@ -84,6 +84,9 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
+    "@cosmjs/amino": "^0.28.4",
+    "@cosmjs/crypto": "^0.28.4",
+    "@cosmjs/encoding": "^0.28.4",
     "@metamask/eth-sig-util": "^4.0.0",
     "@noble/ed25519": "^1.6.0",
     "arweave": "^1.10.18",
