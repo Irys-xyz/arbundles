@@ -42,6 +42,9 @@ export default class DataItem implements BundleItem {
       case 4: {
         return SignatureConfig.SOLANA;
       }
+      case 5: {
+        return SignatureConfig.COSMOS;
+      }
       default: {
         throw new Error("Unknown signature type: " + signatureTypeVal);
       }
