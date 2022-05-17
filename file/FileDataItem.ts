@@ -330,7 +330,7 @@ export default class FileDataItem implements BundleItem {
   /**
    * @deprecated Since version 0.3.0. Will be deleted in version 0.4.0. Use @bundlr-network/client package instead to interact with Bundlr
    */
-  public async sendToBundler(bundler: string): Promise<AxiosResponse> {
+  public async sendToBundler(bundler: string, timeout = 100000): Promise<AxiosResponse> {
     const headers = {
       "Content-Type": "application/octet-stream",
     };
@@ -342,7 +342,7 @@ export default class FileDataItem implements BundleItem {
       fs.createReadStream(this.filename),
       {
         headers,
-        timeout: 100000,
+        timeout: timeout,
         maxBodyLength: Infinity,
         validateStatus: (status) =>
           (status > 200 && status < 300) || status !== 402,
