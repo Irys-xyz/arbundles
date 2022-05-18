@@ -34,7 +34,7 @@ export const SIG_CONFIG: Record<SignatureConfig, SignatureMeta> = {
     sigName: "solana",
   },
   [SignatureConfig.COSMOS]: {
-    sigLength: 64,
+    sigLength: 96,
     pubLength: 65,
     sigName: "cosmos",
   },
