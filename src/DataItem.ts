@@ -270,7 +270,7 @@ export default class DataItem implements BundleItem {
     );
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
 
-    if (numberOfTagBytes > 2048) return false;
+    if (numberOfTagBytes > 4096) return false;
 
     if (numberOfTags > 0) {
       try {
