@@ -5,7 +5,7 @@ import { byteArrayToLong } from "../src/utils";
 import { tagsParser } from "../src/parser";
 import { BundleItem } from "../src/BundleItem";
 import { deepHash } from "../src";
-import { stringToBuffer } from "arweave/web/lib/utils";
+import { stringToBuffer } from "arweave/node/lib/utils";
 import Arweave from "arweave";
 import { promisify } from "util";
 import { indexToType, Signer } from "../src/signing";

@@ -6,7 +6,7 @@ import { MIN_BINARY_SIZE } from "../src/index";
 import { SIG_CONFIG } from "../src/constants";
 import { tagsParser } from "../src/parser";
 import * as crypto from "crypto";
-import { stringToBuffer } from "arweave/web/lib/utils";
+import { stringToBuffer } from "arweave/node/lib/utils";
 import { deepHash } from "../src/deepHash";
 
 export default async function processStream(

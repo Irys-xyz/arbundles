@@ -1,5 +1,5 @@
-import * as web from "arweave/web/lib/deepHash";
-import { stringToBuffer } from "arweave/web/lib/utils";
+import * as web from "arweave/node/lib/deepHash";
+import { stringToBuffer } from "arweave/node/lib/utils";
 import DataItem from "./DataItem";
 import { isBrowser } from "./utils";
 import { deepHash } from "./deepHash";
