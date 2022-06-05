@@ -1,4 +1,3 @@
-import * as web from "arweave/node/lib/deepHash";
 import { stringToBuffer } from "arweave/node/lib/utils";
 import DataItem from "./DataItem";
 import { isBrowser } from "./utils";
@@ -19,6 +18,7 @@ export interface DataItemCreateOptions {
 
 export async function getSignatureData(item: DataItem): Promise<Uint8Array> {
   if (isBrowser) {
+    const web = await import("arweave/web/lib/deepHash");
     return web.default([
       stringToBuffer("dataitem"),
       stringToBuffer("1"),
