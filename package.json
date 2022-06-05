@@ -1,6 +1,6 @@
 {
   "name": "arbundles",
-  "version": "0.6.18",
+  "version": "0.6.19",
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
@@ -55,7 +55,7 @@
     "@randlabs/myalgo-connect": "^1.1.2",
     "@solana/wallet-adapter-base": "^0.9.2",
     "algosdk": "^1.13.1",
-    "arweave": "^1.10.18",
+    "arweave": "^1.11.4",
     "arweave-stream-tx": "^1.1.0",
     "avsc": "https://github.com/Bundlr-Network/avsc#csp-fixes",
     "axios": "^0.21.3",
