@@ -9,6 +9,7 @@ import { getSignatureData } from "./ar-data-base";
 import axios, { AxiosResponse } from "axios";
 import { SIG_CONFIG, SignatureConfig } from "./constants";
 import * as crypto from "crypto";
+import Arweave from "arweave";
 
 export const MIN_BINARY_SIZE = 80;
 
@@ -195,6 +196,11 @@ export default class DataItem implements BundleItem {
   public async sign(signer: Signer): Promise<Buffer> {
     this._id = await sign(this, signer);
     return this.rawId;
+  }
+
+  public async setSignature(signature: Buffer): Promise<void> {
+    this.binary.set(signature, 2)
+    this._id = Buffer.from(await Arweave.crypto.hash(signature));
   }
 
   public isSigned(): boolean {
