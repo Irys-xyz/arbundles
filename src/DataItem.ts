@@ -198,7 +198,7 @@ export default class DataItem implements BundleItem {
     return this.rawId;
   }
 
-  public async setSignature(signature: Buffer) {
+  public async setSignature(signature: Buffer): Promise<void> {
     this.binary.set(signature, 2)
     this._id = Buffer.from(await Arweave.crypto.hash(signature));
   }

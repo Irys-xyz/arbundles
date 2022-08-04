@@ -34,20 +34,18 @@
     "spaced-comment": "error",
     "arrow-spacing": "error",
     "@typescript-eslint/naming-convention": [
-      "error",
-      { "selector": "class", "format": ["StrictPascalCase"] },
-      { "selector": "interface", "format": ["StrictPascalCase"] },
-      {
-        "selector": "classProperty",
-        "format": ["camelCase"],
-        "leadingUnderscore": "allow"
-      },
-      { "selector": "objectLiteralProperty", "format": null },
-      {
-        "selector": "default",
-        "format": ["strictCamelCase"],
-        "leadingUnderscore": "allow"
-      } //this must be the last rule
+      "error", 
+      {"selector": "enum", "format":["PascalCase"]},
+      {"selector": "enumMember", "format":["UPPER_CASE"]},
+      {"selector": "class","format":["PascalCase"]},
+      {"selector": "interface","format":["PascalCase"]},
+      {"selector": "typeAlias","format":["PascalCase"]},
+      {"selector": "classProperty","format":["camelCase"], "leadingUnderscore":"allow"},
+      {"selector": "objectLiteralProperty", "format":null},
+      {"selector": "typeLike", "format":["PascalCase", "camelCase"]},
+      {"selector": "variable", "modifiers": [ "const"], "format":["UPPER_CASE","camelCase"] , "filter": {"regex":"^_.*","match":false}},
+      {"selector": "variable", "modifiers": ["exported", "const"], "format":["UPPER_CASE", "camelCase"]},
+      {"selector": "default","format": ["strictCamelCase"], "leadingUnderscore": "allow" } //this must be the last rule
     ]
   }
 }
