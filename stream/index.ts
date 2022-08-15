@@ -1,13 +1,14 @@
-import { Readable, Transform } from "stream";
+import { PassThrough, Readable, Transform } from "stream";
 import { byteArrayToLong } from "../src/utils";
 import base64url from "base64url";
 import { indexToType } from "../src/signing/constants";
-import { MIN_BINARY_SIZE } from "../src/index";
+import { createData, DataItemCreateOptions, MIN_BINARY_SIZE } from "../src/index";
 import { SIG_CONFIG } from "../src/constants";
 import { tagsParser } from "../src/parser";
 import * as crypto from "crypto";
 import { stringToBuffer } from "arweave/node/lib/utils";
 import { deepHash } from "../src/deepHash";
+import { Signer } from "../src/signing";
 
 export default async function processStream(
   stream: Readable,
@@ -172,6 +173,41 @@ export default async function processStream(
   }
 
   return items;
+}
+
+
+
+
+/**
+ * Signs a stream (requires two instances/read passes)
+ * @param s1 Stream to sign - same as s2
+ * @param s2 Stream to sign - same as s1
+ * @param signer Signer to use to sign the stream
+ * @param opts Optional options to apply to the stream (same as DataItem)
+ */
+
+export async function streamSigner(s1: Readable, s2: Readable, signer: Signer, opts?: DataItemCreateOptions): Promise<PassThrough> {
+
+  const header = createData("", signer, opts);
+  const output = new PassThrough();
+
+  const parts = [
+    stringToBuffer("dataitem"),
+    stringToBuffer("1"),
+    stringToBuffer(header.signatureType.toString()),
+    header.rawOwner,
+    header.rawTarget,
+    header.rawAnchor,
+    header.rawTags,
+    s1
+  ];
+
+  const hash = await deepHash(parts);
+  const sigBytes = Buffer.from(await signer.sign(hash));
+  header.setSignature(sigBytes);
+  output.write(header.getRaw());
+
+  return s2.pipe(output);
 }
 
 async function readBytes(
