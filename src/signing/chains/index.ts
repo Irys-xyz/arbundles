@@ -11,3 +11,4 @@ export { default as NearSigner } from "./NearSigner";
 export { default as AlgorandSigner } from "./AlgorandSigner";
 export { default as HexInjectedSolanaSigner } from "./HexInjectedSolanaSigner";
 export { default as HexSolanaSigner } from "./HexSolanaSigner";
+export { default as AptosSigner } from "./AptosSigner";
