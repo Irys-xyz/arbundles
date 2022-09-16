@@ -3,6 +3,7 @@ export enum SignatureConfig {
   ED25519,
   ETHEREUM,
   SOLANA,
+  INJECTEDAPTOS = 5,
 }
 
 interface SignatureMeta {
@@ -31,5 +32,10 @@ export const SIG_CONFIG: Record<SignatureConfig, SignatureMeta> = {
     sigLength: 64,
     pubLength: 32,
     sigName: "solana",
+  },
+  [SignatureConfig.INJECTEDAPTOS]: {
+    sigLength: 64,
+    pubLength: 32,
+    sigName: "injectedAptos",
   },
 };
