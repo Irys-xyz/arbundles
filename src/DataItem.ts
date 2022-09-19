@@ -9,6 +9,7 @@ import { getSignatureData } from "./ar-data-base";
 import axios, { AxiosResponse } from "axios";
 import { SIG_CONFIG, SignatureConfig } from "./constants";
 import * as crypto from "crypto";
+import Arweave from "arweave";
 
 export const MIN_BINARY_SIZE = 80;
 
@@ -20,7 +21,7 @@ export default class DataItem implements BundleItem {
     this.binary = binary;
   }
 
-  static isDataItem(obj: any): boolean {
+  static isDataItem(obj: any): obj is DataItem {
     return obj.binary !== undefined;
   }
 
@@ -128,7 +129,7 @@ export default class DataItem implements BundleItem {
     return this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize);
   }
 
-  get tags(): { name: string; value: string }[] {
+  get tags(): { name: string; value: string; }[] {
     const tagsStart = this.getTagsStart();
     const tagsCount = byteArrayToLong(
       this.binary.subarray(tagsStart, tagsStart + 8),
@@ -148,7 +149,7 @@ export default class DataItem implements BundleItem {
     );
   }
 
-  get tagsB64Url(): { name: string; value: string }[] {
+  get tagsB64Url(): { name: string; value: string; }[] {
     const _tags = this.tags;
     return _tags.map((t) => ({
       name: base64url.encode(t.name),
@@ -197,6 +198,11 @@ export default class DataItem implements BundleItem {
     return this.rawId;
   }
 
+  public async setSignature(signature: Buffer): Promise<void> {
+    this.binary.set(signature, 2);
+    this._id = Buffer.from(await Arweave.crypto.hash(signature));
+  }
+
   public isSigned(): boolean {
     return (this._id?.length ?? 0) > 0;
   }
@@ -209,7 +215,7 @@ export default class DataItem implements BundleItem {
     data: string;
     signature: string;
     target: string;
-    tags: { name: string; value: string }[];
+    tags: { name: string; value: string; }[];
   } {
     return {
       signature: this.signature,
@@ -270,11 +276,11 @@ export default class DataItem implements BundleItem {
     );
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
 
-    if (numberOfTagBytes > 2048) return false;
+    if (numberOfTagBytes > 4096) return false;
 
     if (numberOfTags > 0) {
       try {
-        const tags: { name: string; value: string }[] = tagsParser.fromBuffer(
+        const tags: { name: string; value: string; }[] = tagsParser.fromBuffer(
           Buffer.from(
             buffer.subarray(tagsStart + 16, tagsStart + 16 + numberOfTagBytes),
           ),

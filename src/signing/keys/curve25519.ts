@@ -1,6 +1,6 @@
 import { Signer } from '../Signer';
 import base64url from 'base64url';
-import * as ed25519 from 'noble-ed25519';
+import * as ed25519 from "@noble/ed25519";
 import { SIG_CONFIG } from '../../constants';
 
 export default class Curve25519 implements Signer {
@@ -8,8 +8,8 @@ export default class Curve25519 implements Signer {
   readonly signatureLength: number = SIG_CONFIG[2].sigLength;
   private readonly _publicKey: Buffer;
   public get publicKey(): Buffer {
-        return this._publicKey;
-    }
+    return this._publicKey;
+  }
   readonly signatureType: number = 2;
 
   constructor(protected _key: string, public pk: string) {

@@ -25,5 +25,5 @@ const dataItems = [createData("some data"), createData("some other data")];
 
 const signer = new ArweaveSigner(jwk);
 
-const bundle = await bundleAndSignData(dataItems, jwk);
+const bundle = await bundleAndSignData(dataItems, signer);
 ```

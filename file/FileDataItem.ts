@@ -5,7 +5,7 @@ import { byteArrayToLong } from "../src/utils";
 import { tagsParser } from "../src/parser";
 import { BundleItem } from "../src/BundleItem";
 import { deepHash } from "../src";
-import { stringToBuffer } from "arweave/web/lib/utils";
+import { stringToBuffer } from "arweave/node/lib/utils";
 import Arweave from "arweave";
 import { promisify } from "util";
 import { indexToType, Signer } from "../src/signing";
@@ -75,7 +75,7 @@ export default class FileDataItem implements BundleItem {
       8,
       tagsStart + 8,
     ).then((r) => byteArrayToLong(r.buffer));
-    if (numberOfTagsBytes > 2048) {
+    if (numberOfTagsBytes > 4096) {
       await handle.close();
       return false;
     }
@@ -257,7 +257,7 @@ export default class FileDataItem implements BundleItem {
       tagsStart + 8,
     ).then((r) => r.buffer);
     const numberOfTagsBytes = byteArrayToLong(numberOfTagsBytesBuffer);
-    if (numberOfTagsBytes > 2048) {
+    if (numberOfTagsBytes > 4096) {
       await handle.close();
       throw new Error("Tags too large");
     }
