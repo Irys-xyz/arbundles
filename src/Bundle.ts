@@ -53,10 +53,11 @@ export default class Bundle implements BundleInterface {
   public getIds(): string[] {
     const ids = [];
     for (let i = HEADER_START; i < HEADER_START + 64 * this.length; i += 64) {
-      if (this.binary.subarray(i + 32, i + 64).length === 0) {
+      let bundledID=this.binary.subarray(i + 32, i + 64)
+      if (bundledID.length === 0) {
         throw new Error("Invalid bundle, id specified in headers isn't existing in bundle.")
       }
-      ids.push(base64url.encode(this.binary.subarray(i + 32, i + 64)));
+      ids.push(base64url.encode(bundledID));
     }
 
     return ids;
