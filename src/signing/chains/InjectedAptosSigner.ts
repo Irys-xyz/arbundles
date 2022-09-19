@@ -36,9 +36,7 @@ export default class InjectedAptosSigner implements Signer {
       message: Buffer.from(message).toString("hex"),
       nonce: "bundlr",
     });
-
-    // TODO: remove once Petra is fixed.
-    return Buffer.from(signature.signature.slice(0, 128), "hex");
+    return Buffer.from(signature.signature, "hex");
   }
 
   static async verify(
@@ -47,12 +45,6 @@ export default class InjectedAptosSigner implements Signer {
     signature: Uint8Array,
   ): Promise<boolean> {
     let p = pk;
-
-    // return nacl.sign.detached.verify(
-    //     Buffer.from(`APTOS\nmessage: ${Buffer.from(message).toString("hex")}\nnonce: bundlr`), // see comment above sign
-    //     Buffer.from(signature),
-    //     Buffer.from(p)
-    // );
     return ed25519.verify(
       Buffer.from(signature),
       Buffer.from(

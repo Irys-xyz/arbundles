@@ -13,3 +13,4 @@ export { default as HexInjectedSolanaSigner } from "./HexInjectedSolanaSigner";
 export { default as HexSolanaSigner } from "./HexSolanaSigner";
 export { default as AptosSigner } from "./AptosSigner";
 export { default as InjectedAptosSigner } from "./InjectedAptosSigner";
+export { default as MultiSignatureAptosSigner } from "./multiSignatureAptos";

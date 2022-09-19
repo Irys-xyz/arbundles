@@ -6,6 +6,7 @@ import {
   HexInjectedSolanaSigner,
   InjectedAptosSigner,
 } from "./chains";
+import MultiSignatureAptos from "./chains/multiSignatureAptos";
 
 interface IndexToType {
   [key: number]: {
@@ -36,4 +37,7 @@ export const indexToType: IndexToType = {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   5: InjectedAptosSigner,
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  6: MultiSignatureAptos,
 };

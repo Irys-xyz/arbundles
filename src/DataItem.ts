@@ -46,6 +46,9 @@ export default class DataItem implements BundleItem {
       case 5: {
         return SignatureConfig.INJECTEDAPTOS;
       }
+      case 6: {
+        return SignatureConfig.MULTIAPTOS;
+      }
       default: {
         throw new Error("Unknown signature type: " + signatureTypeVal);
       }
