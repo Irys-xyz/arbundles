@@ -43,6 +43,12 @@ export default class DataItem implements BundleItem {
       case 4: {
         return SignatureConfig.SOLANA;
       }
+      case 5: {
+        return SignatureConfig.INJECTEDAPTOS;
+      }
+      case 6: {
+        return SignatureConfig.MULTIAPTOS;
+      }
       default: {
         throw new Error("Unknown signature type: " + signatureTypeVal);
       }
@@ -129,7 +135,7 @@ export default class DataItem implements BundleItem {
     return this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize);
   }
 
-  get tags(): { name: string; value: string; }[] {
+  get tags(): { name: string; value: string }[] {
     const tagsStart = this.getTagsStart();
     const tagsCount = byteArrayToLong(
       this.binary.subarray(tagsStart, tagsStart + 8),
@@ -149,7 +155,7 @@ export default class DataItem implements BundleItem {
     );
   }
 
-  get tagsB64Url(): { name: string; value: string; }[] {
+  get tagsB64Url(): { name: string; value: string }[] {
     const _tags = this.tags;
     return _tags.map((t) => ({
       name: base64url.encode(t.name),
@@ -215,7 +221,7 @@ export default class DataItem implements BundleItem {
     data: string;
     signature: string;
     target: string;
-    tags: { name: string; value: string; }[];
+    tags: { name: string; value: string }[];
   } {
     return {
       signature: this.signature,
@@ -280,7 +286,7 @@ export default class DataItem implements BundleItem {
 
     if (numberOfTags > 0) {
       try {
-        const tags: { name: string; value: string; }[] = tagsParser.fromBuffer(
+        const tags: { name: string; value: string }[] = tagsParser.fromBuffer(
           Buffer.from(
             buffer.subarray(tagsStart + 16, tagsStart + 16 + numberOfTagBytes),
           ),

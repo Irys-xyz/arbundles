@@ -3,7 +3,7 @@
     "target": "es2019",
     "module": "commonjs",
     "moduleResolution": "node",
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "declaration": true,

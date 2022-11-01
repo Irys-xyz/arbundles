@@ -3,6 +3,8 @@ export enum SignatureConfig {
   ED25519,
   ETHEREUM,
   SOLANA,
+  INJECTEDAPTOS = 5,
+  MULTIAPTOS = 6,
 }
 
 interface SignatureMeta {
@@ -31,5 +33,15 @@ export const SIG_CONFIG: Record<SignatureConfig, SignatureMeta> = {
     sigLength: 64,
     pubLength: 32,
     sigName: "solana",
+  },
+  [SignatureConfig.INJECTEDAPTOS]: {
+    sigLength: 64,
+    pubLength: 32,
+    sigName: "injectedAptos",
+  },
+  [SignatureConfig.MULTIAPTOS]: {
+    sigLength: 64 * 32 + 4, // max 32 64 byte signatures, +4 for 32-bit bitmap
+    pubLength: 32 * 32 + 1, // max 64 32 byte keys, +1 for 8-bit threshold value
+    sigName: "multiAptos",
   },
 };
