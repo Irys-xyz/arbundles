@@ -22,7 +22,7 @@ export default class EthereumSigner extends Secp256k1 {
       Buffer.from(
         secp256k1.ecdsaSign(arrayify(hashMessage(message)), this.key).signature,
       ),
-    ]);
+      Buffer.from([27])]);
   }
 
   static async verify(
