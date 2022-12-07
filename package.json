@@ -62,7 +62,6 @@
     "arweave": "^1.11.4",
     "arweave-stream-tx": "^1.1.0",
     "avsc": "https://github.com/Bundlr-Network/avsc#csp-fixes",
-    "axios": "^0.21.3",
     "base64url": "^3.0.1",
     "bs58": "^4.0.1",
     "ethers": "^5.5.1",
