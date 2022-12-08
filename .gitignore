@@ -55,3 +55,10 @@ index.js.map
 test
 
 package/
+esm/
+webIndex.js.map
+webIndex.js
+webIndex.d.ts
+bundle.js.map
+bundle.js.LICENSE.txt
+bundle.js

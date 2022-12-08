@@ -7,13 +7,14 @@ import { BundleItem } from "../src/BundleItem";
 import { deepHash } from "../src";
 import { stringToBuffer } from "arweave/node/lib/utils";
 import Arweave from "arweave";
-import { promisify } from "util";
 import { indexToType, Signer } from "../src/signing";
 import axios, { AxiosResponse } from "axios";
 import { SIG_CONFIG } from "../src/constants";
+import { promisify } from "util";
 
-const write = promisify(fs.write);
 const read = promisify(fs.read);
+const write = promisify(fs.write);
+
 export default class FileDataItem implements BundleItem {
   public readonly filename: PathLike;
   async signatureLength(): Promise<number> {
@@ -272,7 +273,7 @@ export default class FileDataItem implements BundleItem {
     return tagsBytes;
   }
 
-  async tags(): Promise<{ name: string; value: string }[]> {
+  async tags(): Promise<{ name: string; value: string; }[]> {
     const tagsBytes = await this.rawTags();
     if (tagsBytes.byteLength === 0) return [];
     return tagsParser.fromBuffer(tagsBytes);
@@ -400,4 +401,4 @@ export default class FileDataItem implements BundleItem {
     await handle.close();
     return [anchorPresent, anchorStart];
   }
-}
+};

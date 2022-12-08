@@ -3,7 +3,6 @@ import { DataItemCreateOptions } from "../src/ar-data-base";
 import * as fs from "fs";
 import { tmpName } from "tmp-promise";
 import base64url from "base64url";
-import assert from "assert";
 import { longTo8ByteArray, shortTo2ByteArray } from "../src/utils";
 import { serializeTags } from "../src/parser";
 import { Signer } from "../src/signing";
@@ -29,21 +28,18 @@ export async function createData(
   stream.write(shortTo2ByteArray(signer.signatureType));
   // Signature
   stream.write(new Uint8Array(signer.signatureLength).fill(0));
+  if (_owner.byteLength !== signer.ownerLength) new Error(`Owner must be ${signer.ownerLength} bytes`);
 
-  assert(
-    _owner.byteLength == signer.ownerLength,
-    new Error(`Owner must be ${signer.ownerLength} bytes`),
-  );
   stream.write(_owner);
   stream.write(_target ? singleItemBuffer(1) : singleItemBuffer(0));
   if (_target) {
-    assert(_target.byteLength == 32, new Error("Target must be 32 bytes"));
+    if (_target.byteLength !== 32) throw new Error("Target must be 32 bytes");
     stream.write(_target);
   }
 
   stream.write(_anchor ? singleItemBuffer(1) : singleItemBuffer(0));
   if (_anchor) {
-    assert(_anchor.byteLength == 32, new Error("Anchor must be 32 bytes"));
+    if (_anchor.byteLength !== 32) throw new Error("Anchor must be 32 bytes");
     stream.write(_anchor);
   }
 

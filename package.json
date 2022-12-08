@@ -18,10 +18,16 @@
     "stream/**/*.d.ts",
     "file/**/*.js",
     "file/**/*.js.map",
-    "file/**/*.d.ts"
+    "file/**/*.d.ts",
+    "esm/**/*",
+    "webIndex.js",
+    "webIndex.js.map",
+    "webIndex.d.ts",
+    "bundle.js",
+    "bundle.js.map"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.json & tsc -p esm.tsconfig.json & webpack",
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
     "test": "jest --coverage",
     "husky-install": "(node -e \"if (!require('fs').existsSync(__dirname + '/.git')) {process.exit(1)}\" && husky install || true)",
@@ -37,21 +43,28 @@
     "@types/secp256k1": "^4.0.3",
     "@typescript-eslint/eslint-plugin": "~4.25.0",
     "@typescript-eslint/parser": "~4.25.0",
+    "crypto-browserify": "^3.12.0",
     "eslint": "~7.27.0",
     "eslint-config-prettier": "~8.3.0",
     "eslint-plugin-jest": "~24.3.6",
     "husky": "^7.0.0",
+    "inspectpack": "^4.7.1",
     "jest": "~27.0.3",
     "object-sizeof": "^1.6.1",
     "perf_hooks": "^0.0.1",
     "prettier": "~2.3.0",
     "pretty-quick": "^3.1.2",
+    "process": "^0.11.10",
     "rimraf": "~3.0.2",
+    "stream-browserify": "^3.0.0",
     "ts-jest": "~27.0.2",
+    "ts-loader": "^9.4.1",
     "ts-node": "^10.8.1",
     "tslib": "^2.4.0",
     "tsutils": "~3.21.0",
-    "typescript": "~4.3.2"
+    "typescript": "^4.9.3",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0"
   },
   "dependencies": {
     "@noble/ed25519": "^1.6.1",
@@ -67,7 +80,6 @@
     "ethers": "^5.5.1",
     "keccak": "^3.0.2",
     "multistream": "^4.1.0",
-    "process": "^0.11.10",
     "secp256k1": "^4.0.2",
     "tmp-promise": "^3.0.2"
   }
