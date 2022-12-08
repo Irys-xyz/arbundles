@@ -82,7 +82,7 @@ export default class DataItem implements BundleItem {
     return base64url.encode(this.rawSignature);
   }
 
-  set setRawOwner(pubkey: Buffer) {
+  set rawOwner(pubkey: Buffer) {
     if (pubkey.byteLength != this.ownerLength) throw new Error(`Expected raw owner (pubkey) to be ${this.ownerLength} bytes, got ${pubkey.byteLength} bytes.`);
     this.binary.set(pubkey, 2 + this.signatureLength);
   }
