@@ -35,8 +35,11 @@ module.exports = {
             "stream": require.resolve("stream-browserify"),
             "events": require.resolve("events/"),
             "buffer": require.resolve('buffer/'),
-            "zlib": false,
-            "path": false
+            "assert": require.resolve("assert/"),
+            "process": require.resolve("process/browser"),
+            "util": require.resolve("util"),
+            "zlib": require.resolve("browserify-zlib"),
+            "path": require.resolve("path-browserify")
         }
     },
     plugins: [
