@@ -7,4 +7,5 @@ module.exports = {
   testRegex: "src/.*(test|spec)\\.(ts)x?$",
   coverageDirectory: "coverage",
   collectCoverageFrom: ["src/**/*.{ts,js}", "!src/**/*.d.ts"],
+  setupFiles: ["<rootDir>/src/__tests__/setup.jest.js"],
 };

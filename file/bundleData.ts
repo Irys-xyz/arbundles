@@ -16,8 +16,7 @@ export async function bundleAndSignData(
 
   headerStream.write(longTo32ByteArray(dataItems.length));
   for (const [index, item] of dataItems.entries()) {
-    let dataItem: FileDataItem;
-    dataItem = item as FileDataItem;
+    const dataItem = item as FileDataItem;
     if (!dataItem.isSigned()) {
       await dataItem.sign(signer);
     }

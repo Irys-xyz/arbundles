@@ -1,5 +1,4 @@
 import { byteArrayToLong } from "./utils";
-import { tagsParser } from "./parser";
 import base64url from "base64url";
 import { Buffer } from "buffer";
 import { sign } from "./ar-data-bundle";
@@ -9,6 +8,7 @@ import { getSignatureData } from "./ar-data-base";
 import { SIG_CONFIG, SignatureConfig } from "./constants";
 import * as crypto from "crypto";
 import Arweave from "arweave";
+import { deserializeTags } from "./tags";
 
 export const MIN_BINARY_SIZE = 80;
 
@@ -83,7 +83,10 @@ export default class DataItem implements BundleItem {
   }
 
   set rawOwner(pubkey: Buffer) {
-    if (pubkey.byteLength != this.ownerLength) throw new Error(`Expected raw owner (pubkey) to be ${this.ownerLength} bytes, got ${pubkey.byteLength} bytes.`);
+    if (pubkey.byteLength != this.ownerLength)
+      throw new Error(
+        `Expected raw owner (pubkey) to be ${this.ownerLength} bytes, got ${pubkey.byteLength} bytes.`,
+      );
     this.binary.set(pubkey, 2 + this.signatureLength);
   }
 
@@ -139,7 +142,7 @@ export default class DataItem implements BundleItem {
     return this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize);
   }
 
-  get tags(): { name: string; value: string; }[] {
+  get tags(): { name: string; value: string }[] {
     const tagsStart = this.getTagsStart();
     const tagsCount = byteArrayToLong(
       this.binary.subarray(tagsStart, tagsStart + 8),
@@ -152,14 +155,14 @@ export default class DataItem implements BundleItem {
       this.binary.subarray(tagsStart + 8, tagsStart + 16),
     );
 
-    return tagsParser.fromBuffer(
+    return deserializeTags(
       Buffer.from(
         this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize),
       ),
     );
   }
 
-  get tagsB64Url(): { name: string; value: string; }[] {
+  get tagsB64Url(): { name: string; value: string }[] {
     const _tags = this.tags;
     return _tags.map((t) => ({
       name: base64url.encode(t.name),
@@ -225,7 +228,7 @@ export default class DataItem implements BundleItem {
     data: string;
     signature: string;
     target: string;
-    tags: { name: string; value: string; }[];
+    tags: { name: string; value: string }[];
   } {
     return {
       signature: this.signature,
@@ -238,7 +241,6 @@ export default class DataItem implements BundleItem {
       data: this.data,
     };
   }
-
 
   /**
    * Verifies a `Buffer` and checks it fits the format of a DataItem
@@ -267,7 +269,7 @@ export default class DataItem implements BundleItem {
 
     if (numberOfTags > 0) {
       try {
-        const tags: { name: string; value: string; }[] = tagsParser.fromBuffer(
+        const tags: { name: string; value: string }[] = deserializeTags(
           Buffer.from(
             buffer.subarray(tagsStart + 16, tagsStart + 16 + numberOfTagBytes),
           ),
