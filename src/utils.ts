@@ -88,8 +88,7 @@ export function byteArrayToLong(byteArray: Uint8Array): number {
 // }
 
 // @ts-expect-error These variables are defined in extension environments
-const isExtension =
-  typeof browser !== "undefined" || typeof chrome !== "undefined";
+const isExtension = typeof browser !== "undefined" || typeof chrome !== "undefined";
 
 export const isBrowser =
   (typeof window !== "undefined" && typeof window.document !== "undefined") ||
