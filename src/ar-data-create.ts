@@ -1,5 +1,5 @@
 import { DataItemCreateOptions } from "./ar-data-base";
-import assert from "assert";
+
 import base64url from "base64url";
 import { longTo8ByteArray, shortTo2ByteArray } from "./utils";
 import DataItem from "./DataItem";
@@ -51,12 +51,8 @@ export function createData(
   // bytes.set(EMPTY_ARRAY, 32);
   // Push bytes for `owner`
 
-  assert(
-    _owner.byteLength == signer.ownerLength,
-    new Error(
-      `Owner must be ${signer.ownerLength} bytes, but was incorrectly ${_owner.byteLength}`,
-    ),
-  );
+
+  if (_owner.byteLength !== signer.ownerLength) throw new Error(`Owner must be ${signer.ownerLength} bytes, but was incorrectly ${_owner.byteLength}`);
   bytes.set(_owner, 2 + signer.signatureLength);
 
   const position = 2 + signer.signatureLength + signer.ownerLength;
@@ -64,12 +60,7 @@ export function createData(
   // 64 + OWNER_LENGTH
   bytes[position] = _target ? 1 : 0;
   if (_target) {
-    assert(
-      _target.byteLength == 32,
-      new Error(
-        "Target must be 32 bytes but was incorrectly ${_target.byteLength}",
-      ),
-    );
+    if (_target.byteLength !== 32) throw new Error(`Target must be 32 bytes but was incorrectly ${_target.byteLength}`);
     bytes.set(_target, position + 1);
   }
 
@@ -80,7 +71,7 @@ export function createData(
   bytes[anchor_start] = _anchor ? 1 : 0;
   if (_anchor) {
     tags_start += _anchor.byteLength;
-    assert(_anchor.byteLength == 32, new Error("Anchor must be 32 bytes"));
+    if (_anchor.byteLength == 32) throw new Error("Anchor must be 32 bytes");
     bytes.set(_anchor, anchor_start + 1);
   }
 

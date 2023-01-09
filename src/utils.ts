@@ -117,5 +117,8 @@ export function arraybufferEqual(buf1: Uint8Array, buf2: Uint8Array): boolean {
   return true;
 }
 
+// @ts-expect-error These variables are defined in extension environments
+const isExtension = typeof browser !== "undefined" || typeof chrome !== "undefined";
+
 export const isBrowser =
-  typeof window !== "undefined" && typeof window.document !== "undefined";
+  (typeof window !== "undefined" && typeof window.document !== "undefined") || isExtension;
