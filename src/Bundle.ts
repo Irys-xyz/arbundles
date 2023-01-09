@@ -1,5 +1,5 @@
 import base64url from "base64url";
-import { arraybufferEqual, byteArrayToLong } from "./utils";
+import { byteArrayToLong } from "./utils";
 import DataItem from "./DataItem";
 import Transaction from "arweave/node/lib/transaction";
 import Arweave from "arweave";
@@ -103,7 +103,7 @@ export default class Bundle implements BundleInterface {
       offset += _offset;
       const _id = this.binary.subarray(i + 32, i + 64);
 
-      if (arraybufferEqual(_id, id)) {
+      if (Buffer.compare(_id, id) === 0) {
         return { startOffset: offset, size: _offset };
       }
     }

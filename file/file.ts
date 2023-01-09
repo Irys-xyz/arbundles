@@ -1,13 +1,13 @@
 import * as fs from "fs";
 import { promisify } from "util";
 import { byteArrayToLong } from "../src/utils";
-import { tagsParser } from "../src/parser";
 import base64url from "base64url";
 import { FileHandle } from "fs/promises";
 import { Signer } from "../src/signing";
 import { DataItemCreateOptions } from "../src";
 import { streamSigner } from "../stream";
 import { Readable } from "stream";
+import { deserializeTags } from "../src/tags";
 
 type File = string | FileHandle;
 const read = promisify(fs.read);
@@ -15,7 +15,7 @@ const read = promisify(fs.read);
 interface Transaction {
   id: string;
   owner: string;
-  tags: { name: string; value: string; }[];
+  tags: { name: string; value: string }[];
   target: string;
   data_size: number;
   fee: number;
@@ -68,7 +68,7 @@ export async function fileToJson(filename: string): Promise<Transaction> {
       numberOfTagBytes,
       0,
     ).then((value) => value.buffer);
-    tags = tagsParser.fromBuffer(tagBytes);
+    tags = deserializeTags(tagBytes);
   }
 
   const id = filename;
@@ -134,7 +134,7 @@ export async function* getHeaders(
 
 export async function getId(
   file: File,
-  options?: { offset: number; },
+  options?: { offset: number },
 ): Promise<Buffer> {
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;
@@ -152,7 +152,7 @@ export async function getId(
 
 export async function getSignature(
   file: File,
-  options?: { offset: number; },
+  options?: { offset: number },
 ): Promise<Buffer> {
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;
@@ -170,7 +170,7 @@ export async function getSignature(
 
 export async function getOwner(
   file: File,
-  options?: { offset: number; },
+  options?: { offset: number },
 ): Promise<string> {
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;
@@ -189,7 +189,7 @@ export async function getOwner(
 
 export async function getTarget(
   file: File,
-  options?: { offset: number; },
+  options?: { offset: number },
 ): Promise<string | undefined> {
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;
@@ -220,7 +220,7 @@ export async function getTarget(
 
 export async function getAnchor(
   file: File,
-  options?: { offset: number; },
+  options?: { offset: number },
 ): Promise<string | undefined> {
   const fd = await fileToFd(file);
   const offset = options.offset ?? 0;
@@ -263,8 +263,8 @@ export async function getAnchor(
 
 export async function getTags(
   file: File,
-  options?: { offset: number; },
-): Promise<{ name: string; value: string; }[]> {
+  options?: { offset: number },
+): Promise<{ name: string; value: string }[]> {
   const fd = await fileToFd(file);
 
   const offset = options?.offset ?? 0;
@@ -316,9 +316,18 @@ export async function getTags(
   ).then((value) => value.buffer);
   await fd.close();
 
-  return tagsParser.fromBuffer(tagBytes);
+  return deserializeTags(tagBytes);
 }
 
-export async function signedFileStream(path: string, signer: Signer, opts?: DataItemCreateOptions): Promise<Readable> {
-  return streamSigner(fs.createReadStream(path), fs.createReadStream(path), signer, opts);
+export async function signedFileStream(
+  path: string,
+  signer: Signer,
+  opts?: DataItemCreateOptions,
+): Promise<Readable> {
+  return streamSigner(
+    fs.createReadStream(path),
+    fs.createReadStream(path),
+    signer,
+    opts,
+  );
 }
