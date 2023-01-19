@@ -3,7 +3,7 @@ import { Signer } from "..";
 import { SignatureConfig, SIG_CONFIG } from "../../constants";
 
 export default class InjectedEthereumSigner implements Signer {
-  private signer: ethers.providers.JsonRpcSigner;
+  protected signer: ethers.providers.JsonRpcSigner;
   public publicKey: Buffer;
   readonly ownerLength: number = SIG_CONFIG[SignatureConfig.ETHEREUM].pubLength;
   readonly signatureLength: number =

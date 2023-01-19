@@ -42,7 +42,7 @@ export default class Secp256k1 implements Signer {
     return verified;
   }
 
-  sign(message: Uint8Array): Uint8Array {
+  async sign(message: Uint8Array): Promise<Uint8Array> {
     return secp256k1.ecdsaSign(
       keccak256(Buffer.from(message)),
       Buffer.from(this.key),
