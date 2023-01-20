@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { Signer } from "..";
-import { SignatureConfig, SIG_CONFIG } from "../../constants";
+import { SignatureConfig, SIG_CONFIG } from "../constants";
 
 export default class InjectedEthereumSigner implements Signer {
   protected signer: ethers.providers.JsonRpcSigner;

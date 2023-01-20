@@ -1,7 +1,7 @@
 import { Signer } from "../Signer";
 import base64url from "base64url";
 import * as ed25519 from "@noble/ed25519";
-import { SIG_CONFIG } from "../../constants";
+import { SIG_CONFIG } from "../constants";
 
 export default class Curve25519 implements Signer {
   readonly ownerLength: number = SIG_CONFIG[2].pubLength;

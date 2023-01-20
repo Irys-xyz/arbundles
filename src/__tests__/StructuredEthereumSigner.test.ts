@@ -5,6 +5,7 @@ const wallet = new ethers.Wallet(
 );
 const randWallet = ethers.Wallet.createRandom();
 import Crypto from "crypto";
+import { createData } from "../ar-data-create";
 
 describe("Typed ethereum signer", function () {
   describe("sign & verify", () => {
@@ -58,6 +59,15 @@ describe("Typed ethereum signer", function () {
         );
         expect(isValid).toEqual(true);
       });
+    });
+  });
+
+  describe("Create & Validate DataItems", async () => {
+    it("should create a valid dataItem", async () => {
+      const signer = new TypedEthereumSigner(wallet.privateKey.slice(2));
+      const data = "Hello, Bundlr!";
+      const tags = [{ name: "Hello", value: "Bundlr" }];
+      const item = createData(data, signer);
     });
   });
 });

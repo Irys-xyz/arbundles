@@ -1,7 +1,7 @@
 import { Signer } from "..";
 import * as ed25519 from "@noble/ed25519";
 // import nacl from 'tweetnacl';
-import { SignatureConfig, SIG_CONFIG } from "../../constants";
+import { SignatureConfig, SIG_CONFIG } from "../constants";
 
 export default class InjectedAptosSigner implements Signer {
   private _publicKey: Buffer;

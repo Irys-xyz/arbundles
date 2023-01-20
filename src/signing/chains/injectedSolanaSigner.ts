@@ -1,7 +1,7 @@
 import { Signer } from "..";
 import * as ed25519 from "@noble/ed25519";
 import base64url from "base64url";
-import { SIG_CONFIG } from "../../constants";
+import { SIG_CONFIG } from "../constants";
 import { MessageSignerWalletAdapter } from "@solana/wallet-adapter-base";
 
 export default class InjectedSolanaSigner implements Signer {

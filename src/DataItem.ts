@@ -5,7 +5,7 @@ import { sign } from "./ar-data-bundle";
 import { BundleItem } from "./BundleItem";
 import { indexToType, Signer } from "./signing/index";
 import { getSignatureData } from "./ar-data-base";
-import { SIG_CONFIG, SignatureConfig } from "./constants";
+import { SIG_CONFIG, SignatureConfig } from "./signing/constants";
 import * as crypto from "crypto";
 import Arweave from "arweave";
 import { deserializeTags } from "./tags";
@@ -29,29 +29,33 @@ export default class DataItem implements BundleItem {
       this.binary.subarray(0, 2),
     );
 
-    switch (signatureTypeVal) {
-      case 1: {
-        return SignatureConfig.ARWEAVE;
-      }
-      case 2: {
-        return SignatureConfig.ED25519;
-      }
-      case 3: {
-        return SignatureConfig.ETHEREUM;
-      }
-      case 4: {
-        return SignatureConfig.SOLANA;
-      }
-      case 5: {
-        return SignatureConfig.INJECTEDAPTOS;
-      }
-      case 6: {
-        return SignatureConfig.MULTIAPTOS;
-      }
-      default: {
-        throw new Error("Unknown signature type: " + signatureTypeVal);
-      }
+    // switch (signatureTypeVal) {
+    //   case 1: {
+    //     return SignatureConfig.ARWEAVE;
+    //   }
+    //   case 2: {
+    //     return SignatureConfig.ED25519;
+    //   }
+    //   case 3: {
+    //     return SignatureConfig.ETHEREUM;
+    //   }
+    //   case 4: {
+    //     return SignatureConfig.SOLANA;
+    //   }
+    //   case 5: {
+    //     return SignatureConfig.INJECTEDAPTOS;
+    //   }
+    //   case 6: {
+    //     return SignatureConfig.MULTIAPTOS;
+    //   }
+    //   default: {
+    //
+    //   }
+    // }
+    if (SignatureConfig?.[signatureTypeVal] !== undefined) {
+      return signatureTypeVal;
     }
+    throw new Error("Unknown signature type: " + signatureTypeVal);
   }
 
   async isValid(): Promise<boolean> {

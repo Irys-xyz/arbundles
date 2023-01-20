@@ -8,7 +8,7 @@ import { stringToBuffer } from "arweave/node/lib/utils";
 import Arweave from "arweave";
 import { indexToType, Signer } from "../src/signing";
 import axios, { AxiosResponse } from "axios";
-import { SIG_CONFIG } from "../src/constants";
+import { SIG_CONFIG } from "../src/signing/constants";
 import { promisify } from "util";
 import { deserializeTags } from "../src/tags";
 
