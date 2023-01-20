@@ -53,6 +53,7 @@ index.js
 index.d.ts
 index.js.map
 test
+!src/__tests__/setup.jest.js
 
 package/
 esm/
