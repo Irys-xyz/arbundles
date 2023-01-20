@@ -30,7 +30,7 @@ export function serializeTags(tags: { name: string; value: string }[]): Buffer {
   // number of tags
   byt = Buffer.concat([byt, encodeLong(tags.length)]);
   for (const tag of tags) {
-    if (!tag?.name || !tag?.value)
+    if (tag?.name === undefined || tag?.value === undefined)
       throw new Error(
         `Invalid tag format for ${tag}, expected {name:string, value: string}`,
       );

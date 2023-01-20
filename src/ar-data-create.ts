@@ -77,7 +77,7 @@ export function createData(
   bytes[anchor_start] = _anchor ? 1 : 0;
   if (_anchor) {
     tags_start += _anchor.byteLength;
-    if (_anchor.byteLength == 32) throw new Error("Anchor must be 32 bytes");
+    if (_anchor.byteLength !== 32) throw new Error("Anchor must be 32 bytes");
     bytes.set(_anchor, anchor_start + 1);
   }
 
