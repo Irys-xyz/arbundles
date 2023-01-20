@@ -117,7 +117,7 @@ export default class Bundle implements BundleInterface {
    * @param index
    * @private
    */
-  private getByIndex(index: number) {
+  private getByIndex(index: number): DataItem {
     let offset = 0;
 
     const headerStart = 32 + 64 * index;

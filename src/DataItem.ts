@@ -90,15 +90,15 @@ export default class DataItem implements BundleItem {
     this.binary.set(pubkey, 2 + this.signatureLength);
   }
 
-  get signatureLength(): number {
-    return SIG_CONFIG[this.signatureType].sigLength;
-  }
-
   get rawOwner(): Buffer {
     return this.binary.subarray(
       2 + this.signatureLength,
       2 + this.signatureLength + this.ownerLength,
     );
+  }
+
+  get signatureLength(): number {
+    return SIG_CONFIG[this.signatureType].sigLength;
   }
 
   get owner(): string {
@@ -223,6 +223,7 @@ export default class DataItem implements BundleItem {
   /**
    * Returns a JSON representation of a DataItem
    */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   public toJSON(): {
     owner: string;
     data: string;

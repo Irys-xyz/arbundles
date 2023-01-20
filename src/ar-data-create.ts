@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { DataItemCreateOptions } from "./ar-data-base";
 
 import base64url from "base64url";

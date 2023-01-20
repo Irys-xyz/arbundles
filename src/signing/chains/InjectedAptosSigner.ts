@@ -44,7 +44,7 @@ export default class InjectedAptosSigner implements Signer {
     message: Uint8Array,
     signature: Uint8Array,
   ): Promise<boolean> {
-    let p = pk;
+    const p = pk;
     return ed25519.verify(
       Buffer.from(signature),
       Buffer.from(

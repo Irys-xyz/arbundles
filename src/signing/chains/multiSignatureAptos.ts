@@ -13,7 +13,7 @@ export default class MultiSignatureAptosSigner implements Signer {
 
   protected collectSignatures: (
     message: Uint8Array,
-  ) => Promise<{ signatures: Buffer[]; bitmap: number[]; }>;
+  ) => Promise<{ signatures: Buffer[]; bitmap: number[] }>;
 
   protected provider: any;
 
@@ -21,7 +21,7 @@ export default class MultiSignatureAptosSigner implements Signer {
     publicKey: Buffer,
     collectSignatures: (
       message: Uint8Array,
-    ) => Promise<{ signatures: Buffer[]; bitmap: number[]; }>,
+    ) => Promise<{ signatures: Buffer[]; bitmap: number[] }>,
   ) {
     this._publicKey = publicKey;
     this.collectSignatures = collectSignatures;
@@ -61,7 +61,6 @@ export default class MultiSignatureAptosSigner implements Signer {
       bitmap[byteOffset] = byte;
     });
 
-
     const signature = Buffer.alloc(this.signatureLength);
     let sigPos = 0;
     for (let i = 0; i < 32; i++) {
@@ -87,9 +86,9 @@ export default class MultiSignatureAptosSigner implements Signer {
     let oneFalse = false;
     for (let i = 0; i < 32; i++) {
       // check bitmap
-      let bucket = Math.floor(i / 8);
-      let bucket_pos = i - bucket * 8;
-      const sigIncluded = (encodedBitmap[bucket] & (128 >> bucket_pos)) != 0;
+      const bucket = Math.floor(i / 8);
+      const bucketPos = i - bucket * 8;
+      const sigIncluded = (encodedBitmap[bucket] & (128 >> bucketPos)) != 0;
       if (sigIncluded) {
         const signature = signatures.slice(i * 64, (i + 1) * 64);
         const pubkey = pk.slice(i * 32, (i + 1) * 32);
