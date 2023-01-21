@@ -1,14 +1,8 @@
 import { readFileSync } from "fs";
 import path from "path";
 import { Buffer } from "buffer";
-import { DataItemCreateOptions } from "../ar-data-base";
 import * as fs from "fs";
-import ArweaveSigner from "../signing/chains/ArweaveSigner";
-import { createData } from "../ar-data-create";
-import DataItem from "../DataItem";
-import { bundleAndSignData } from "../ar-data-bundle";
-import SolanaSigner from "../signing/chains/SolanaSigner";
-
+import { SolanaSigner, bundleAndSignData, DataItem, createData, ArweaveSigner, DataItemCreateOptions } from "../../index";
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString(),
 );

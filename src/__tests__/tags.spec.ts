@@ -18,7 +18,7 @@ const tagsParser = Type.forSchema({
 });
 
 function serializeTagsAVSC(
-  tags: { name: string; value: string }[],
+  tags: { name: string; value: string; }[],
 ): Uint8Array {
   if (tags!.length == 0) {
     return new Uint8Array(0);

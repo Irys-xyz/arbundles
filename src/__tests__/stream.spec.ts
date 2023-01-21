@@ -1,7 +1,6 @@
-import { bundleAndSignData, createData } from "../index";
 import { readFileSync } from "fs";
 import path from "path";
-import { ArweaveSigner } from "../signing";
+import { bundleAndSignData, createData, ArweaveSigner } from "../../index";
 import processStream from "../../stream";
 import { Readable } from "stream";
 

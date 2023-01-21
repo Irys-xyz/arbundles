@@ -1,9 +1,8 @@
+import { DataItem, ArweaveSigner } from "../../index";
 import { bundleAndSignData, createData, FileDataItem } from "../../file";
 import { readFileSync } from "fs";
 import path from "path";
-import ArweaveSigner from "../signing/chains/ArweaveSigner";
 import * as fs from "fs";
-import DataItem from "../DataItem";
 // import Arweave from "arweave";
 
 // const arweave = Arweave.init({

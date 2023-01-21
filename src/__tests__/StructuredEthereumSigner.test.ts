@@ -1,11 +1,10 @@
 import { ethers } from "ethers";
-import { TypedEthereumSigner } from "../signing";
+import { createData, TypedEthereumSigner } from "../../index";
+import Crypto from "crypto";
 const wallet = new ethers.Wallet(
   "0x37929fc21ab44ace162318acbbf4d24a41270b2aee18fd1cfb22e3fc3f4b4024",
 );
 const randWallet = ethers.Wallet.createRandom();
-import Crypto from "crypto";
-import { createData } from "../ar-data-create";
 
 describe("Typed ethereum signer", function () {
   describe("sign & verify", () => {

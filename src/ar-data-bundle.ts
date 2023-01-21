@@ -73,7 +73,7 @@ export async function bundleAndSignData(
 export async function getSignatureAndId(
   item: DataItem,
   signer: Signer,
-): Promise<{ signature: Buffer; id: Buffer }> {
+): Promise<{ signature: Buffer; id: Buffer; }> {
   const signatureData = await gsd.getSignatureData(item);
 
   const signatureBytes = await signer.sign(signatureData);
