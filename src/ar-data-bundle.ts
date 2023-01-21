@@ -1,4 +1,4 @@
-import { getSignatureData } from "./ar-data-base";
+import gsd from "./ar-data-base";
 import { longTo32ByteArray } from "./utils";
 import DataItem from "./DataItem";
 import Arweave from "arweave";
@@ -74,7 +74,7 @@ export async function getSignatureAndId(
   item: DataItem,
   signer: Signer,
 ): Promise<{ signature: Buffer; id: Buffer }> {
-  const signatureData = await getSignatureData(item);
+  const signatureData = await gsd.getSignatureData(item);
 
   const signatureBytes = await signer.sign(signatureData);
   const idBytes = await Arweave.crypto.hash(signatureBytes);

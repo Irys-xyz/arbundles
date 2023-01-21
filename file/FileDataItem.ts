@@ -15,7 +15,7 @@ import { deserializeTags } from "../src/tags";
 const read = promisify(fs.read);
 const write = promisify(fs.write);
 
-export default class FileDataItem implements BundleItem {
+export class FileDataItem implements BundleItem {
   public readonly filename: PathLike;
   async signatureLength(): Promise<number> {
     const length = SIG_CONFIG[await this.signatureType()]?.sigLength;
@@ -402,3 +402,4 @@ export default class FileDataItem implements BundleItem {
     return [anchorPresent, anchorStart];
   }
 }
+export default FileDataItem;

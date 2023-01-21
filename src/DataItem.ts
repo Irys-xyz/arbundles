@@ -4,7 +4,7 @@ import { Buffer } from "buffer";
 import { sign } from "./ar-data-bundle";
 import { BundleItem } from "./BundleItem";
 import { indexToType, Signer } from "./signing/index";
-import { getSignatureData } from "./ar-data-base";
+import gsd from "./ar-data-base";
 import { SIG_CONFIG, SignatureConfig } from "./constants";
 import * as crypto from "crypto";
 import Arweave from "arweave";
@@ -12,7 +12,7 @@ import { deserializeTags } from "./tags";
 
 export const MIN_BINARY_SIZE = 80;
 
-export default class DataItem implements BundleItem {
+export class DataItem implements BundleItem {
   private readonly binary: Buffer;
   private _id: Buffer;
 
@@ -291,12 +291,12 @@ export default class DataItem implements BundleItem {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const Signer = indexToType[sigType];
 
-    const signatureData = await getSignatureData(item);
+    const signatureData = await gsd.getSignatureData(item);
     return await Signer.verify(item.rawOwner, signatureData, item.rawSignature);
   }
 
   public async getSignatureData(): Promise<Uint8Array> {
-    return getSignatureData(this);
+    return gsd.getSignatureData(this);
   }
 
   /**
@@ -336,3 +336,4 @@ export default class DataItem implements BundleItem {
     return anchorStart;
   }
 }
+export default DataItem;

@@ -23,7 +23,7 @@ import { CreateTransactionInterface } from "arweave/node/common";
 // import { pipeline } from 'stream/promises';
 const read = promisify(fs.read);
 
-export default class FileBundle implements BundleInterface {
+export class FileBundle implements BundleInterface {
   public readonly headerFile: PathLike;
   public readonly txs: PathLike[];
 
@@ -195,3 +195,4 @@ export default class FileBundle implements BundleInterface {
     throw new Error("Can't find by index");
   }
 }
+export default FileBundle;

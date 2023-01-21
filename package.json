@@ -5,6 +5,25 @@
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
   "main": "src/index.js",
+  "module": "esm/index.js",
+  "browser": "esm/webIndex.js",
+  "exports": {
+    ".": {
+      "import": "./esm/index.js",
+      "require": "./src/index.js",
+      "node": "./src/index.js"
+    },
+    "./file": {
+      "import": "./esm/file/index.js",
+      "require": "./file/index.js",
+      "node": "./file/index.js"
+    },
+    "./stream": {
+      "import": "./esm/stream/index.js",
+      "require": "./stream/index.js",
+      "node": "./stream/index.js"
+    }
+  },
   "types": "index.d.ts",
   "files": [
     "index.js",

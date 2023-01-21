@@ -10,7 +10,7 @@ import { CreateTransactionInterface } from "arweave/node/common";
 
 const HEADER_START = 32;
 
-export default class Bundle implements BundleInterface {
+export class Bundle implements BundleInterface {
   public length: number;
   public items: DataItem[];
   protected binary: Buffer;
@@ -198,3 +198,4 @@ export default class Bundle implements BundleInterface {
     return items;
   }
 }
+export default Bundle;
