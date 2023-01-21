@@ -5,7 +5,7 @@ import base64url from "base64url";
 import { ethers } from "ethers";
 
 export default class EthereumSigner extends Secp256k1 {
-  get publicKey(): Buffer {
+  public get publicKey(): Buffer {
     return Buffer.from(this.pk, "hex");
   }
 

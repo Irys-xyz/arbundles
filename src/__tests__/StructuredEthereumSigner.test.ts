@@ -32,6 +32,7 @@ describe("Typed ethereum signer", function () {
           expectedSignature,
         );
         expect(isValid).toEqual(true);
+        6;
       });
       it("should sign & verify an unknown value", async () => {
         const randData = Crypto.randomBytes(256);
@@ -62,12 +63,14 @@ describe("Typed ethereum signer", function () {
     });
   });
 
-  describe("Create & Validate DataItems", async () => {
+  describe("Create & Validate DataItems", () => {
     it("should create a valid dataItem", async () => {
       const signer = new TypedEthereumSigner(wallet.privateKey.slice(2));
       const data = "Hello, Bundlr!";
       const tags = [{ name: "Hello", value: "Bundlr" }];
-      const item = createData(data, signer);
+      const item = createData(data, signer, { tags });
+      await item.sign(signer);
+      expect(await item.isValid()).toBe(true);
     });
   });
 });

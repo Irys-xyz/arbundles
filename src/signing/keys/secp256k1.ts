@@ -1,7 +1,7 @@
 import { Signer } from "../Signer";
 import base64url from "base64url";
 import secp256k1 from "secp256k1";
-import { SignatureConfig, SIG_CONFIG } from "../constants";
+import { SignatureConfig, SIG_CONFIG } from "../../constants";
 import keccak256 from "../keccak256";
 
 export default class Secp256k1 implements Signer {

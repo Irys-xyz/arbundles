@@ -7,7 +7,7 @@ import {
   DataItemCreateOptions,
   MIN_BINARY_SIZE,
 } from "../src/index";
-import { SIG_CONFIG } from "../src/signing/constants";
+import { SIG_CONFIG } from "../src/constants";
 import * as crypto from "crypto";
 import { stringToBuffer } from "arweave/node/lib/utils";
 import { deepHash } from "../src/deepHash";

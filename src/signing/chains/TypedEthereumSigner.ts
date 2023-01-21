@@ -1,16 +1,28 @@
 import { Wallet } from "ethers";
 import { verifyTypedData } from "ethers/lib/utils";
+import { SignatureConfig, SIG_CONFIG } from "../../constants";
 import keccak256 from "../keccak256";
 import EthereumSigner from "./ethereumSigner";
 
 export default class TypedEthereumSigner extends EthereumSigner {
+  readonly ownerLength: number =
+    SIG_CONFIG[SignatureConfig.TYPEDETHEREUM].pubLength;
+  readonly signatureLength: number =
+    SIG_CONFIG[SignatureConfig.TYPEDETHEREUM].sigLength;
+  readonly signatureType: SignatureConfig = SignatureConfig.TYPEDETHEREUM;
+
   private address: string;
   private signer: Wallet;
+
   constructor(key: string) {
     super(key);
     this.address =
-      "0x" + keccak256(this.publicKey.slice(1)).slice(-20).toString("hex");
+      "0x" + keccak256(super.publicKey.slice(1)).slice(-20).toString("hex");
     this.signer = new Wallet(key);
+  }
+
+  get publicKey(): Buffer {
+    return Buffer.from(this.address);
   }
 
   async sign(message: Uint8Array): Promise<Uint8Array> {
@@ -44,7 +56,7 @@ export default class TypedEthereumSigner extends EthereumSigner {
     //     ]
 
     // );
-    const address = pk; // pk *is* address for this weird type. /* "0x" + keccak256(pk.slice(1)).slice(-20).toString("hex"); */
+    const address = pk.toString(); // pk *is* address for this weird type. /* "0x" + keccak256(pk.slice(1)).slice(-20).toString("hex"); */
     // const hash = _TypedDataEncoder.hash(domain, types, { address, message });
 
     // // errecover to check address
@@ -55,7 +67,7 @@ export default class TypedEthereumSigner extends EthereumSigner {
       { address, message },
       signature,
     );
-    return address === addr;
+    return address.toLowerCase() === addr.toLowerCase();
   }
 }
 

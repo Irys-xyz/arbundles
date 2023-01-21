@@ -5,7 +5,7 @@ import { sign } from "./ar-data-bundle";
 import { BundleItem } from "./BundleItem";
 import { indexToType, Signer } from "./signing/index";
 import { getSignatureData } from "./ar-data-base";
-import { SIG_CONFIG, SignatureConfig } from "./signing/constants";
+import { SIG_CONFIG, SignatureConfig } from "./constants";
 import * as crypto from "crypto";
 import Arweave from "arweave";
 import { deserializeTags } from "./tags";

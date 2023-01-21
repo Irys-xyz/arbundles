@@ -2,7 +2,7 @@ import { Signer } from "../Signer";
 import { constants, createPublicKey, createSign } from "crypto";
 import Arweave from "arweave";
 import base64url from "base64url";
-import { SIG_CONFIG } from "../constants";
+import { SIG_CONFIG } from "../../constants";
 
 export default class Rsa4096Pss implements Signer {
   readonly signatureType: number = 1;
