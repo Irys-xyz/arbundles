@@ -17,5 +17,3 @@ getSigData.getSignatureData = (item: DataItem): Promise<Uint8Array> => {
 };
 
 export * from "./src/index";
-export * as file from "./file/index";
-export * as stream from "./stream/index";

@@ -1789,6 +1789,18 @@ arweave-stream-tx@^1.1.0:
     exponential-backoff "^3.1.0"
     stream-chunker "^1.2.8"
 
+arweave@=1.11.8:
+  version "1.11.8"
+  resolved "https://registry.yarnpkg.com/arweave/-/arweave-1.11.8.tgz#09376e0c6cec40a661cbb27a306cb11c0a663cd8"
+  integrity sha512-58ODeNPIC4OjaOCl2bXjKbOFGsiVZFs+DkQg3BvQGvFWNqw1zTJ4Jp01xGUz+GbdOaDyJcCC0g3l0HwdJfFPyw==
+  dependencies:
+    arconnect "^0.4.2"
+    asn1.js "^5.4.1"
+    axios "^0.27.2"
+    base64-js "^1.5.1"
+    bignumber.js "^9.0.2"
+    util "^0.12.4"
+
 arweave@^1.10.13:
   version "1.10.18"
   resolved "https://registry.yarnpkg.com/arweave/-/arweave-1.10.18.tgz#3042edd1afa52b7c3caeacf88271758232c7b866"
@@ -1799,18 +1811,6 @@ arweave@^1.10.13:
     axios "^0.22.0"
     base64-js "^1.3.1"
     bignumber.js "^9.0.1"
-
-arweave@^1.11.4:
-  version "1.12.2"
-  resolved "https://registry.yarnpkg.com/arweave/-/arweave-1.12.2.tgz#e99fb3db0529043ae0c67a89587751f8640058dd"
-  integrity sha512-gm82sbUd3AqiRxZ9hWRBnC2mRff+kCuVw1cSdMwhUmVyeSgvDxi5GkdCKHUm1tMvu59f45OcZRiL1yEIvvJY2Q==
-  dependencies:
-    arconnect "^0.4.2"
-    asn1.js "^5.4.1"
-    axios "^0.27.2"
-    base64-js "^1.5.1"
-    bignumber.js "^9.0.2"
-    util "^0.12.4"
 
 asn1.js@^5.2.0, asn1.js@^5.4.1:
   version "5.4.1"
