@@ -10,9 +10,9 @@ import {
   TypedEthereumSigner,
 } from "./chains";
 
-interface IndexToType {
+export interface IndexToType {
   [key: number]: {
-    new (...args): Signer;
+    new(...args): Signer;
     readonly signatureLength: number;
     readonly ownerLength: number;
     verify(

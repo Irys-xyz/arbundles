@@ -16,22 +16,22 @@
 // globalThis.stream ??= streamDep;
 // // globalThis.path ??= path;
 
-import getSigData from "./src/ar-data-base";
-import webDeepHash from "arweave/web/lib/deepHash";
-import type DataItem from "./src/DataItem";
-import { stringToBuffer } from "arweave/node/lib/utils";
+// import getSigData from "./src/ar-data-base";
+// import webDeepHash from "arweave/web/lib/deepHash";
+// import type DataItem from "./src/DataItem";
+// import { stringToBuffer } from "arweave/node/lib/utils";
 
-getSigData.getSignatureData = (item: DataItem) =>
-  webDeepHash([
-    stringToBuffer("dataitem"),
-    stringToBuffer("1"),
-    stringToBuffer(item.signatureType.toString()),
-    item.rawOwner,
-    item.rawTarget,
-    item.rawAnchor,
-    item.rawTags,
-    item.rawData,
-  ]);
+// getSigData.getSignatureData = (item: DataItem) =>
+//   webDeepHash([
+//     stringToBuffer("dataitem"),
+//     stringToBuffer("1"),
+//     stringToBuffer(item.signatureType.toString()),
+//     item.rawOwner,
+//     item.rawTarget,
+//     item.rawAnchor,
+//     item.rawTags,
+//     item.rawData,
+//   ]);
 
 import * as arbundlesSrc from "./src";
 import * as stream from "./stream";

@@ -87,3 +87,5 @@ export async function hashStream(
 
   return context.digest();
 }
+
+export default deepHash;

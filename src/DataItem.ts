@@ -4,7 +4,7 @@ import { Buffer } from "buffer";
 import { sign } from "./ar-data-bundle";
 import { BundleItem } from "./BundleItem";
 import { indexToType, Signer } from "./signing/index";
-import gsd from "./ar-data-base";
+import getSignatureData from "./ar-data-base";
 import { SIG_CONFIG, SignatureConfig } from "./constants";
 import * as crypto from "crypto";
 import Arweave from "arweave";
@@ -146,7 +146,7 @@ export class DataItem implements BundleItem {
     return this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize);
   }
 
-  get tags(): { name: string; value: string }[] {
+  get tags(): { name: string; value: string; }[] {
     const tagsStart = this.getTagsStart();
     const tagsCount = byteArrayToLong(
       this.binary.subarray(tagsStart, tagsStart + 8),
@@ -166,7 +166,7 @@ export class DataItem implements BundleItem {
     );
   }
 
-  get tagsB64Url(): { name: string; value: string }[] {
+  get tagsB64Url(): { name: string; value: string; }[] {
     const _tags = this.tags;
     return _tags.map((t) => ({
       name: base64url.encode(t.name),
@@ -233,7 +233,7 @@ export class DataItem implements BundleItem {
     data: string;
     signature: string;
     target: string;
-    tags: { name: string; value: string }[];
+    tags: { name: string; value: string; }[];
   } {
     return {
       signature: this.signature,
@@ -274,7 +274,7 @@ export class DataItem implements BundleItem {
 
     if (numberOfTags > 0) {
       try {
-        const tags: { name: string; value: string }[] = deserializeTags(
+        const tags: { name: string; value: string; }[] = deserializeTags(
           Buffer.from(
             buffer.subarray(tagsStart + 16, tagsStart + 16 + numberOfTagBytes),
           ),
@@ -291,12 +291,12 @@ export class DataItem implements BundleItem {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const Signer = indexToType[sigType];
 
-    const signatureData = await gsd.getSignatureData(item);
+    const signatureData = await getSignatureData(item);
     return await Signer.verify(item.rawOwner, signatureData, item.rawSignature);
   }
 
   public async getSignatureData(): Promise<Uint8Array> {
-    return gsd.getSignatureData(this);
+    return getSignatureData(this);
   }
 
   /**

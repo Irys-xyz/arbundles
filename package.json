@@ -4,49 +4,46 @@
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
-  "main": "src/index.js",
-  "module": "esm/index.js",
-  "browser": "esm/webIndex.js",
+  "main": "build/node/cjs/index.js",
+  "module": "build/node/esm/index.js",
+  "browser": "build/web/esm/webIndex.js",
   "exports": {
     ".": {
-      "import": "./esm/index.js",
-      "require": "./src/index.js",
-      "node": "./src/index.js"
+      "types": "./build/node/esm/index.d.ts",
+      "import": "./build/node/esm/index.js",
+      "require": "./build/node/cjs/index.js",
+      "node": "./build/node/cjs/src/index.js"
     },
     "./file": {
-      "import": "./esm/file/index.js",
-      "require": "./file/index.js",
-      "node": "./file/index.js"
+      "types": "./build/node/esm/file/index.d.ts",
+      "import": "./build/node/esm/file/index.js",
+      "require": "./build/node/cjs/file/index.js",
+      "node": "./build/node/cjs/file/index.js"
     },
     "./stream": {
-      "import": "./esm/stream/index.js",
-      "require": "./stream/index.js",
-      "node": "./stream/index.js"
+      "types": "./build/node/esm/stream/index.d.ts",
+      "import": "./build/node/esm/stream/index.js",
+      "require": "./build/node/cjs/stream/index.js",
+      "node": "./build/node/cjs/stream/index.js"
+    },
+    "./web": {
+      "types": "./build/web/esm/webIndex.d.ts",
+      "import": "./build/web/esm/webIndex.js",
+      "default": "./build/web/esm/webIndex.js"
+    },
+    "./bundle": {
+      "types": "./build/web/esm/index.d.ts",
+      "default": "./build/web/bundle.js"
     }
   },
-  "types": "index.d.ts",
+  "types": "./build/node/cjs/index.d.ts",
   "files": [
-    "index.js",
-    "index.js.map",
-    "index.d.ts",
-    "src/**/*.js",
-    "src/**/*.js.map",
-    "src/**/*.d.ts",
-    "stream/**/*.js",
-    "stream/**/*.js.map",
-    "stream/**/*.d.ts",
-    "file/**/*.js",
-    "file/**/*.js.map",
-    "file/**/*.d.ts",
-    "esm/**/*",
-    "webIndex.js",
-    "webIndex.js.map",
-    "webIndex.d.ts",
-    "bundle.js",
-    "bundle.js.map"
+    "build/**/*.js",
+    "build/**/*.js.map",
+    "build/**/*.d.ts"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json & tsc -p esm.tsconfig.json & webpack",
+    "build": "rm -rf ./build && tsc -p tsconfig.json &  tsc -p esm.tsconfig.json & (tsc -p web.tsconfig.json  && webpack)",
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
     "test": "jest --coverage",
     "husky-install": "(node -e \"if (!require('fs').existsSync(__dirname + '/.git')) {process.exit(1)}\" && husky install || true)",

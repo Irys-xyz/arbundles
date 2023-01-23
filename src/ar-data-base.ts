@@ -1,4 +1,7 @@
 import type DataItem from "./DataItem";
+import deepHash from "$/deepHash";
+import { stringToBuffer } from "arweave/node/lib/utils";
+
 /**
  * Options for creation of a DataItem
  */
@@ -7,11 +10,18 @@ export interface DataItemCreateOptions {
   anchor?: string;
   tags?: { name: string; value: string; }[];
 }
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-empty-function
+
 async function getSignatureData(item: DataItem): Promise<Uint8Array> {
-  throw new Error("Please import arbundles from the root index/webIndex.js! (or also dummy import the index so it registers this function correctly)");
+  return deepHash([
+    stringToBuffer("dataitem"),
+    stringToBuffer("1"),
+    stringToBuffer(item.signatureType.toString()),
+    item.rawOwner,
+    item.rawTarget,
+    item.rawAnchor,
+    item.rawTags,
+    item.rawData,
+  ]);
 }
 
-export default { getSignatureData };
+export default getSignatureData;

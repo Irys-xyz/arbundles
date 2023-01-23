@@ -8,7 +8,7 @@ export enum SignatureConfig {
   TYPEDETHEREUM = 7,
 }
 
-interface SignatureMeta {
+export interface SignatureMeta {
   sigLength: number;
   pubLength: number;
   sigName: string;
