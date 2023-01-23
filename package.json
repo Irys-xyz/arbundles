@@ -79,7 +79,7 @@
     "process": "^0.11.10",
     "rimraf": "~3.0.2",
     "stream-browserify": "^3.0.0",
-    "ts-jest": "^29.0.3",
+    "ts-jest": "^29.0.5",
     "ts-loader": "^9.4.1",
     "ts-node": "^10.8.1",
     "tslib": "^2.4.0",
