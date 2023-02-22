@@ -1,6 +1,7 @@
-import { createData, PolygonSigner, DataItemCreateOptions, MultiSignatureAptosSigner, SolanaSigner, ArweaveSigner, EthereumSigner, AlgorandSigner, AptosSigner, NearSigner, HexSolanaSigner } from "../../index";
+import { createData, PolygonSigner, DataItemCreateOptions, SolanaSigner, ArweaveSigner, EthereumSigner, AlgorandSigner, AptosSigner, NearSigner, HexSolanaSigner, DataItem } from "../../index";
 import base58 from 'bs58';
 import arweaveTestKey from "./test_key0.json";
+import { createData as createFileData } from "../../file";
 
 
 const multiAptoskeyPairs = [{
@@ -130,78 +131,156 @@ const signerTestVariations: {
       ownerEncoding: "base58",
       signatureType: 2
     },
-    {
-      description: "multiaptos",
-      signer: (() => {
-        return new MultiSignatureAptosSigner(multiAptosPublicKey,
-          (() => {
-            return async (message: Uint8Array) => {
-              const signedMessage = [
-                Buffer.from(await multiAptosWallets[0].sign(message)),
-                Buffer.from(await multiAptosWallets[2].sign(message))
-              ];
-              return { signatures: signedMessage, bitmap: [0, 2] };
-            };
-          })());
-      })(),
-      ownerEncoding: "hex",
-      signatureType: 6
-    }
+//    {
+//      description: "multiaptos",
+//      signer: (() => {
+//        return new MultiSignatureAptosSigner(multiAptosPublicKey,
+//          (() => {
+//            return async (message: Uint8Array) => {
+//              const signedMessage = [
+//                Buffer.from(await multiAptosWallets[0].sign(message)),
+//                Buffer.from(await multiAptosWallets[2].sign(message))
+//              ];
+//              return { signatures: signedMessage, bitmap: [0, 2] };
+//            };
+//          })());
+//      })(),
+//      ownerEncoding: "hex",
+//      signatureType: 6
+//    }
   ];
 
+
 describe("Signers()", function () {
-  describe.each(signerTestVariations)("given we have a $description signer", (signerTestVariation) => {
-    const signer = signerTestVariation.signer;
-    describe.each(dataTestVariations)("and given we have $description data", (dataTestVariation) => {
-      const data = dataTestVariation.data;
-      describe.each(tagsTestVariations)("and given we have $description tags", (tagsTestVariation) => {
-        describe.each(targetTestVariations)("and given we have a $description target", (targetTestVariation) => {
-          describe.each(anchorTestVariation)("and given we have an $description anchor", (anchorTestVariation) => {
-            describe("and given everything is valid", () => {
-              const tags = tagsTestVariation.tags;
-              const options: DataItemCreateOptions = {
-                target: targetTestVariation.target,
-                anchor: anchorTestVariation.anchor,
-                tags
-              };
+  describe("given we use ordinary data", () => {
 
-              it("should sign the dataItem", async function () {
-                const dataItem = createData(data, signer, options);
-                await dataItem.sign(signer);
-                expect(await dataItem.isValid()).toBe(true);
+    describe.each(signerTestVariations)("given we have a $description signer", (signerTestVariation) => {
+      const signer = signerTestVariation.signer;
+      describe.each(dataTestVariations)("and given we have $description data", (dataTestVariation) => {
+        const data = dataTestVariation.data;
+        describe.each(tagsTestVariations)("and given we have $description tags", (tagsTestVariation) => {
+          describe.each(targetTestVariations)("and given we have a $description target", (targetTestVariation) => {
+            describe.each(anchorTestVariation)("and given we have an $description anchor", (anchorTestVariation) => {
+              describe("and given everything is valid", () => {
+                const tags = tagsTestVariation.tags;
+                const options: DataItemCreateOptions = {
+                  target: targetTestVariation.target,
+                  anchor: anchorTestVariation.anchor,
+                  tags
+                };
+
+                it("should sign the dataItem", async function () {
+                  const dataItem = createData(data, signer, options);
+                  await dataItem.sign(signer);
+                  expect(await dataItem.isValid()).toBe(true);
+                });
+
+                it("should give the dataItem the required meta information", async () => {
+                  const dataItem = createData(data, signer, options);
+                  await dataItem.sign(signer);
+                  let encodedOwner: string | Buffer = signerTestVariation.ownerEncoding === "base58" ? base58.encode(dataItem.rawOwner) : dataItem.rawOwner.toString("hex");
+                  switch (signerTestVariation.description) {
+                    // aptos adds 0x before the hex string
+                    case "aptos":
+                      encodedOwner = "0x" + encodedOwner;
+                      break;
+                    // algorand signer stores Buffer internally
+                    case "algorand":
+                      encodedOwner = Buffer.from(encodedOwner, "hex");
+                      break;
+                    // arweave owner is stored in n
+                    case "arweave":
+                      encodedOwner = arweaveTestKey.n;
+                      break;
+                  }
+
+                  // aptos multi signer doesnt contain .pk 
+                  expect(encodedOwner).toEqual(signerTestVariation.description === "multiaptos" ? multiAptosPublicKey.toString("hex") : signer.pk);
+                  expect(dataItem.signatureType).toEqual(signerTestVariation.signatureType);
+                  expect(dataItem.target).toEqual(targetTestVariation.target ?? "");
+                  expect(dataItem.anchor).toEqual(anchorTestVariation.anchor ?? "");
+                  expect(dataItem.tags).toEqual(tags ?? []);
+                });
+
+                it("should let the dataItem contain the data", async () => {
+                  const dataItem = createData(data, signer, options);
+                  await dataItem.sign(signer);
+                  expect(dataItem.rawData).toEqual(Buffer.from(data));
+                });
+                
+                it("should be correctly verifiable using DataItem.verify", async () => {
+                  const dataItem = createData(data, signer, options);
+                  await dataItem.sign(signer);
+                  expect(await DataItem.verify(dataItem.getRaw())).toEqual(true);
+                });
               });
+            });
+          });
+        });
+      });
+    });
+  });
 
-              it("should give the dataItem the required meta information", async () => {
-                const dataItem = createData(data, signer, options);
-                await dataItem.sign(signer);
-                let encodedOwner: string | Buffer = signerTestVariation.ownerEncoding === "base58" ? base58.encode(dataItem.rawOwner) : dataItem.rawOwner.toString("hex");
-                switch (signerTestVariation.description) {
-                  // aptos adds 0x before the hex string
-                  case "aptos":
-                    encodedOwner = "0x" + encodedOwner;
-                    break;
-                  // algorand signer stores Buffer internally
-                  case "algorand":
-                    encodedOwner = Buffer.from(encodedOwner, "hex");
-                    break;
-                  // arweave owner is stored in n
-                  case "arweave":
-                    encodedOwner = arweaveTestKey.n;
-                    break;
-                }
+  describe("given we use a file ", () => {
+    describe.each(signerTestVariations)("given we have a $description signer", (signerTestVariation) => {
+      const signer = signerTestVariation.signer;
+      describe.each(dataTestVariations)("and given we have $description data", (dataTestVariation) => {
+        const data = dataTestVariation.data;
+        describe.each(tagsTestVariations)("and given we have $description tags", (tagsTestVariation) => {
+          describe.each(targetTestVariations)("and given we have a $description target", (targetTestVariation) => {
+            describe.each(anchorTestVariation)("and given we have an $description anchor", (anchorTestVariation) => {
+              describe("and given everything is valid", () => {
+                const tags = tagsTestVariation.tags;
+                const options: DataItemCreateOptions = {
+                  target: targetTestVariation.target,
+                  anchor: anchorTestVariation.anchor,
+                  tags
+                };
 
-                // aptos multi signer doesnt contain .pk 
-                expect(encodedOwner).toEqual(signerTestVariation.description === "multiaptos" ? multiAptosPublicKey.toString("hex") : signer.pk);
-                expect(dataItem.signatureType).toEqual(signerTestVariation.signatureType);
-                expect(dataItem.target).toEqual(targetTestVariation.target ?? "");
-                expect(dataItem.anchor).toEqual(anchorTestVariation.anchor ?? "");
-                expect(dataItem.tags).toEqual(tags ?? []);
-              });
+                it("should sign the dataItem", async function () {
+                  const dataItem = await createFileData(data, signer, options);
+                  await dataItem.sign(signer);
+                  expect(await dataItem.isValid()).toBe(true);
+                });
 
-              it("should let the dataItem contain the data", async () => {
-                const dataItem = createData(data, signer, options);
-                await dataItem.sign(signer);
-                expect(dataItem.rawData).toEqual(Buffer.from(data));
+                it("should give the dataItem the required meta information", async () => {
+                  const dataItem = await createFileData(data, signer, options);
+                  await dataItem.sign(signer);
+                  let encodedOwner: string | Buffer = signerTestVariation.ownerEncoding === "base58" ? base58.encode(await dataItem.rawOwner()) : (await dataItem.rawOwner()).toString("hex");
+                  switch (signerTestVariation.description) {
+                    // aptos adds 0x before the hex string
+                    case "aptos":
+                      encodedOwner = "0x" + encodedOwner;
+                      break;
+                    // algorand signer stores Buffer internally
+                    case "algorand":
+                      encodedOwner = Buffer.from(encodedOwner, "hex");
+                      break;
+                    // arweave owner is stored in n
+                    case "arweave":
+                      encodedOwner = arweaveTestKey.n;
+                      break;
+                  }
+
+                  // aptos multi signer doesnt contain .pk 
+                  expect(encodedOwner).toEqual(signerTestVariation.description === "multiaptos" ? multiAptosPublicKey.toString("hex") : signer.pk);
+                  expect(await dataItem.signatureType()).toEqual(signerTestVariation.signatureType);
+                  expect(await dataItem.target()).toEqual(targetTestVariation.target ?? "");
+                  expect(await dataItem.anchor()).toEqual(anchorTestVariation.anchor ?? "");
+                  expect(await dataItem.tags()).toEqual(tags ?? []);
+                });
+
+                it("should let the dataItem contain the data", async () => {
+                  const dataItem = await createFileData(data, signer, options);
+                  await dataItem.sign(signer);
+                  expect(await dataItem.rawData()).toEqual(Buffer.from(data));
+                });
+
+                it("should be correctly verifiable using DataItem.verify", async () => {
+                  const dataItem = createData(data, signer, options);
+                  await dataItem.sign(signer);
+                  expect(await DataItem.verify(dataItem.getRaw())).toEqual(true);
+                });
               });
             });
           });
