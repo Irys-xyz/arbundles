@@ -73,20 +73,51 @@ const lTagsEnc = Buffer.from([
 ]);
 
 describe("Tag tests", function () {
-  it("should encode the sample tags correctly", function () {
-    const parserEncodeS = serializeTags(sTags);
-    expect(parserEncodeS).toEqual(sTagsEnc);
-    const parserEncodeL = serializeTags(lTags);
-    expect(parserEncodeL).toEqual(lTagsEnc);
-  });
-  it("should decode the sample tags correctly", function () {
-    expect(deserializeTags(sTagsEnc)).toEqual(sTags);
-    expect(deserializeTags(lTagsEnc)).toEqual(lTags);
-  });
-  it("should correctly encode/decode random tags", function () {
-    const randomTags = generateRandomTags();
-    let serializedTags = serializeTags(randomTags);
-    expect(serializedTags).toEqual(Buffer.from(serializeTagsAVSC(randomTags)));
-    expect(deserializeTags(serializedTags)).toEqual(randomTags);
+  describe("given we have tags", () => {
+    it("should encode the sample tags correctly", function () {
+      const parserEncodeS = serializeTags(sTags);
+      expect(parserEncodeS).toEqual(sTagsEnc);
+      const parserEncodeL = serializeTags(lTags);
+      expect(parserEncodeL).toEqual(lTagsEnc);
+    });
+    it("should decode the sample tags correctly", function () {
+      expect(deserializeTags(sTagsEnc)).toEqual(sTags);
+      expect(deserializeTags(lTagsEnc)).toEqual(lTags);
+    });
+    it("should correctly encode/decode random tags", function () {
+      const randomTags = generateRandomTags();
+      let serializedTags = serializeTags(randomTags);
+      expect(serializedTags).toEqual(Buffer.from(serializeTagsAVSC(randomTags)));
+      expect(deserializeTags(serializedTags)).toEqual(randomTags);
+    });
+    describe("given the tags are invalid", () => {
+      it("should throw an error if the tags are not in the correct format", function () {
+        // @ts-expect-error
+        expect(() => serializeTags([{ name: "ThisIsAShortName" }])).toThrow(
+          "Incorrect tag format used. Make sure your tags are { name: string, value: string }[]",
+        );
+        // @ts-expect-error
+        expect(() => serializeTags([{ value: "ThisIsAShortValue" }])).toThrow(
+          "Incorrect tag format used. Make sure your tags are { name: string, value: string }[]",
+        );
+        // @ts-expect-error
+        expect(() => serializeTags([{ name: "ThisIsAShortName", value: 1 }])).toThrow(
+          "Incorrect tag format used. Make sure your tags are { name: string, value: string }[]",
+        );
+      });
+    });
+    describe("given we don't have tags", () => {
+      it("should encode an empty array as an empty array", function () {
+        expect(serializeTags([])).toEqual(Buffer.from(""));
+      });
+    });
+    describe("given we have many many tags", () => {
+      it("should encode/decode many tags", function () {
+        const randomTags = generateRandomTags(1024);
+        const serializedTags = serializeTags(randomTags);
+        expect(serializedTags).toEqual(Buffer.from(serializeTagsAVSC(randomTags)));
+        expect(deserializeTags(serializedTags)).toEqual(randomTags);
+      });
+    });
   });
 });

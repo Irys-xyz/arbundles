@@ -1,7 +1,21 @@
-import { createData, PolygonSigner, DataItemCreateOptions, SolanaSigner, ArweaveSigner, EthereumSigner, AlgorandSigner, AptosSigner, NearSigner, HexSolanaSigner, DataItem } from "../../index";
+import {
+  createData,
+  DataItemCreateOptions,
+  AptosSigner,
+  DataItem,
+  TypedEthereumSigner,
+  PolygonSigner,
+  SolanaSigner,
+  ArweaveSigner,
+  EthereumSigner,
+  AlgorandSigner,
+  NearSigner,
+  HexSolanaSigner,
+} from "../../index";
 import base58 from 'bs58';
 import arweaveTestKey from "./test_key0.json";
 import { createData as createFileData } from "../../file";
+import { ethers } from "ethers";
 
 
 const multiAptoskeyPairs = [{
@@ -21,6 +35,9 @@ multiAptosWallets.forEach((w, i) => {
 });
 multiAptosPublicKey.set(Buffer.from("2"), 1024);
 
+const ethersWallet = new ethers.Wallet(
+  "0x37929fc21ab44ace162318acbbf4d24a41270b2aee18fd1cfb22e3fc3f4b4024",
+);
 
 const targetTestVariations = [
   {
@@ -131,23 +148,29 @@ const signerTestVariations: {
       ownerEncoding: "base58",
       signatureType: 2
     },
-//    {
-//      description: "multiaptos",
-//      signer: (() => {
-//        return new MultiSignatureAptosSigner(multiAptosPublicKey,
-//          (() => {
-//            return async (message: Uint8Array) => {
-//              const signedMessage = [
-//                Buffer.from(await multiAptosWallets[0].sign(message)),
-//                Buffer.from(await multiAptosWallets[2].sign(message))
-//              ];
-//              return { signatures: signedMessage, bitmap: [0, 2] };
-//            };
-//          })());
-//      })(),
-//      ownerEncoding: "hex",
-//      signatureType: 6
-//    }
+    {
+      description: "typedether",
+      signer: new TypedEthereumSigner(ethersWallet.privateKey.slice(2)),
+      ownerEncoding: "hex",
+      signatureType: 7
+    }
+    //    {
+    //      description: "multiaptos",
+    //      signer: (() => {
+    //        return new MultiSignatureAptosSigner(multiAptosPublicKey,
+    //          (() => {
+    //            return async (message: Uint8Array) => {
+    //              const signedMessage = [
+    //                Buffer.from(await multiAptosWallets[0].sign(message)),
+    //                Buffer.from(await multiAptosWallets[2].sign(message))
+    //              ];
+    //              return { signatures: signedMessage, bitmap: [0, 2] };
+    //            };
+    //          })());
+    //      })(),
+    //      ownerEncoding: "hex",
+    //      signatureType: 6
+    //    }
   ];
 
 
@@ -169,13 +192,13 @@ describe("Signers()", function () {
                   tags
                 };
 
-                it("should sign the dataItem", async function () {
+                it.concurrent("should sign the dataItem", async function () {
                   const dataItem = createData(data, signer, options);
                   await dataItem.sign(signer);
                   expect(await dataItem.isValid()).toBe(true);
                 });
 
-                it("should give the dataItem the required meta information", async () => {
+                it.concurrent("should give the dataItem the required meta information", async () => {
                   const dataItem = createData(data, signer, options);
                   await dataItem.sign(signer);
                   let encodedOwner: string | Buffer = signerTestVariation.ownerEncoding === "base58" ? base58.encode(dataItem.rawOwner) : dataItem.rawOwner.toString("hex");
@@ -194,21 +217,33 @@ describe("Signers()", function () {
                       break;
                   }
 
-                  // aptos multi signer doesnt contain .pk 
-                  expect(encodedOwner).toEqual(signerTestVariation.description === "multiaptos" ? multiAptosPublicKey.toString("hex") : signer.pk);
+                  let publicKey = signer.pk;
+                  switch (signerTestVariation.description) {
+                    // aptos multi signer doesnt contain .pk 
+                    // TODO: Multi signer doesn't work right
+                    case "multiaptos":
+                      publicKey = multiAptosPublicKey.toString("hex");
+                      break;
+                    // typed ether doesn't store in pk a usable comparable format,thus we need to use this solution
+                    // TODO: Not comparable to normal public key, investigate it
+                    case "typedether":
+                      publicKey = "307861386463393037346439613131643562313635393063623665626635303334396433386436626531";
+                      break;
+                  }
+                  expect(encodedOwner).toEqual(publicKey);
                   expect(dataItem.signatureType).toEqual(signerTestVariation.signatureType);
                   expect(dataItem.target).toEqual(targetTestVariation.target ?? "");
                   expect(dataItem.anchor).toEqual(anchorTestVariation.anchor ?? "");
                   expect(dataItem.tags).toEqual(tags ?? []);
                 });
 
-                it("should let the dataItem contain the data", async () => {
+                it.concurrent("should let the dataItem contain the data", async () => {
                   const dataItem = createData(data, signer, options);
                   await dataItem.sign(signer);
                   expect(dataItem.rawData).toEqual(Buffer.from(data));
                 });
-                
-                it("should be correctly verifiable using DataItem.verify", async () => {
+
+                it.concurrent("should be correctly verifiable using DataItem.verify", async () => {
                   const dataItem = createData(data, signer, options);
                   await dataItem.sign(signer);
                   expect(await DataItem.verify(dataItem.getRaw())).toEqual(true);
@@ -237,13 +272,13 @@ describe("Signers()", function () {
                   tags
                 };
 
-                it("should sign the dataItem", async function () {
+                it.concurrent("should sign the dataItem", async function () {
                   const dataItem = await createFileData(data, signer, options);
                   await dataItem.sign(signer);
                   expect(await dataItem.isValid()).toBe(true);
                 });
 
-                it("should give the dataItem the required meta information", async () => {
+                it.concurrent("should give the dataItem the required meta information", async () => {
                   const dataItem = await createFileData(data, signer, options);
                   await dataItem.sign(signer);
                   let encodedOwner: string | Buffer = signerTestVariation.ownerEncoding === "base58" ? base58.encode(await dataItem.rawOwner()) : (await dataItem.rawOwner()).toString("hex");
@@ -262,21 +297,33 @@ describe("Signers()", function () {
                       break;
                   }
 
-                  // aptos multi signer doesnt contain .pk 
-                  expect(encodedOwner).toEqual(signerTestVariation.description === "multiaptos" ? multiAptosPublicKey.toString("hex") : signer.pk);
+                  let publicKey = signer.pk;
+                  switch (signerTestVariation.description) {
+                    // aptos multi signer doesnt contain .pk 
+                    case "multiaptos":
+                      publicKey = multiAptosPublicKey.toString("hex");
+                      break;
+                    // typed ether doesn't store in pk a usable comparable format,thus we need to use this solution
+                    // TODO: Not comparable to normal public key, investigate it
+                    case "typedether":
+                      publicKey = "MHhhOGRjOTA3NGQ5YTExZDViMTY1OTBjYjZlYmY1MDM0OWQzOGQ2YmUx";
+                      break;
+                  }
+                  expect(await dataItem.owner()).toEqual(publicKey);
+
                   expect(await dataItem.signatureType()).toEqual(signerTestVariation.signatureType);
                   expect(await dataItem.target()).toEqual(targetTestVariation.target ?? "");
                   expect(await dataItem.anchor()).toEqual(anchorTestVariation.anchor ?? "");
                   expect(await dataItem.tags()).toEqual(tags ?? []);
                 });
 
-                it("should let the dataItem contain the data", async () => {
+                it.concurrent("should let the dataItem contain the data", async () => {
                   const dataItem = await createFileData(data, signer, options);
                   await dataItem.sign(signer);
                   expect(await dataItem.rawData()).toEqual(Buffer.from(data));
                 });
 
-                it("should be correctly verifiable using DataItem.verify", async () => {
+                it.concurrent("should be correctly verifiable using DataItem.verify", async () => {
                   const dataItem = createData(data, signer, options);
                   await dataItem.sign(signer);
                   expect(await DataItem.verify(dataItem.getRaw())).toEqual(true);

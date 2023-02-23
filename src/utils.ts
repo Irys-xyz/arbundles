@@ -91,3 +91,12 @@ export function byteArrayToLong(byteArray: Uint8Array): number {
 const isExtension = typeof browser !== "undefined" || typeof chrome !== "undefined";
 
 export const isBrowser = (typeof window !== "undefined" && typeof window.document !== "undefined") || isExtension;
+
+
+export const exportForTesting = {
+  longTo8ByteArray,
+  longTo16ByteArray,
+  longTo32ByteArray,
+  byteArrayToLong,
+  shortTo2ByteArray,
+};

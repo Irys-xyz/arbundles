@@ -162,7 +162,7 @@ describe("Signers()", function () {
                   tags
                 };
 
-                it("should give the dataItem the required information", async () => {
+                it.concurrent("should give the dataItem the required information", async () => {
                   const dataItem = createData(data, signer, options);
                   const bundle = await bundleAndSignData([dataItem], signer);
 
