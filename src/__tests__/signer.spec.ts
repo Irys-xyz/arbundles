@@ -310,7 +310,6 @@ describe("Signers()", function () {
                       break;
                   }
                   expect(await dataItem.owner()).toEqual(publicKey);
-
                   expect(await dataItem.signatureType()).toEqual(signerTestVariation.signatureType);
                   expect(await dataItem.target()).toEqual(targetTestVariation.target ?? "");
                   expect(await dataItem.anchor()).toEqual(anchorTestVariation.anchor ?? "");

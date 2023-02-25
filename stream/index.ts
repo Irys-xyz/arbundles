@@ -234,3 +234,9 @@ async function* getReader(s: Readable): AsyncGenerator<Buffer> {
     yield chunk;
   }
 }
+
+
+export const streamExportForTesting = {
+  readBytes,
+  getReader
+}

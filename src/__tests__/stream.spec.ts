@@ -1,9 +1,9 @@
 import { bundleAndSignData } from "../../index";
-import processStream from "../../stream";
+import processStream, { streamSigner, streamExportForTesting } from "../../stream";
 import { Readable } from "stream";
 import { createData, PolygonSigner, DataItemCreateOptions, SolanaSigner, ArweaveSigner, EthereumSigner, AlgorandSigner, AptosSigner, NearSigner, HexSolanaSigner } from "../../index";
 import arweaveTestKey from "./test_key0.json";
-
+import fs from "fs";
 
 
 const multiAptoskeyPairs = [{
@@ -122,7 +122,7 @@ const signerTestVariations: {
       description: "nearsigner",
       signer: new NearSigner("ed25519:rUC3u5oz8W1Y2b8b2tq1K5AUWnXMiVV5o9Fx29yTJepFqFPfYPdwjainQhUvxfNuuhMJAGoawA3qYWzo8QhC5pj"),
       ownerEncoding: "base58",
-      signerType : "ed25519"
+      signerType: "ed25519"
     },
     //    {
     //      description: "multiaptos",
@@ -185,3 +185,51 @@ describe("Signers()", function () {
 
 });
 
+
+
+describe("streamSigner", () => {
+  describe("given we have a stream", () => {
+    it("should return a signer", async () => {
+      fs.writeFileSync("test.txt", Buffer.from("102030405060708090a", "hex"));
+      const signer = signerTestVariations[0].signer;
+      const signedStream =  await streamSigner(fs.createReadStream("test.txt"), fs.createReadStream("test.txt"),signer);
+      expect(signedStream).toBeDefined();
+    });
+  });
+  afterAll(() => {
+    if (fs.existsSync("test.txt")) {
+      fs.unlinkSync("test.txt");
+    }
+  });
+});
+
+
+
+describe("getReader", () => {
+  describe("given we have a stream", () => {
+    it("should return a reader", () => {
+      const reader = streamExportForTesting.getReader(new Readable());
+      expect(reader).toBeDefined();
+    });
+  });
+});
+
+describe("readBytes", () => {
+  describe("given we have a reader, a buffer and a length", () => {
+    it("should read the bytes", async () => {
+      fs.writeFileSync("test.txt", Buffer.from("102030405060708090a", "hex"));
+      const reader = streamExportForTesting.getReader(fs.createReadStream("test.txt"));
+      const buffer = new Uint8Array(10);
+      const length = 10;
+      const result = await streamExportForTesting.readBytes(reader, buffer, length);
+      console.log(Buffer.from(result).toString("hex"));
+      expect(Buffer.from(result).toString("hex")).toEqual("102030405060708090a");
+    });
+
+    afterAll(() => {
+      if (fs.existsSync("test.txt")) {
+        fs.unlinkSync("test.txt");
+      }
+    });
+  });
+});

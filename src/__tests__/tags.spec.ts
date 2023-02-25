@@ -1,4 +1,4 @@
-import { deserializeTags, serializeTags } from "../tags";
+import { deserializeTags, serializeTags, tagsExportForTesting } from "../tags";
 
 import { Type } from "avsc";
 import { randomBytes, randomInt } from "crypto";
@@ -120,4 +120,16 @@ describe("Tag tests", function () {
       });
     });
   });
+
+
+  describe("encodeLong", () => {
+    describe("given we have a long", () => {
+      it("should encode a long AVSC", () => {
+        const long = 123456789;
+        const encoded = tagsExportForTesting.encodeLong(long);
+        expect(encoded).toEqual(Buffer.from([170, 180, 222, 117]));
+      });
+    });
+  });
 });
+

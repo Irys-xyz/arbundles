@@ -93,7 +93,7 @@ const isExtension = typeof browser !== "undefined" || typeof chrome !== "undefin
 export const isBrowser = (typeof window !== "undefined" && typeof window.document !== "undefined") || isExtension;
 
 
-export const exportForTesting = {
+export const utilsExportForTesting = {
   longTo8ByteArray,
   longTo16ByteArray,
   longTo32ByteArray,

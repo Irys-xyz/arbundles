@@ -24,7 +24,7 @@ function encodeLong(n: number): Buffer {
   return buf;
 }
 
-export function serializeTags(tags: { name: string; value: string }[]): Buffer {
+export function serializeTags(tags: { name: string; value: string; }[]): Buffer {
   let byt = Buffer.from("");
   if (!tags) return byt;
   // number of tags
@@ -50,7 +50,7 @@ export function serializeTags(tags: { name: string; value: string }[]): Buffer {
 
 export function deserializeTags(
   bTags: Buffer,
-): { name: string; value: string }[] {
+): { name: string; value: string; }[] {
   if (bTags.length === 0) return [];
   const tags = [];
   let offset = 0;
@@ -97,3 +97,8 @@ export function deserializeTags(
   }
   return tags;
 }
+
+
+export const tagsExportForTesting = {
+  encodeLong
+};

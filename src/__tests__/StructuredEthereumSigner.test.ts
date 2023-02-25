@@ -1,11 +1,12 @@
 import { ethers } from "ethers";
 import { createData, TypedEthereumSigner } from "../../index";
 import Crypto from "crypto";
+import { createData as createFileData } from "../../file";
+
 const wallet = new ethers.Wallet(
   "0x37929fc21ab44ace162318acbbf4d24a41270b2aee18fd1cfb22e3fc3f4b4024",
 );
 const randWallet = ethers.Wallet.createRandom({});
-
 
 const tagsTestVariations = [
   { description: "no tags", tags: undefined },
@@ -22,8 +23,6 @@ const dataTestVariations = [
   { description: "small buffer", data: Buffer.from("hello world") },
   { description: "large buffer", data: Buffer.from("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{};':\",./<>?`~") },
 ];
-
-
 
 describe("Typed ethereum signer", function () {
   describe("given we have a signer", () => {
@@ -103,6 +102,32 @@ describe("Typed ethereum signer", function () {
           const item = createData(data, signer, { tags });
           await item.sign(signer);
           expect(item.rawData).toEqual(Buffer.from(data));
+        });
+
+      });
+    });
+  });
+
+  describe("and given we want to create a file data item", () => {
+    describe.each(tagsTestVariations)("with $description tags", ({ tags }) => {
+      describe.each(dataTestVariations)("and with $description data", ({ data }) => {
+        it("should create a valid dataItem", async () => {
+          const signer = new TypedEthereumSigner(wallet.privateKey.slice(2));
+          const item = await createFileData(data, signer, { tags });
+          await item.sign(signer);
+          expect(await item.isValid()).toBe(true);
+        });
+        it("should set the correct tags", async () => {
+          const signer = new TypedEthereumSigner(wallet.privateKey.slice(2));
+          const item = await createFileData(data, signer, { tags });
+          await item.sign(signer);
+          expect(await item.tags()).toEqual(tags ?? []);
+        });
+        it("should set the correct data", async () => {
+          const signer = new TypedEthereumSigner(wallet.privateKey.slice(2));
+          const item = await createFileData(data, signer, { tags });
+          await item.sign(signer);
+          expect(await item.rawData()).toEqual(Buffer.from(data));
         });
       });
     });
