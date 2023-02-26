@@ -4,6 +4,7 @@ import { serializeTags } from "../../src/tags";
 import { byteArrayToLong } from "../../src/utils";
 import { promisify } from "util";
 import FileDataItem from "file/FileDataItem";
+import { createData } from "file/createData";
 
 const testTagsVariations = [
   { description: "no", tags: [] },
@@ -19,7 +20,7 @@ const testAnchorVariations = [
 
 const testTargetVariations: { description: string, target: undefined | string; }[] = [
   { description: "no", target: undefined },
-  // { description: "a valid", target: "thisSentenceIsDefinitely32Bytes!" },
+  { description: "a valid", target: "thisSentenceIsDefinitely32Bytes!" },
 ];
 
 const testDataVariations = [
