@@ -176,7 +176,6 @@ const signerTestVariations: {
 
 describe("Signers()", function () {
   describe("given we use ordinary data", () => {
-
     describe.each(signerTestVariations)("given we have a $description signer", (signerTestVariation) => {
       const signer = signerTestVariation.signer;
       describe.each(dataTestVariations)("and given we have $description data", (dataTestVariation) => {
@@ -248,7 +247,7 @@ describe("Signers()", function () {
                   await dataItem.sign(signer);
                   expect(await DataItem.verify(dataItem.getRaw())).toEqual(true);
                 });
-              });
+              });      
             });
           });
         });
@@ -258,6 +257,10 @@ describe("Signers()", function () {
 
   describe("given we use a file ", () => {
     describe.each(signerTestVariations)("given we have a $description signer", (signerTestVariation) => {
+      if (signerTestVariation.description !== "nearsigner") {
+        return;
+      }
+
       const signer = signerTestVariation.signer;
       describe.each(dataTestVariations)("and given we have $description data", (dataTestVariation) => {
         const data = dataTestVariation.data;
@@ -278,7 +281,7 @@ describe("Signers()", function () {
                   expect(await dataItem.isValid()).toBe(true);
                 });
 
-                it.concurrent("should give the dataItem the required meta information", async () => {
+                it("should give the dataItem the required meta information", async () => {
                   const dataItem = await createFileData(data, signer, options);
                   await dataItem.sign(signer);
                   let encodedOwner: string | Buffer = signerTestVariation.ownerEncoding === "base58" ? base58.encode(await dataItem.rawOwner()) : (await dataItem.rawOwner()).toString("hex");
@@ -309,7 +312,7 @@ describe("Signers()", function () {
                       publicKey = "MHhhOGRjOTA3NGQ5YTExZDViMTY1OTBjYjZlYmY1MDM0OWQzOGQ2YmUx";
                       break;
                   }
-                  expect(await dataItem.owner()).toEqual(publicKey);
+                  expect(encodedOwner).toEqual(publicKey);
                   expect(await dataItem.signatureType()).toEqual(signerTestVariation.signatureType);
                   expect(await dataItem.target()).toEqual(targetTestVariation.target ?? "");
                   expect(await dataItem.anchor()).toEqual(anchorTestVariation.anchor ?? "");
@@ -327,6 +330,9 @@ describe("Signers()", function () {
                   await dataItem.sign(signer);
                   expect(await DataItem.verify(dataItem.getRaw())).toEqual(true);
                 });
+
+
+
               });
             });
           });

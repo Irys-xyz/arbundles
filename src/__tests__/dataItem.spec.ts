@@ -96,7 +96,7 @@ describe("DataItem", () => {
                         });
                         describe("given we use getRaw()", () => {
                             it("should return the raw data", async () => {
-                                expect(dataItem).toBeDefined();
+                                expect(dataItem.getRaw()).toBeDefined();
                             });
                         });
                         describe("given we use getSignatureData()", () => {
