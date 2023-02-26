@@ -112,10 +112,11 @@ export class FileBundle implements BundleInterface {
 
     const stream = MultiStream.obj(streams);
 
-    const tx = await pipeline(
+    const tx  = await pipeline(
       stream,
-      createTransactionAsync(attributes, arweave, jwk),
-    );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      createTransactionAsync(attributes, arweave, jwk) as any
+    ) as Transaction;
     tx.addTag("Bundle-Format", "binary");
     tx.addTag("Bundle-Version", "2.0.0");
 
@@ -143,7 +144,8 @@ export class FileBundle implements BundleInterface {
 
     const stream2 = MultiStream.obj(streams2);
 
-    await pipeline(stream2, uploadTransactionAsync(tx, arweave, true));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await pipeline(stream2, uploadTransactionAsync(tx, arweave, true) as any);
 
     return tx;
   }
