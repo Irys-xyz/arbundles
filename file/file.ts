@@ -331,3 +331,9 @@ export async function signedFileStream(
     opts,
   );
 }
+
+
+export const fileExportForTesting = {
+  fileToFd,
+  read
+}
