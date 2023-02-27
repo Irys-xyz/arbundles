@@ -1,5 +1,5 @@
 import keccak256, { exportForTesting } from "../keccak256";
-
+import BN from "bn.js";
 
 describe("intTohex", function () {
     describe("given we have a number", () => {
@@ -132,6 +132,18 @@ describe("isHexString", () => {
                 expect(isHex).toEqual(false);
             });
         });
+        describe("and we give a length and the length is not 2+2*length of string", () => {
+            it("should return false", () => {
+                const isHex = exportForTesting.isHexString("0x123", 1000);
+                expect(isHex).toEqual(false);
+            });
+        });
+        describe("and we give a length and the length is 2+2*length of string", () => {
+            it("should return true", () => {
+                const isHex = exportForTesting.isHexString("0x1234", 2);
+                expect(isHex).toEqual(true);
+            });
+        });
     });
 });
 
@@ -161,6 +173,47 @@ describe("toBuffer", () => {
         it("should return the buffer", () => {
             const buf = exportForTesting.toBuffer(Buffer.from("123", "hex"));
             expect(buf).toEqual(Buffer.from("123", "hex"));
+        });
+    });
+    describe("given we have an array", () => {
+        it("should convert the array to a buffer", () => {
+            const buf = exportForTesting.toBuffer([1, 2, 3]);
+            expect(buf.toString("hex")).toEqual("010203");
+        });
+    });
+    describe("given we have null or undefined", () => {
+        it("should return a buffer of size 0", () => {
+            const buf = exportForTesting.toBuffer(null);
+            expect(buf.length).toEqual(0);
+            expect(buf).toBeInstanceOf(Buffer);
+
+            const buf2 = exportForTesting.toBuffer(undefined);
+            expect(buf2.length).toEqual(0);
+            expect(buf2).toBeInstanceOf(Buffer);
+        });
+    });
+    describe("and given we have BN", () => {
+        it("should convert the BN to a buffer", () => {
+            const buf = exportForTesting.toBuffer(new BN(123));
+            expect(buf.toString("hex")).toEqual("7b");
+        });
+    });
+
+    describe("and given we have a type with a toArray method", () => {
+        it("should convert the type to a buffer", () => {
+            const ownType = {
+                toArray: (): number[] => {
+                    return [1, 2, 3];
+                },
+            };
+            const buf = exportForTesting.toBuffer(ownType);
+            expect(buf.toString("hex")).toEqual("010203");
+        });
+    });
+
+    describe("and given we have a invalid type", () => {
+        it("should throw", () => {
+            expect(() => exportForTesting.toBuffer({})).toThrowError("invalid type");
         });
     });
 });
