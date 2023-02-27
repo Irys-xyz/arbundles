@@ -1,10 +1,11 @@
 import * as fs from "fs";
 import { EthereumSigner } from "../../src/signing";
 import { serializeTags } from "../../src/tags";
-import { byteArrayToLong } from "../../src/utils";
+import { byteArrayToLong, longTo8ByteArray } from "../../src/utils";
 import { promisify } from "util";
 import FileDataItem from "file/FileDataItem";
 import { createData } from "file/createData";
+import base64url from "base64url";
 
 const testTagsVariations = [
   { description: "no", tags: [] },
@@ -115,6 +116,12 @@ describe("DataItem", () => {
               });
             });
 
+            describe("given we call data()", () => {
+              it("should return the data as base64url", async () => {
+                expect(await dataItem.data()).toEqual(base64url.encode(Buffer.from(data)))
+              });
+            });
+
             describe("given we use getStartOfData()", () => {
               it("should return the start of data", async () => {
                 const tagsStart = await dataItem.getTagsStart();
@@ -167,8 +174,25 @@ describe("DataItem", () => {
             });
 
             describe("given we access rawTags", () => {
-              it("should return the raw tags", async () => {
-                expect(await dataItem.rawTags()).toEqual(serializeTags(tags ?? []));
+              describe("and the format is valid", () => {
+                it("should return the raw tags", async () => {
+                  expect(await dataItem.rawTags()).toEqual(serializeTags(tags ?? []));
+                });
+              });
+              
+              describe("and the format is invalid (too many numberOfTagsBytes)", () => {
+                it("should return false", async () => {
+                  await dataItem.sign(signer);
+                  const tagStart = await dataItem.getTagsStart();
+                  const fakeTagLength = longTo8ByteArray(4096 + 1);
+                  const fakeTagCnt = longTo8ByteArray(10);
+
+                  const handle = fs.openSync(dataItem.filename, "r+");
+                  fs.writeSync(handle, fakeTagCnt, 0, 8, tagStart);
+                  fs.writeSync(handle, fakeTagLength, 0, 8, tagStart + 8);
+                  fs.closeSync(handle);
+                  await expect(async () => await dataItem.rawTags()).rejects.toThrowError("Tags too large");
+                }); 
               });
             });
 
@@ -176,6 +200,9 @@ describe("DataItem", () => {
               it("should return the raw id", async () => {
                 await dataItem.sign(signer);
                 expect(dataItem.rawId).toBeDefined();
+              });
+              it("should throw if the id is not set", () => {
+                expect(dataItem.rawId).toThrowError("ID is not set");
               });
             });
 
@@ -207,6 +234,62 @@ describe("DataItem", () => {
               });
             });
           });
+        });
+      });
+    });
+  });
+});
+
+
+describe("static methods", () => {
+  const signer = new EthereumSigner("8da4ef21b864d2cc526dbdb2a120bd2874c36c9d0a1fb7f8c63d7f7a8b41de8f");
+  describe("isDataItem()", () => {
+    describe("given a valid data item", () => {
+      it("should return true", async () => {
+        const dataItem = await createData("loremIpsum", signer);
+        expect(FileDataItem.isDataItem(dataItem)).toEqual(true);
+      });
+    });
+    describe("given an invalid data item", () => {
+      it("should return false for objects", async () => {
+        expect(FileDataItem.isDataItem({})).toEqual(false);
+      });
+      it("should return false for strings", async () => {
+        expect(FileDataItem.isDataItem("")).toEqual(false);
+      });
+      it("should return false for numbers", async () => {
+        expect(FileDataItem.isDataItem(0)).toEqual(false);
+      });
+      it("should return false for objects with partial DataItem properties", () => {
+        expect(FileDataItem.isDataItem({ filename: "test" })).toEqual(false);
+      });
+    });
+  });
+  describe("verify()", () => {
+    describe("given a valid data item", () => {
+      it("should return true", async () => {
+        const dataItem = await createData("loremipsum", signer);
+        await dataItem.sign(signer);
+        expect(await FileDataItem.verify(dataItem.filename)).toEqual(true);
+      });
+      describe("given a invalid data item", () => {
+        it("should return false", async () => {
+          const dataItem = await createData("loremIpsum", signer);
+          await dataItem.sign(signer);
+          fs.writeFileSync(dataItem.filename, "invalid", { flag: "a" });
+          expect(await FileDataItem.verify(dataItem.filename)).toEqual(false);
+        });
+      });
+      describe("given a invalid DataItem due to having too many tags", () => {
+        it("should return false", async () => {
+          const dataItem = await createData("loremIpsum", signer);
+          await dataItem.sign(signer);
+          const tagStart = await dataItem.getTagsStart();
+          const fakeTagLength = longTo8ByteArray(4096 + 1);
+          const handle = fs.openSync(dataItem.filename, "r+");
+          fs.writeSync(handle, fakeTagLength, 0, 8, tagStart + 8);
+          fs.closeSync(handle);
+          expect(await FileDataItem.verify(dataItem.filename)).toEqual(false);
         });
       });
     });
