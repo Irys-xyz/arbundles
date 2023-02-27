@@ -18,6 +18,7 @@ import {
   uploadTransactionAsync,
 } from "arweave-stream-tx";
 import { CreateTransactionInterface } from "arweave/node/common";
+import path from "path";
 // import { Readable } from 'stream';
 // import { createTransactionAsync } from 'arweave-stream';
 // import { pipeline } from 'stream/promises';
@@ -32,16 +33,15 @@ export class FileBundle implements BundleInterface {
     this.txs = txs;
   }
 
-  static async fromDir(dir: string): Promise<FileBundle> {
-    const txs = await fs.promises
-      .readdir(dir)
-      .then((r) =>
-        r.filter(
-          async (f) =>
-            !(await fs.promises.stat(f).then((s) => s.isDirectory())),
-        ),
-      );
-    return new FileBundle(dir + "/header", txs);
+  static async fromDir(dir: string, headerName = "header"): Promise<FileBundle> {
+    const dirContent = await fs.promises.readdir(dir);
+    const txs = dirContent.filter((f) => {
+      const filePath = path.join(dir,f);
+      const isDir = fs.statSync(filePath).isDirectory();
+      const isHeader = filePath.includes(headerName);
+      return !(isDir || isHeader);
+    }).map((f) => path.join(dir, f));
+    return new FileBundle(path.join(dir, headerName), txs);
   }
 
   async length(): Promise<number> {
@@ -112,7 +112,7 @@ export class FileBundle implements BundleInterface {
 
     const stream = MultiStream.obj(streams);
 
-    const tx  = await pipeline(
+    const tx = await pipeline(
       stream,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       createTransactionAsync(attributes, arweave, jwk) as any
@@ -126,7 +126,7 @@ export class FileBundle implements BundleInterface {
   async signAndSubmit(
     arweave: Arweave,
     jwk: JWKInterface,
-    tags: { name: string; value: string }[] = [],
+    tags: { name: string; value: string; }[] = [],
   ): Promise<Transaction> {
     const tx = await this.toTransaction({}, arweave, jwk);
     tx.addTag("Bundle-Format", "binary");
@@ -150,7 +150,7 @@ export class FileBundle implements BundleInterface {
     return tx;
   }
 
-  public async *getHeaders(): AsyncGenerator<{ offset: number; id: string }> {
+  public async *getHeaders(): AsyncGenerator<{ offset: number; id: string; }> {
     const handle = await fs.promises.open(this.headerFile, "r");
     for (let i = 32; i < 32 + 64 * (await this.length()); i += 64) {
       yield {
