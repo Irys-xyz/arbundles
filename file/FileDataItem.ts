@@ -53,7 +53,7 @@ export class FileDataItem implements BundleItem {
   }
 
   static isDataItem(obj: any): boolean {
-    return obj.filename && typeof obj.filename === "string";
+    return obj?.filename ? typeof obj.filename === "string" : false;
   }
 
   static async verify(filename: PathLike): Promise<boolean> {
