@@ -90,6 +90,17 @@ describe("Tag tests", function () {
       expect(serializedTags).toEqual(Buffer.from(serializeTagsAVSC(randomTags)));
       expect(deserializeTags(serializedTags)).toEqual(randomTags);
     });
+
+    // This test is way too slow on my machine, so I'm skipping it for now. 
+    // This test focues on the internal decodeLong arrow function, which has a path for avoiding overflows through using float arithmetic.
+    it.skip("should correctly decode randomTags that are really long, thus requiring float arithmetic, otherwise we might overflow.", function () {
+      const veryManyTags = Array(1073741).fill(sTags[0]);
+      console.log(veryManyTags.length);
+      let serializedTags = serializeTags(veryManyTags);
+      expect(serializedTags).toEqual(Buffer.from(serializeTagsAVSC(veryManyTags)));
+      expect(deserializeTags(serializedTags)).toEqual(veryManyTags);
+    });
+
     describe("given the tags are invalid", () => {
       it("should throw an error if the tags are not in the correct format", function () {
         // @ts-expect-error
@@ -128,6 +139,13 @@ describe("Tag tests", function () {
         const long = 123456789;
         const encoded = tagsExportForTesting.encodeLong(long);
         expect(encoded).toEqual(Buffer.from([170, 180, 222, 117]));
+      });
+    });
+    describe("given we have a longer long, which requires a slower arithmetic", () => {
+      it("should encode a long AVSC", () => {
+        const long = 1073741824;
+        const encoded = tagsExportForTesting.encodeLong(long);
+        expect(encoded).toEqual(Buffer.from([128, 128, 128, 128, 8]));
       });
     });
   });
