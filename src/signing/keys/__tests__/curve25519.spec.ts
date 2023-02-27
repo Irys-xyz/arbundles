@@ -36,8 +36,6 @@ describe("curve25519", () => {
             // TODO: curve doesn't implement properly this method, since pk is just a empty buffer
             it("should return the signature", async () => {
                 const message = "helloWorld";
-                console.log(curve.key.length);
-                console.log(curve.publicKey.length);
 
                 const signature = await curve.sign(Buffer.from(message));
                 expect(signature).toEqual(await ed25519.sign(Buffer.from(message), key));

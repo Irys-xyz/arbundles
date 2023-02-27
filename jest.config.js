@@ -9,7 +9,8 @@ module.exports = {
   //src or file
   testRegex: "((src|file))/.*(test|spec)\\.(ts)x?$",
   coverageDirectory: "coverage",
-  collectCoverageFrom: ["src/**/*.{ts,js}", "!src/**/*.d.ts"],
+  // dont collect covergage from injected
+  collectCoverageFrom: ["((src)|(file))/**/*.{ts,js}", "!src/**/*.d.ts"], // , "!src/**/*[I|i]njected*.ts"], // in case we want only the covery of not injecected stuff
   setupFiles: ["<rootDir>/src/__tests__/setup.jest.js"],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths),
   modulePaths: [
