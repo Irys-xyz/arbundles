@@ -247,7 +247,7 @@ describe("Signers()", function () {
                   await dataItem.sign(signer);
                   expect(await DataItem.verify(dataItem.getRaw())).toEqual(true);
                 });
-              });      
+              });
             });
           });
         });
@@ -330,14 +330,19 @@ describe("Signers()", function () {
                   await dataItem.sign(signer);
                   expect(await DataItem.verify(dataItem.getRaw())).toEqual(true);
                 });
-
-
-
               });
             });
           });
         });
       });
+    });
+  });
+  describe("given the ownerLength.bytelength doesn't match the signer.ownerLength", () => {
+    it.concurrent("should throw an error", async () => {
+      const signer = new EthereumSigner("8da4ef21b864d2cc526dbdb2a120bd2874c36c9d0a1fb7f8c63d7f7a8b41de8f");
+      //@ts-expect-error
+      signer.ownerLength = 10;
+      expect(() => createData(Buffer.from("loremIpsum"), signer)).toThrowError("Owner must be 10 bytes, but was incorrectly 65")
     });
   });
 });
