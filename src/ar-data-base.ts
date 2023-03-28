@@ -1,14 +1,13 @@
 import type DataItem from "./DataItem";
 import deepHash from "$/deepHash";
-import { stringToBuffer } from "arweave/node/lib/utils";
-
+import { stringToBuffer } from "$/arweave/lib/utils";
 /**
  * Options for creation of a DataItem
  */
 export interface DataItemCreateOptions {
   target?: string;
   anchor?: string;
-  tags?: { name: string; value: string; }[];
+  tags?: { name: string; value: string }[];
 }
 
 async function getSignatureData(item: DataItem): Promise<Uint8Array> {

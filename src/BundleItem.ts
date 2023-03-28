@@ -1,5 +1,5 @@
-import { Signer } from "./signing";
-import { Buffer } from "buffer";
+import type { Signer } from "./signing";
+import type { Buffer } from "buffer";
 
 type ResolvesTo<T> = T | Promise<T> | ((...args: any[]) => Promise<T>);
 

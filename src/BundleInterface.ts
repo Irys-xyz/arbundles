@@ -1,8 +1,8 @@
-import { BundleItem } from "./BundleItem";
-import Arweave from "arweave";
-import Transaction from "arweave/node/lib/transaction";
-import { JWKInterface } from "./interface-jwk";
-import { CreateTransactionInterface } from "arweave/node/common";
+import type { BundleItem } from "./BundleItem";
+import type Arweave from "arweave";
+import type Transaction from "$/arweave/lib/transaction";
+import type { JWKInterface } from "./interface-jwk";
+import type { CreateTransactionInterface } from "$/arweave/common";
 
 type ResolvesTo<T> = T | Promise<T> | ((...args: any[]) => Promise<T>);
 
@@ -12,9 +12,5 @@ export interface BundleInterface {
   get(index: number | string): BundleItem | Promise<BundleItem>;
   getIds(): string[] | Promise<string[]>;
   getRaw(): ResolvesTo<Buffer>;
-  toTransaction(
-    attributes: Partial<CreateTransactionInterface>,
-    arweave: Arweave,
-    jwk: JWKInterface,
-  ): Promise<Transaction>;
+  toTransaction(attributes: Partial<CreateTransactionInterface>, arweave: Arweave, jwk: JWKInterface): Promise<Transaction>;
 }

@@ -1,15 +1,11 @@
 import { file } from "tmp-promise";
 import * as fs from "fs";
-import { longTo32ByteArray } from "../src/utils";
-import { Signer } from "../src/signing";
+import { longTo32ByteArray } from "../utils";
+import type { Signer } from "../signing";
 import FileBundle from "./FileBundle";
-import FileDataItem from "./FileDataItem";
+import type FileDataItem from "./FileDataItem";
 
-export async function bundleAndSignData(
-  dataItems: FileDataItem[],
-  signer: Signer,
-  dir?: string,
-): Promise<FileBundle> {
+export async function bundleAndSignData(dataItems: FileDataItem[], signer: Signer, dir?: string): Promise<FileBundle> {
   const headerFile = await file({ dir });
   const headerStream = fs.createWriteStream(headerFile.path);
   const files = new Array(dataItems.length);
@@ -22,9 +18,7 @@ export async function bundleAndSignData(
     }
 
     files[index] = dataItem.filename;
-    headerStream.write(
-      Buffer.concat([longTo32ByteArray(await dataItem.size()), dataItem.rawId]),
-    );
+    headerStream.write(Buffer.concat([longTo32ByteArray(await dataItem.size()), dataItem.rawId]));
   }
 
   await new Promise((resolve) => headerStream.end(resolve));

@@ -5,6 +5,9 @@
         "paths": {
             "$/deepHash": [
                 "node_modules/arweave/web/lib/deepHash"
+            ],
+            "$/arweave/*": [
+                "node_modules/arweave/web/*"
             ]
         }
     }

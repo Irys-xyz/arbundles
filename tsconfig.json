@@ -22,9 +22,10 @@
     "baseUrl": ".",
     "outDir": "./build/node/cjs",
     "paths": {
-      "$/deepHash": ["src/deepHash"]
+      "$/deepHash": ["src/deepHash"],
+      "$/arweave/*": ["node_modules/arweave/node/*"]
     }
   },
-  "include": ["src/**/*", "file/**/*", "stream/**/*", "index.ts", "webIndex.ts"],
+  "include": ["src/**/*","index.ts", "webIndex.ts"],
   "exclude": ["src/__tests__/**"]
 }

@@ -1,14 +1,12 @@
-import { Signer } from "..";
+import type { Signer } from "..";
 import * as ed25519 from "@noble/ed25519";
 // import nacl from 'tweetnacl';
 import { SignatureConfig, SIG_CONFIG } from "../../constants";
 
 export default class InjectedAptosSigner implements Signer {
   private _publicKey: Buffer;
-  readonly ownerLength: number =
-    SIG_CONFIG[SignatureConfig.INJECTEDAPTOS].pubLength;
-  readonly signatureLength: number =
-    SIG_CONFIG[SignatureConfig.INJECTEDAPTOS].sigLength;
+  readonly ownerLength: number = SIG_CONFIG[SignatureConfig.INJECTEDAPTOS].pubLength;
+  readonly signatureLength: number = SIG_CONFIG[SignatureConfig.INJECTEDAPTOS].sigLength;
   readonly signatureType: number = SignatureConfig.INJECTEDAPTOS;
   pem?: string | Buffer;
 
@@ -30,8 +28,7 @@ export default class InjectedAptosSigner implements Signer {
    */
 
   async sign(message: Uint8Array): Promise<Uint8Array> {
-    if (!this.provider.signMessage)
-      throw new Error("Selected Wallet does not support message signing");
+    if (!this.provider.signMessage) throw new Error("Selected Wallet does not support message signing");
     const signature = await this.provider.signMessage({
       message: Buffer.from(message).toString("hex"),
       nonce: "bundlr",
@@ -39,19 +36,11 @@ export default class InjectedAptosSigner implements Signer {
     return Buffer.from(signature.signature, "hex");
   }
 
-  static async verify(
-    pk: Buffer,
-    message: Uint8Array,
-    signature: Uint8Array,
-  ): Promise<boolean> {
+  static async verify(pk: Buffer, message: Uint8Array, signature: Uint8Array): Promise<boolean> {
     const p = pk;
     return ed25519.verify(
       Buffer.from(signature),
-      Buffer.from(
-        `APTOS\nmessage: ${Buffer.from(message).toString(
-          "hex",
-        )}\nnonce: bundlr`,
-      ), // see comment above sign
+      Buffer.from(`APTOS\nmessage: ${Buffer.from(message).toString("hex")}\nnonce: bundlr`), // see comment above sign
       Buffer.from(p),
     );
   }

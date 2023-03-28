@@ -29,7 +29,8 @@ module.exports = {
       process: "process/browser",
       crypto: "crypto-browserify",
       stream: "stream-browserify",
-      "$/deepHash": "arweave/web/lib/deepHash"
+      "$/deepHash": "arweave/web/lib/deepHash",
+      "$/arweave/lib/utils": "arweave/web/lib/utils"
     },
     fallback: {
       crypto: require.resolve("crypto-browserify"),

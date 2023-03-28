@@ -1,4 +1,4 @@
-import { Signer } from "../Signer";
+import type { Signer } from "../Signer";
 import base64url from "base64url";
 import * as ed25519 from "@noble/ed25519";
 import { SIG_CONFIG } from "../../constants";
@@ -22,17 +22,9 @@ export default class Curve25519 implements Signer {
     return ed25519.sign(Buffer.from(message), Buffer.from(this.key));
   }
 
-  static async verify(
-    pk: string | Buffer,
-    message: Uint8Array,
-    signature: Uint8Array,
-  ): Promise<boolean> {
+  static async verify(pk: string | Buffer, message: Uint8Array, signature: Uint8Array): Promise<boolean> {
     let p = pk;
     if (typeof pk === "string") p = base64url.toBuffer(pk);
-    return ed25519.verify(
-      Buffer.from(signature),
-      Buffer.from(message),
-      Buffer.from(p),
-    );
+    return ed25519.verify(Buffer.from(signature), Buffer.from(message), Buffer.from(p));
   }
 }

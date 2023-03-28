@@ -5,10 +5,8 @@ import keccak256 from "../keccak256";
 import EthereumSigner from "./ethereumSigner";
 
 export default class TypedEthereumSigner extends EthereumSigner {
-  readonly ownerLength: number =
-    SIG_CONFIG[SignatureConfig.TYPEDETHEREUM].pubLength;
-  readonly signatureLength: number =
-    SIG_CONFIG[SignatureConfig.TYPEDETHEREUM].sigLength;
+  readonly ownerLength: number = SIG_CONFIG[SignatureConfig.TYPEDETHEREUM].pubLength;
+  readonly signatureLength: number = SIG_CONFIG[SignatureConfig.TYPEDETHEREUM].sigLength;
   readonly signatureType: SignatureConfig = SignatureConfig.TYPEDETHEREUM;
 
   private address: string;
@@ -16,8 +14,7 @@ export default class TypedEthereumSigner extends EthereumSigner {
 
   constructor(key: string) {
     super(key);
-    this.address =
-      "0x" + keccak256(super.publicKey.slice(1)).slice(-20).toString("hex");
+    this.address = "0x" + keccak256(super.publicKey.slice(1)).slice(-20).toString("hex");
     this.signer = new Wallet(key);
   }
 
@@ -39,11 +36,7 @@ export default class TypedEthereumSigner extends EthereumSigner {
     // return sig;
   }
 
-  static async verify(
-    pk: string | Buffer,
-    message: Uint8Array,
-    signature: Uint8Array,
-  ): Promise<boolean> {
+  static async verify(pk: string | Buffer, message: Uint8Array, signature: Uint8Array): Promise<boolean> {
     // get the hash of the primary type
     // const typeHash = keccak256(MESSAGE);
     // const c = new AbiCoder();
@@ -61,12 +54,7 @@ export default class TypedEthereumSigner extends EthereumSigner {
 
     // // errecover to check address
     // const addr = ethers.utils.recoverAddress(Buffer.from(hash.slice(2), "hex"), signature);
-    const addr = verifyTypedData(
-      domain,
-      types,
-      { address, message },
-      signature,
-    );
+    const addr = verifyTypedData(domain, types, { address, message }, signature);
     return address.toLowerCase() === addr.toLowerCase();
   }
 }
