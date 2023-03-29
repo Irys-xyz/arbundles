@@ -1,8 +1,8 @@
 import type { Signer } from "..";
-import * as ed25519 from "@noble/ed25519";
 import base64url from "base64url";
 import { SIG_CONFIG } from "../../constants";
 import type { MessageSignerWalletAdapter } from "@solana/wallet-adapter-base";
+import { verify } from "@noble/ed25519";
 
 export default class InjectedSolanaSigner implements Signer {
   private readonly _publicKey: Buffer;
@@ -29,6 +29,6 @@ export default class InjectedSolanaSigner implements Signer {
   static async verify(pk: Buffer, message: Uint8Array, signature: Uint8Array): Promise<boolean> {
     let p = pk;
     if (typeof pk === "string") p = base64url.toBuffer(pk);
-    return ed25519.verify(Buffer.from(signature), Buffer.from(message), Buffer.from(p));
+    return verify(Buffer.from(signature), Buffer.from(message), Buffer.from(p));
   }
 }

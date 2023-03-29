@@ -1,6 +1,5 @@
+import { verify } from "@noble/ed25519";
 import type { Signer } from "..";
-import * as ed25519 from "@noble/ed25519";
-// import nacl from 'tweetnacl';
 import { SignatureConfig, SIG_CONFIG } from "../../constants";
 
 export default class InjectedAptosSigner implements Signer {
@@ -38,7 +37,7 @@ export default class InjectedAptosSigner implements Signer {
 
   static async verify(pk: Buffer, message: Uint8Array, signature: Uint8Array): Promise<boolean> {
     const p = pk;
-    return ed25519.verify(
+    return verify(
       Buffer.from(signature),
       Buffer.from(`APTOS\nmessage: ${Buffer.from(message).toString("hex")}\nnonce: bundlr`), // see comment above sign
       Buffer.from(p),

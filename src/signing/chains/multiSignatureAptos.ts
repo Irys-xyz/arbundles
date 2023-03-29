@@ -1,6 +1,5 @@
+import { verify } from "@noble/ed25519";
 import type { Signer } from "..";
-import * as ed25519 from "@noble/ed25519";
-// import nacl from 'tweetnacl';
 import { SignatureConfig, SIG_CONFIG } from "../../constants";
 
 export default class MultiSignatureAptosSigner implements Signer {
@@ -79,7 +78,7 @@ export default class MultiSignatureAptosSigner implements Signer {
       if (sigIncluded) {
         const signature = signatures.slice(i * 64, (i + 1) * 64);
         const pubkey = pk.slice(i * 32, (i + 1) * 32);
-        if (!(await ed25519.verify(Buffer.from(signature), Buffer.from(message), Buffer.from(pubkey)))) oneFalse = true;
+        if (!(await verify(Buffer.from(signature), Buffer.from(message), Buffer.from(pubkey)))) oneFalse = true;
       }
     }
     return !oneFalse;
