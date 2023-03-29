@@ -19,11 +19,11 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "strictNullChecks": false,
-    "baseUrl": ".",
+    "baseUrl": "./src",
+    "rootDir": ".",
     "outDir": "./build/node/cjs",
     "paths": {
-      "$/deepHash": ["src/deepHash"],
-      "$/arweave/*": ["node_modules/arweave/node/*"]
+      "$/utils": ["nodeUtils.ts"]
     }
   },
   "include": ["src/**/*","index.ts", "webIndex.ts"],

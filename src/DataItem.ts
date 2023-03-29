@@ -8,7 +8,7 @@ import { indexToType } from "./signing/index";
 import getSignatureData from "./ar-data-base";
 import { SIG_CONFIG, SignatureConfig } from "./constants";
 import * as crypto from "crypto";
-import Arweave from "arweave";
+import { Arweave } from "$/utils";
 import { deserializeTags } from "./tags";
 
 export const MIN_BINARY_SIZE = 80;
@@ -27,30 +27,6 @@ export class DataItem implements BundleItem {
 
   get signatureType(): SignatureConfig {
     const signatureTypeVal: number = byteArrayToLong(this.binary.subarray(0, 2));
-
-    // switch (signatureTypeVal) {
-    //   case 1: {
-    //     return SignatureConfig.ARWEAVE;
-    //   }
-    //   case 2: {
-    //     return SignatureConfig.ED25519;
-    //   }
-    //   case 3: {
-    //     return SignatureConfig.ETHEREUM;
-    //   }
-    //   case 4: {
-    //     return SignatureConfig.SOLANA;
-    //   }
-    //   case 5: {
-    //     return SignatureConfig.INJECTEDAPTOS;
-    //   }
-    //   case 6: {
-    //     return SignatureConfig.MULTIAPTOS;
-    //   }
-    //   default: {
-    //
-    //   }
-    // }
     if (SignatureConfig?.[signatureTypeVal] !== undefined) {
       return signatureTypeVal;
     }

@@ -1,5 +1,5 @@
 import { DataItem, ArweaveSigner } from "../../index";
-import { bundleAndSignData, createData, FileDataItem } from "../../file";
+import { bundleAndSignData, createData, FileDataItem } from "../../src/file";
 import { readFileSync } from "fs";
 import path from "path";
 import * as fs from "fs";

@@ -34,6 +34,10 @@
     "./bundle": {
       "types": "./build/web/esm/index.d.ts",
       "default": "./build/web/bundle.js"
+    },
+    "./*": {
+      "default": "./build/*.js",
+      "types": "./build/*.d.ts"
     }
   },
   "types": "./build/node/cjs/index.d.ts",
@@ -43,7 +47,7 @@
     "build/**/*.d.ts"
   ],
   "scripts": {
-    "build": "rm -rf ./build && tsc -p tsconfig.json &  tsc -p esm.tsconfig.json & (tsc -p web.tsconfig.json  && webpack)",
+    "build": "rm -rf ./build && (tsc -p tsconfig.json && resolve-tspaths -p tsconfig.json) &  (tsc -p esm.tsconfig.json && resolve-tspaths -p esm.tsconfig.json) & (tsc -p web.tsconfig.json && resolve-tspaths -p web.tsconfig.json && webpack)",
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
     "lint:fix": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx --fix",
     "test": "jest --coverage",
@@ -79,6 +83,7 @@
     "prettier": "~2.3.0",
     "pretty-quick": "^3.1.2",
     "process": "^0.11.10",
+    "resolve-tspaths": "^0.8.8",
     "rimraf": "~3.0.2",
     "stream-browserify": "^3.0.0",
     "ts-jest": "^29.0.5",
@@ -95,7 +100,7 @@
     "arweave": "=1.11.8",
     "base64url": "^3.0.1",
     "bs58": "^4.0.1",
-    "ethers": "^5.7.2",
+    "ethers": "=5.7.2",
     "keccak": "^3.0.2",
     "secp256k1": "^4.0.2"
   },

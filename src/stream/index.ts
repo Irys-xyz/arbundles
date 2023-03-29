@@ -7,7 +7,7 @@ import type { DataItemCreateOptions } from "../index";
 import { createData, MIN_BINARY_SIZE } from "../index";
 import { SIG_CONFIG } from "../constants";
 import * as crypto from "crypto";
-import { stringToBuffer } from "arweave/node/lib/utils";
+import { stringToBuffer } from "$/utils";
 import { deepHash } from "../deepHash";
 import type { Signer } from "../signing";
 import { deserializeTags } from "../tags";

@@ -1,6 +1,6 @@
 import type { Signer } from "../Signer";
 import { constants, createPublicKey, createSign } from "crypto";
-import Arweave from "arweave";
+import { Arweave } from "$/utils";
 import base64url from "base64url";
 import { SIG_CONFIG } from "../../constants";
 

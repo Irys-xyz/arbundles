@@ -3,11 +3,8 @@
     "compilerOptions": {
         "outDir": "./build/web/esm",
         "paths": {
-            "$/deepHash": [
-                "node_modules/arweave/web/lib/deepHash"
-            ],
-            "$/arweave/*": [
-                "node_modules/arweave/web/*"
+            "$/utils": [
+                "webUtils.ts"
             ]
         }
     }

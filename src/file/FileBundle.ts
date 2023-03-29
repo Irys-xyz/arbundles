@@ -4,7 +4,7 @@ import type { PathLike } from "fs";
 import * as fs from "fs";
 import { byteArrayToLong } from "../utils";
 import type Arweave from "arweave";
-import type Transaction from "$/arweave/lib/transaction";
+
 import MultiStream from "multistream";
 // import { pipeline } from 'stream/promises';
 // import { createTransactionAsync } from 'arweave-stream';
@@ -14,7 +14,7 @@ import base64url from "base64url";
 import { pipeline } from "stream/promises";
 
 import { createTransactionAsync, uploadTransactionAsync } from "arweave-stream-tx";
-import type { CreateTransactionInterface } from "$/arweave/common";
+import type { CreateTransactionInterface, Transaction } from "$/utils";
 // import { Readable } from 'stream';
 // import { createTransactionAsync } from 'arweave-stream';
 // import { pipeline } from 'stream/promises';

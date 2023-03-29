@@ -1,6 +1,5 @@
 import type DataItem from "./DataItem";
-import deepHash from "$/deepHash";
-import { stringToBuffer } from "$/arweave/lib/utils";
+import { deepHash, stringToBuffer } from "$/utils";
 /**
  * Options for creation of a DataItem
  */

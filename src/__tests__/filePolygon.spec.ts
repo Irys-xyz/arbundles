@@ -1,5 +1,5 @@
 import { PolygonSigner, DataItemCreateOptions, createData } from "../../index";
-import { createData as createFileData } from "../../file";
+import { createData as createFileData } from "../../src/file";
 
 describe("Polygon signing tests", function () {
   it("should sign and verify using non file", async function () {
