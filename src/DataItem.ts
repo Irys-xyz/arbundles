@@ -2,17 +2,18 @@ import { byteArrayToLong } from "./utils";
 import base64url from "base64url";
 import { Buffer } from "buffer";
 import { sign } from "./ar-data-bundle";
-import { BundleItem } from "./BundleItem";
-import { indexToType, Signer } from "./signing/index";
-import { getSignatureData } from "./ar-data-base";
+import type { BundleItem } from "./BundleItem";
+import type { Signer } from "./signing/index";
+import { indexToType } from "./signing/index";
+import getSignatureData from "./ar-data-base";
 import { SIG_CONFIG, SignatureConfig } from "./constants";
 import * as crypto from "crypto";
-import Arweave from "arweave";
+import { Arweave } from "$/utils";
 import { deserializeTags } from "./tags";
 
 export const MIN_BINARY_SIZE = 80;
 
-export default class DataItem implements BundleItem {
+export class DataItem implements BundleItem {
   private readonly binary: Buffer;
   private _id: Buffer;
 
@@ -25,33 +26,11 @@ export default class DataItem implements BundleItem {
   }
 
   get signatureType(): SignatureConfig {
-    const signatureTypeVal: number = byteArrayToLong(
-      this.binary.subarray(0, 2),
-    );
-
-    switch (signatureTypeVal) {
-      case 1: {
-        return SignatureConfig.ARWEAVE;
-      }
-      case 2: {
-        return SignatureConfig.ED25519;
-      }
-      case 3: {
-        return SignatureConfig.ETHEREUM;
-      }
-      case 4: {
-        return SignatureConfig.SOLANA;
-      }
-      case 5: {
-        return SignatureConfig.INJECTEDAPTOS;
-      }
-      case 6: {
-        return SignatureConfig.MULTIAPTOS;
-      }
-      default: {
-        throw new Error("Unknown signature type: " + signatureTypeVal);
-      }
+    const signatureTypeVal: number = byteArrayToLong(this.binary.subarray(0, 2));
+    if (SignatureConfig?.[signatureTypeVal] !== undefined) {
+      return signatureTypeVal;
     }
+    throw new Error("Unknown signature type: " + signatureTypeVal);
   }
 
   async isValid(): Promise<boolean> {
@@ -84,21 +63,16 @@ export default class DataItem implements BundleItem {
 
   set rawOwner(pubkey: Buffer) {
     if (pubkey.byteLength != this.ownerLength)
-      throw new Error(
-        `Expected raw owner (pubkey) to be ${this.ownerLength} bytes, got ${pubkey.byteLength} bytes.`,
-      );
+      throw new Error(`Expected raw owner (pubkey) to be ${this.ownerLength} bytes, got ${pubkey.byteLength} bytes.`);
     this.binary.set(pubkey, 2 + this.signatureLength);
+  }
+
+  get rawOwner(): Buffer {
+    return this.binary.subarray(2 + this.signatureLength, 2 + this.signatureLength + this.ownerLength);
   }
 
   get signatureLength(): number {
     return SIG_CONFIG[this.signatureType].sigLength;
-  }
-
-  get rawOwner(): Buffer {
-    return this.binary.subarray(
-      2 + this.signatureLength,
-      2 + this.signatureLength + this.ownerLength,
-    );
   }
 
   get owner(): string {
@@ -112,9 +86,7 @@ export default class DataItem implements BundleItem {
   get rawTarget(): Buffer {
     const targetStart = this.getTargetStart();
     const isPresent = this.binary[targetStart] == 1;
-    return isPresent
-      ? this.binary.subarray(targetStart + 1, targetStart + 33)
-      : Buffer.alloc(0);
+    return isPresent ? this.binary.subarray(targetStart + 1, targetStart + 33) : Buffer.alloc(0);
   }
 
   get target(): string {
@@ -125,9 +97,7 @@ export default class DataItem implements BundleItem {
     const anchorStart = this.getAnchorStart();
     const isPresent = this.binary[anchorStart] == 1;
 
-    return isPresent
-      ? this.binary.subarray(anchorStart + 1, anchorStart + 33)
-      : Buffer.alloc(0);
+    return isPresent ? this.binary.subarray(anchorStart + 1, anchorStart + 33) : Buffer.alloc(0);
   }
 
   get anchor(): string {
@@ -136,30 +106,20 @@ export default class DataItem implements BundleItem {
 
   get rawTags(): Buffer {
     const tagsStart = this.getTagsStart();
-    const tagsSize = byteArrayToLong(
-      this.binary.subarray(tagsStart + 8, tagsStart + 16),
-    );
+    const tagsSize = byteArrayToLong(this.binary.subarray(tagsStart + 8, tagsStart + 16));
     return this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize);
   }
 
   get tags(): { name: string; value: string }[] {
     const tagsStart = this.getTagsStart();
-    const tagsCount = byteArrayToLong(
-      this.binary.subarray(tagsStart, tagsStart + 8),
-    );
+    const tagsCount = byteArrayToLong(this.binary.subarray(tagsStart, tagsStart + 8));
     if (tagsCount == 0) {
       return [];
     }
 
-    const tagsSize = byteArrayToLong(
-      this.binary.subarray(tagsStart + 8, tagsStart + 16),
-    );
+    const tagsSize = byteArrayToLong(this.binary.subarray(tagsStart + 8, tagsStart + 16));
 
-    return deserializeTags(
-      Buffer.from(
-        this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize),
-      ),
-    );
+    return deserializeTags(Buffer.from(this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize)));
   }
 
   get tagsB64Url(): { name: string; value: string }[] {
@@ -173,10 +133,7 @@ export default class DataItem implements BundleItem {
   getStartOfData(): number {
     const tagsStart = this.getTagsStart();
 
-    const numberOfTagBytesArray = this.binary.subarray(
-      tagsStart + 8,
-      tagsStart + 16,
-    );
+    const numberOfTagBytesArray = this.binary.subarray(tagsStart + 8, tagsStart + 16);
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
     return tagsStart + 16 + numberOfTagBytes;
   }
@@ -184,10 +141,7 @@ export default class DataItem implements BundleItem {
   get rawData(): Buffer {
     const tagsStart = this.getTagsStart();
 
-    const numberOfTagBytesArray = this.binary.subarray(
-      tagsStart + 8,
-      tagsStart + 16,
-    );
+    const numberOfTagBytesArray = this.binary.subarray(tagsStart + 8, tagsStart + 16);
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
     const dataStart = tagsStart + 16 + numberOfTagBytes;
 
@@ -223,6 +177,7 @@ export default class DataItem implements BundleItem {
   /**
    * Returns a JSON representation of a DataItem
    */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   public toJSON(): {
     owner: string;
     data: string;
@@ -256,13 +211,8 @@ export default class DataItem implements BundleItem {
     const sigType = item.signatureType;
     const tagsStart = item.getTagsStart();
 
-    const numberOfTags = byteArrayToLong(
-      buffer.subarray(tagsStart, tagsStart + 8),
-    );
-    const numberOfTagBytesArray = buffer.subarray(
-      tagsStart + 8,
-      tagsStart + 16,
-    );
+    const numberOfTags = byteArrayToLong(buffer.subarray(tagsStart, tagsStart + 8));
+    const numberOfTagBytesArray = buffer.subarray(tagsStart + 8, tagsStart + 16);
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
 
     if (numberOfTagBytes > 4096) return false;
@@ -270,9 +220,7 @@ export default class DataItem implements BundleItem {
     if (numberOfTags > 0) {
       try {
         const tags: { name: string; value: string }[] = deserializeTags(
-          Buffer.from(
-            buffer.subarray(tagsStart + 16, tagsStart + 16 + numberOfTagBytes),
-          ),
+          Buffer.from(buffer.subarray(tagsStart + 16, tagsStart + 16 + numberOfTagBytes)),
         );
 
         if (tags.length !== numberOfTags) {
@@ -331,3 +279,4 @@ export default class DataItem implements BundleItem {
     return anchorStart;
   }
 }
+export default DataItem;

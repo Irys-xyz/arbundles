@@ -10,15 +10,7 @@ export default class HexSolanaSigner extends SolanaSigner {
     return super.sign(Buffer.from(Buffer.from(message).toString("hex")));
   }
 
-  static async verify(
-    pk: Buffer,
-    message: Uint8Array,
-    signature: Uint8Array,
-  ): Promise<boolean> {
-    return super.verify(
-      pk,
-      Buffer.from(Buffer.from(message).toString("hex")),
-      signature,
-    );
+  static async verify(pk: Buffer, message: Uint8Array, signature: Uint8Array): Promise<boolean> {
+    return super.verify(pk, Buffer.from(Buffer.from(message).toString("hex")), signature);
   }
 }

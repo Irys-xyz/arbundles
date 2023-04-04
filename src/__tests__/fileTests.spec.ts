@@ -1,17 +1,16 @@
-import { bundleAndSignData, createData, FileDataItem } from "../../file";
+import { DataItem, ArweaveSigner } from "../../index";
+import { bundleAndSignData, createData, FileDataItem } from "../../src/file";
 import { readFileSync } from "fs";
 import path from "path";
-import ArweaveSigner from "../signing/chains/ArweaveSigner";
 import * as fs from "fs";
-import DataItem from "../DataItem";
-import Arweave from "arweave";
+// import Arweave from "arweave";
 
-const arweave = Arweave.init({
-  host: "arweave.net",
-  port: 443,
-  protocol: "https",
-  logging: false,
-});
+// const arweave = Arweave.init({
+//   host: "arweave.net",
+//   port: 443,
+//   protocol: "https",
+//   logging: false,
+// });
 
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString(),
@@ -76,24 +75,24 @@ describe("file tests", function () {
     expect(await third.owner()).toEqual(wallet0.n);
   }, 1000000000);
 
-  it("Should post correctly", async function () {
-    const signer = new ArweaveSigner(wallet0);
-    const tags = [
-      {
-        name: "Content-Type",
-        value: "image/png",
-      },
-    ];
+  // it("Should post correctly", async function () {
+  //   const signer = new ArweaveSigner(wallet0);
+  //   const tags = [
+  //     {
+  //       name: "Content-Type",
+  //       value: "image/png",
+  //     },
+  //   ];
 
-    const d = [await createData("", signer, { tags })];
+  //   const d = [await createData("", signer, { tags })];
 
-    const bundle = await bundleAndSignData(d, signer);
-    const tx = await bundle.toTransaction({}, arweave, wallet0);
-    await arweave.transactions.sign(tx, wallet0);
-    const response = await arweave.transactions.post(tx);
+  //   const bundle = await bundleAndSignData(d, signer);
+  //   const tx = await bundle.toTransaction({}, arweave, wallet0);
+  //   await arweave.transactions.sign(tx, wallet0);
+  //   const response = await arweave.transactions.post(tx);
 
-    expect(response.status).toEqual(200);
-  });
+  //   expect(response.status).toEqual(200);
+  // });
 
   // it("Test posted tx", async function () {
   //   const tx = await arweave.transactions.getData(

@@ -1,2 +1,4 @@
 /**/*.js
-/src/file/bundleData.ts
+/**/*.d.ts
+/**/*.js.map
+/src/__tests__/**/*.*

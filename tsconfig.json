@@ -18,8 +18,14 @@
     "noUnusedParameters": true,
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "baseUrl": "./src",
+    "rootDir": ".",
+    "outDir": "./build/node/cjs",
+    "paths": {
+      "$/utils": ["nodeUtils.ts"]
+    }
   },
-  "include": ["src/**/*", "file/**/*", "stream/**/*", "index.ts"],
+  "include": ["src/**/*","index.ts", "webIndex.ts"],
   "exclude": ["src/__tests__/**"]
 }

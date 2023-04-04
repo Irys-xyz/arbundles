@@ -1,4 +1,17 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env bash
 
-npx pretty-quick --staged
+
+# Bash sets the BASH environment variable, so if it is not set, then we
+# are running in a different shell, so manually run ourselves in BASH.
+if [ -z "${BASH:-}" ]; then
+  exec bash "$0" "$@"
+fi
+
+
+. "$(dirname -- "$0")/_/husky.sh"
+
+output="$(yarn lint)"
+
+if [[ $? -ne 0 ]] ; then
+    echo "$output"
+fi

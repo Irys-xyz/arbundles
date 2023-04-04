@@ -30,10 +30,7 @@ export function serializeTags(tags: { name: string; value: string }[]): Buffer {
   // number of tags
   byt = Buffer.concat([byt, encodeLong(tags.length)]);
   for (const tag of tags) {
-    if (!tag?.name || !tag?.value)
-      throw new Error(
-        `Invalid tag format for ${tag}, expected {name:string, value: string}`,
-      );
+    if (tag?.name === undefined || tag?.value === undefined) throw new Error(`Invalid tag format for ${tag}, expected {name:string, value: string}`);
     const name = Buffer.from(tag.name);
     const value = Buffer.from(tag.value);
     // encode the length of the field using variable integer encoding
@@ -48,9 +45,7 @@ export function serializeTags(tags: { name: string; value: string }[]): Buffer {
   return byt;
 }
 
-export function deserializeTags(
-  bTags: Buffer,
-): { name: string; value: string }[] {
+export function deserializeTags(bTags: Buffer): { name: string; value: string }[] {
   if (bTags.length === 0) return [];
   const tags = [];
   let offset = 0;

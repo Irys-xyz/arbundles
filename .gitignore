@@ -40,25 +40,6 @@ output
 .devcontainer/devcontainer.json
 .devcontainer/Dockerfile
 
-src/**/*.js
-src/**/*.js.map
-src/**/*.d.ts
-stream/**/*.js
-stream/**/*.js.map
-stream/**/*.d.ts
-file/**/*.js
-file/**/*.js.map
-file/**/*.d.ts
-index.js
-index.d.ts
-index.js.map
-test
 
-package/
-esm/
-webIndex.js.map
-webIndex.js
-webIndex.d.ts
-bundle.js.map
-bundle.js.LICENSE.txt
-bundle.js
+test
+!src/__tests__/setup.jest.js

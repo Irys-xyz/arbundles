@@ -5,8 +5,8 @@ export abstract class Signer {
   readonly ownerLength: number;
   readonly pem?: string | Buffer;
 
-  abstract sign(message: Uint8Array): Promise<Uint8Array> | Uint8Array;
-  static verify(_: string | Buffer): boolean {
+  abstract sign(message: Uint8Array, _opts?: any): Promise<Uint8Array> | Uint8Array;
+  static verify(_pk: string | Buffer, _message: Uint8Array, _signature: Uint8Array, _opts?: any): boolean {
     throw new Error("You must implement verify method on child");
   }
 }

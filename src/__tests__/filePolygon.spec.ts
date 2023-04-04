@@ -1,8 +1,5 @@
-import { DataItemCreateOptions } from "../ar-data-base";
-import { createData as createFileData } from "../../file";
-import { createData } from "../ar-data-create";
-import PolygonSigner from "../signing/chains/PolygonSigner";
-// import DataItem from '../DataItem';
+import { PolygonSigner, DataItemCreateOptions, createData } from "../../index";
+import { createData as createFileData } from "../../src/file";
 
 describe("Polygon signing tests", function () {
   it("should sign and verify using non file", async function () {

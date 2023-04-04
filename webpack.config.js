@@ -3,7 +3,7 @@ const webpack = require("webpack");
 const { DuplicatesPlugin } = require("inspectpack/plugin");
 
 module.exports = {
-  entry: ["./webIndex.ts"],
+  entry: ["./build/web/esm/webIndex.js"],
   devtool: "source-map",
   mode: "production",
   module: {
@@ -29,6 +29,10 @@ module.exports = {
       process: "process/browser",
       crypto: "crypto-browserify",
       stream: "stream-browserify",
+      "$/utils": path.resolve(
+        __dirname,
+        "./src/webUtils.ts"
+      ),
     },
     fallback: {
       crypto: require.resolve("crypto-browserify"),
@@ -54,7 +58,7 @@ module.exports = {
   ],
   output: {
     filename: "bundle.js",
-    path: __dirname,
+    path: path.resolve(__dirname, "./build/web/"),
     libraryTarget: "umd",
     library: "Arbundles",
   },

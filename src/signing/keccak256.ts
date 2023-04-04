@@ -3,7 +3,7 @@ import BN from "bn.js";
 import { Buffer } from "buffer";
 import createKeccakHash from "keccak";
 
-export default function keccak256(value: Buffer | BN | string | number) {
+export function keccak256(value: Buffer | BN | string | number) {
   value = toBuffer(value);
   return createKeccakHash("keccak256")
     .update(value as Buffer)
@@ -51,9 +51,7 @@ function isHexString(value: any, length?: number) {
 
 function padToEven(value: any) {
   if (typeof value !== "string") {
-    throw new Error(
-      `while padding to even, value must be string, is currently ${typeof value}, while padToEven.`,
-    );
+    throw new Error(`while padding to even, value must be string, is currently ${typeof value}, while padToEven.`);
   }
 
   if (value.length % 2) {
@@ -73,14 +71,10 @@ function stripHexPrefix(value: any) {
 
 function isHexPrefixed(value: any) {
   if (typeof value !== "string") {
-    throw new Error(
-      "value must be type 'string', is currently type " +
-      typeof value +
-      ", while checking isHexPrefixed.",
-    );
+    throw new Error("value must be type 'string', is currently type " + typeof value + ", while checking isHexPrefixed.");
   }
 
-  return value.slice(0, 2) === "0x";
+  return value.startsWith("0x");
 }
 
 function intToBuffer(i: number) {
@@ -96,3 +90,5 @@ function intToHex(i: number) {
 if (typeof window !== "undefined") {
   (window as any).keccak256 = keccak256;
 }
+
+export default keccak256;
