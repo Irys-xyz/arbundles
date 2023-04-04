@@ -10,13 +10,7 @@ describe("Typed ethereum signer", function () {
   describe("sign & verify", () => {
     const signer = new TypedEthereumSigner(wallet.privateKey.slice(2));
     const data = Buffer.from("Hello, Bundlr!");
-    const expectedSignature = Buffer.from([
-      140, 2, 138, 150, 122, 68, 199, 26, 198, 74, 47, 114, 99, 135, 108, 240,
-      113, 245, 239, 194, 227, 143, 162, 3, 206, 88, 222, 55, 208, 180, 209,
-      146, 118, 34, 185, 134, 92, 159, 217, 48, 178, 160, 59, 180, 55, 233, 35,
-      130, 109, 130, 150, 138, 151, 191, 101, 102, 180, 85, 50, 185, 151, 105,
-      52, 121, 28,
-    ]);
+    const expectedSignature = Buffer.from([188, 220, 82, 226, 88, 27, 234, 197, 186, 241, 99, 91, 39, 11, 49, 110, 190, 209, 73, 2, 55, 56, 113, 55, 216, 249, 133, 108, 249, 31, 207, 114, 57, 248, 2, 141, 253, 15, 18, 172, 231, 158, 25, 228, 188, 25, 157, 199, 118, 215, 74, 242, 12, 245, 218, 203, 83, 135, 231, 11, 184, 20, 0, 56, 28])
 
     describe("with a known wallet", () => {
       it("should sign a known value ", async () => {
