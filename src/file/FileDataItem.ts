@@ -4,8 +4,7 @@ import type { PathLike } from "fs";
 import { byteArrayToLong } from "../utils";
 import type { BundleItem } from "../BundleItem";
 import { deepHash } from "..";
-import { stringToBuffer } from "$/utils";
-import { Arweave } from "$/utils";
+import { getCryptoDriver, stringToBuffer } from "$/utils";
 import type { Signer } from "../signing";
 import { indexToType } from "../signing";
 import type { AxiosResponse } from "axios";
@@ -246,7 +245,7 @@ export class FileDataItem implements BundleItem {
     ]);
 
     const signatureBytes = await signer.sign(signatureData);
-    const idBytes = await Arweave.crypto.hash(signatureBytes);
+    const idBytes = await getCryptoDriver().hash(signatureBytes);
     const handle = await fs.promises.open(this.filename, "r+");
     await write(handle.fd, signatureBytes, 0, await this.signatureLength(), 2);
 

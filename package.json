@@ -1,6 +1,6 @@
 {
   "name": "arbundles",
-  "version": "0.8.0",
+  "version": "0.9.0-a1",
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
@@ -12,11 +12,12 @@
       "types": "./build/node/esm/index.d.ts",
       "import": "./build/node/esm/index.js",
       "require": "./build/node/cjs/index.js",
-      "node": "./build/node/cjs/src/index.js"
+      "node": "./build/node/cjs/index.js",
+      "browser": "./build/web/esm/webIndex.js"
     },
     "./file": {
       "types": "./build/node/esm/src/file/index.d.ts",
-      "import": "./build/node/esm/src/ile/index.js",
+      "import": "./build/node/esm/src/file/index.js",
       "require": "./build/node/cjs/src/file/index.js",
       "node": "./build/node/cjs/src/file/index.js"
     },
@@ -25,6 +26,12 @@
       "import": "./build/node/esm/src/stream/index.js",
       "require": "./build/node/cjs/src/stream/index.js",
       "node": "./build/node/cjs/src/stream/index.js"
+    },
+    "./node": {
+      "types": "./build/node/esm/index.d.ts",
+      "import": "./build/node/esm/index.js",
+      "require": "./build/node/cjs/index.js",
+      "node": "./build/node/cjs/index.js"
     },
     "./web": {
       "types": "./build/web/esm/webIndex.d.ts",
@@ -36,8 +43,8 @@
       "default": "./build/web/bundle.js"
     },
     "./*": {
-      "default": "./build/*.js",
-      "types": "./build/*.d.ts"
+      "types": "./build/*.d.ts",
+      "default": "./build/*.js"
     }
   },
   "types": "./build/node/cjs/index.d.ts",

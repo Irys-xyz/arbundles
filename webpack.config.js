@@ -10,7 +10,7 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/,
-        use: "ts-loader",
+        use: { loader: "ts-loader", options: { configFile: "web.tsconfig.json" } },
         exclude: [
           /node_modules/,
           path.resolve(__dirname, "file/"),
