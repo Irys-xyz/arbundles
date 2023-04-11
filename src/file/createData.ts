@@ -1,12 +1,12 @@
 import FileDataItem from "./FileDataItem";
 import type { DataItemCreateOptions } from "../ar-data-base";
-import * as fs from "fs";
 import { tmpName } from "tmp-promise";
 import base64url from "base64url";
 import { longTo8ByteArray, shortTo2ByteArray } from "../utils";
 import { serializeTags } from "../tags";
 import type { Signer } from "../signing";
 import { pipeline } from "stream/promises";
+import { createWriteStream } from "fs";
 
 export async function createData(
   data: string | Uint8Array | NodeJS.ReadableStream,
@@ -14,7 +14,7 @@ export async function createData(
   opts?: DataItemCreateOptions,
 ): Promise<FileDataItem> {
   const filename = await tmpName();
-  const stream = fs.createWriteStream(filename);
+  const stream = createWriteStream(filename);
 
   // TODO: Add asserts
   // Parse all values to a buffer and

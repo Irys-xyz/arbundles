@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import { createReadStream, promises, read as FSRead } from "fs";
 import { promisify } from "util";
 import { byteArrayToLong } from "../utils";
 import base64url from "base64url";
@@ -10,7 +10,7 @@ import type { Readable } from "stream";
 import { deserializeTags } from "../tags";
 
 type File = string | FileHandle;
-const read = promisify(fs.read);
+const read = promisify(FSRead);
 
 interface Transaction {
   id: string;
@@ -22,10 +22,10 @@ interface Transaction {
   signature: string;
 }
 
-const fileToFd = async (f: File): Promise<FileHandle> => (typeof f === "string" ? await fs.promises.open(f, "r") : f);
+const fileToFd = async (f: File): Promise<FileHandle> => (typeof f === "string" ? await promises.open(f, "r") : f);
 
 export async function fileToJson(filename: string): Promise<Transaction> {
-  const fd = await fs.promises.open(filename, "r").then((handle) => handle.fd);
+  const fd = await promises.open(filename, "r").then((handle) => handle.fd);
 
   let tagsStart = 512 + 512 + 2;
 
@@ -188,5 +188,5 @@ export async function getTags(file: File, options?: { offset: number }): Promise
 }
 
 export async function signedFileStream(path: string, signer: Signer, opts?: DataItemCreateOptions): Promise<Readable> {
-  return streamSigner(fs.createReadStream(path), fs.createReadStream(path), signer, opts);
+  return streamSigner(createReadStream(path), createReadStream(path), signer, opts);
 }

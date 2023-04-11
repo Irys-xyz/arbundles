@@ -6,11 +6,11 @@ import { indexToType } from "../signing/constants";
 import type { DataItemCreateOptions } from "../index";
 import { createData, MIN_BINARY_SIZE } from "../index";
 import { SIG_CONFIG } from "../constants";
-import * as crypto from "crypto";
 import { stringToBuffer } from "$/utils";
 import { deepHash } from "../deepHash";
 import type { Signer } from "../signing";
 import { deserializeTags } from "../tags";
+import { createHash } from "crypto";
 
 export default async function processStream(stream: Readable): Promise<Record<string, any>[]> {
   const reader = getReader(stream);
@@ -125,7 +125,7 @@ export default async function processStream(stream: Readable): Promise<Record<st
     transform.end();
 
     // Check id
-    if (id !== base64url(crypto.createHash("sha256").update(signature).digest())) throw new Error("ID doesn't match signature");
+    if (id !== base64url(createHash("sha256").update(signature).digest())) throw new Error("ID doesn't match signature");
 
     const Signer = indexToType[signatureType];
 

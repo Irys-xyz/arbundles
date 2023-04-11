@@ -41,7 +41,7 @@ module.exports = {
       buffer: require.resolve("buffer/"),
       // "assert": require.resolve('assert/'),
       process: require.resolve("process/browser"),
-      util: require.resolve("util"),
+      // util: require.resolve("util"),
       // "zlib": require.resolve('browserify-zlib'),
       // "path": require.resolve('path-browserify')
     },
