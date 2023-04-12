@@ -25,7 +25,7 @@ export default class TypedEthereumSigner extends EthereumSigner {
   async sign(message: Uint8Array): Promise<Uint8Array> {
     const signature = await this.signer._signTypedData(domain, types, {
       address: this.address,
-      message,
+      "Transaction hash": message,
     });
 
     return Buffer.from(signature.slice(2), "hex"); // trim leading 0x, convert to hex.
@@ -33,7 +33,7 @@ export default class TypedEthereumSigner extends EthereumSigner {
 
   static async verify(pk: string | Buffer, message: Uint8Array, signature: Uint8Array): Promise<boolean> {
     const address = pk.toString();
-    const addr = verifyTypedData(domain, types, { address, message }, signature);
+    const addr = verifyTypedData(domain, types, { address, "Transaction hash": message }, signature);
     return address.toLowerCase() === addr.toLowerCase();
   }
 }
@@ -45,10 +45,10 @@ export const domain = {
 
 export const types = {
   Bundlr: [
-    { name: "message", type: "bytes" },
+    { name: "Transaction hash", type: "bytes" },
     { name: "address", type: "address" },
   ],
 };
 
-export const MESSAGE = "Bundlr(bytes message, address address)";
+export const MESSAGE = "Bundlr(bytes Transaction hash, address address)";
 export const DOMAIN = "EIP712Domain(string name,string version)";
