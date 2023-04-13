@@ -36,6 +36,7 @@
     "./web": {
       "types": "./build/web/esm/webIndex.d.ts",
       "import": "./build/web/esm/webIndex.js",
+      "require": "./build/web/cjs/webIndex.js",
       "default": "./build/web/esm/webIndex.js"
     },
     "./bundle": {
@@ -54,7 +55,7 @@
     "build/**/*.d.ts"
   ],
   "scripts": {
-    "build": "rm -rf ./build && (tsc -p tsconfig.json && resolve-tspaths -p tsconfig.json) &  (tsc -p esm.tsconfig.json && resolve-tspaths -p esm.tsconfig.json) & (tsc -p web.tsconfig.json && resolve-tspaths -p web.tsconfig.json && webpack)",
+    "build": "rm -rf ./build && concurrently \"tsc -p tsconfig.json && resolve-tspaths -p tsconfig.json\" \"tsc -p esm.tsconfig.json && resolve-tspaths -p esm.tsconfig.json\"  \"tsc -p web.tsconfig.json && resolve-tspaths -p web.tsconfig.json\" \"tsc -p web-cjs.tsconfig.json && resolve-tspaths -p web-cjs.tsconfig.json\" && webpack",
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
     "lint:fix": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx --fix",
     "test": "jest --coverage",
@@ -76,6 +77,7 @@
     "assert": "^2.0.0",
     "avsc": "https://github.com/Bundlr-Network/avsc#csp-fixes",
     "browserify-zlib": "^0.2.0",
+    "concurrently": "^8.0.1",
     "crypto-browserify": "^3.12.0",
     "eslint": "^8.31.0",
     "eslint-config-prettier": "~8.3.0",
