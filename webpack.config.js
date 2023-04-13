@@ -3,7 +3,7 @@ const webpack = require("webpack");
 const { DuplicatesPlugin } = require("inspectpack/plugin");
 
 module.exports = {
-  entry: ["./build/web/esm/webIndex.js"],
+  entry: ["./webIndex.ts"],
   devtool: "source-map",
   mode: "production",
   module: {
@@ -13,8 +13,7 @@ module.exports = {
         use: { loader: "ts-loader", options: { configFile: "web.tsconfig.json" } },
         exclude: [
           /node_modules/,
-          path.resolve(__dirname, "file/"),
-          path.resolve(__dirname, "esm/"),
+          path.resolve(__dirname, "build/"),
         ],
       },
     ],
@@ -39,11 +38,7 @@ module.exports = {
       stream: require.resolve("stream-browserify"),
       events: require.resolve("events/"),
       buffer: require.resolve("buffer/"),
-      // "assert": require.resolve('assert/'),
       process: require.resolve("process/browser"),
-      // util: require.resolve("util"),
-      // "zlib": require.resolve('browserify-zlib'),
-      // "path": require.resolve('path-browserify')
     },
   },
   plugins: [
