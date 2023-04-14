@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import path from "path";
 import { Buffer } from "buffer";
 import * as fs from "fs";
-import { SolanaSigner, bundleAndSignData, DataItem, createData, ArweaveSigner, DataItemCreateOptions } from "../../index";
+import { SolanaSigner, bundleAndSignData, DataItem, createData, ArweaveSigner, DataItemCreateOptions } from "../../index.js";
 const wallet0 = JSON.parse(
   readFileSync(path.join(__dirname, "test_key0.json")).toString(),
 );

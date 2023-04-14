@@ -1,7 +1,7 @@
-import type { Signer } from "../Signer";
+import type { Signer } from "../Signer.js";
 import { getCryptoDriver } from "$/utils";
 import base64url from "base64url";
-import { SIG_CONFIG } from "../../constants";
+import { SIG_CONFIG } from "../../constants.js";
 import { constants, createSign } from "crypto";
 
 export default class Rsa4096Pss implements Signer {

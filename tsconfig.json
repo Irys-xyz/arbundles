@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es2019",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "node",
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
@@ -21,7 +21,7 @@
     "strictNullChecks": false,
     "baseUrl": "./src",
     "rootDir": ".",
-    "outDir": "./build/node/cjs",
+    "outDir": "./build/node/esm",
     "paths": {
       "$/utils": ["nodeUtils.ts"]
     }

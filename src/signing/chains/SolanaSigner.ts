@@ -1,4 +1,4 @@
-import Curve25519 from "../keys/curve25519";
+import Curve25519 from "../keys/curve25519.js";
 import bs58 from "bs58";
 
 export default class SolanaSigner extends Curve25519 {

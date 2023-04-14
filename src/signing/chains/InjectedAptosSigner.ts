@@ -1,6 +1,6 @@
 import { verify } from "@noble/ed25519";
-import type { Signer } from "..";
-import { SignatureConfig, SIG_CONFIG } from "../../constants";
+import type { Signer } from "../index.js";
+import { SignatureConfig, SIG_CONFIG } from "../../constants.js";
 
 export default class InjectedAptosSigner implements Signer {
   private _publicKey: Buffer;

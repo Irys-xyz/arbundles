@@ -1,7 +1,7 @@
-import { SignatureConfig, SIG_CONFIG } from "../../constants";
-import { verifyTypedData } from "ethers/lib/utils";
-import InjectedEthereumSigner from "./injectedEthereumSigner";
-import { domain, types } from "./TypedEthereumSigner";
+import { SignatureConfig, SIG_CONFIG } from "../../constants.js";
+import { verifyTypedData } from "ethers/lib/utils.js";
+import InjectedEthereumSigner from "./injectedEthereumSigner.js";
+import { domain, types } from "./TypedEthereumSigner.js";
 
 export default class InjectedTypedEthereumSigner extends InjectedEthereumSigner {
   readonly ownerLength: number = SIG_CONFIG[SignatureConfig.TYPEDETHEREUM].pubLength;

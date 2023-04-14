@@ -8,7 +8,7 @@ import {
   InjectedAptosSigner,
   MultiSignatureAptosSigner,
   TypedEthereumSigner,
-} from "./chains";
+} from "./chains/index.js";
 
 export type IndexToType = Record<
   number,

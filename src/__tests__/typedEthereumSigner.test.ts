@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { createData, TypedEthereumSigner } from "../../index";
+import { createData, TypedEthereumSigner } from "../../index.js";
 import Crypto from "crypto";
 const wallet = new ethers.Wallet(
   "0x37929fc21ab44ace162318acbbf4d24a41270b2aee18fd1cfb22e3fc3f4b4024",

@@ -1,14 +1,14 @@
-import type { BundleInterface } from "../BundleInterface";
-import FileDataItem from "./FileDataItem";
+import type { BundleInterface } from "../BundleInterface.js";
+import FileDataItem from "./FileDataItem.js";
 import type { PathLike } from "fs";
 import { createReadStream, promises } from "fs";
-import { byteArrayToLong } from "../utils";
+import { byteArrayToLong } from "../utils.js";
 import type Arweave from "arweave";
 import { read as FSRead } from "fs";
 import MultiStream from "multistream";
 // import { pipeline } from 'stream/promises';
 // import { createTransactionAsync } from 'arweave-stream';
-import type { JWKInterface } from "../interface-jwk";
+import type { JWKInterface } from "../interface-jwk.js";
 import { promisify } from "util";
 import base64url from "base64url";
 import { pipeline } from "stream/promises";

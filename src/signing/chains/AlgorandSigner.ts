@@ -1,4 +1,4 @@
-import Curve25519 from "../keys/curve25519";
+import Curve25519 from "../keys/curve25519.js";
 export default class AlgorandSigner extends Curve25519 {
   get publicKey(): Buffer {
     return Buffer.from(this.pk);

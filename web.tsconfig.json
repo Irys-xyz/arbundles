@@ -1,5 +1,5 @@
 {
-    "extends": "./esm.tsconfig.json",
+    "extends": "./tsconfig.json",
     "compilerOptions": {
         "outDir": "./build/web/esm",
         "paths": {

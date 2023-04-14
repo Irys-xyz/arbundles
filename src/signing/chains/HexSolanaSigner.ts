@@ -1,4 +1,4 @@
-import SolanaSigner from "./SolanaSigner";
+import SolanaSigner from "./SolanaSigner.js";
 export default class HexSolanaSigner extends SolanaSigner {
   signatureType = 4; // for solana sig type
 

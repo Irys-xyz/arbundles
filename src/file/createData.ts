@@ -1,10 +1,10 @@
-import FileDataItem from "./FileDataItem";
-import type { DataItemCreateOptions } from "../ar-data-base";
+import FileDataItem from "./FileDataItem.js";
+import type { DataItemCreateOptions } from "../ar-data-base.js";
 import { tmpName } from "tmp-promise";
 import base64url from "base64url";
-import { longTo8ByteArray, shortTo2ByteArray } from "../utils";
-import { serializeTags } from "../tags";
-import type { Signer } from "../signing";
+import { longTo8ByteArray, shortTo2ByteArray } from "../utils.js";
+import { serializeTags } from "../tags.js";
+import type { Signer } from "../signing/index.js";
 import { pipeline } from "stream/promises";
 import { createWriteStream } from "fs";
 

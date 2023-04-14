@@ -1,7 +1,7 @@
 // import MyAlgoConnect from "@randlabs/myalgo-connect";
 // import * as algosdk from "algosdk";
-// import { Signer } from "..";
-// import { SignatureConfig, SIG_CONFIG } from "../../../constants";
+// import { Signer } from "...js";
+// import { SignatureConfig, SIG_CONFIG } from "../../../constants.js";
 // import * as ed25519 from "noble-ed25519";
 
 // export default class InjectedAlgorandSigner implements Signer {

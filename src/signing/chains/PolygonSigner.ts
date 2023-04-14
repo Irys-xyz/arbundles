@@ -1,3 +1,3 @@
-import EthereumSigner from "./ethereumSigner";
+import EthereumSigner from "./ethereumSigner.js";
 
 export default class PolygonSigner extends EthereumSigner {}

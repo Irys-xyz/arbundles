@@ -3,21 +3,21 @@ const webpack = require("webpack");
 const { DuplicatesPlugin } = require("inspectpack/plugin");
 
 module.exports = {
-  entry: ["./webIndex.ts"],
+  entry: ["./build/web/esm/webIndex.js"],
   devtool: "source-map",
   mode: "production",
-  module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        use: { loader: "ts-loader", options: { configFile: "web.tsconfig.json" } },
-        exclude: [
-          /node_modules/,
-          path.resolve(__dirname, "build/"),
-        ],
-      },
-    ],
-  },
+  // module: {
+  //   rules: [
+  //     {
+  //       test: /\.ts$/,
+  //       use: { loader: "ts-loader", options: { configFile: "web.tsconfig.json" } },
+  //       exclude: [
+  //         /node_modules/,
+  //         path.resolve(__dirname, "build/"),
+  //       ],
+  //     },
+  //   ],
+  // },
   // optimization: {
   //     minimize: false,
   //     mangleExports: false,

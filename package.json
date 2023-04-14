@@ -9,35 +9,56 @@
   "browser": "build/web/esm/webIndex.js",
   "exports": {
     ".": {
-      "types": "./build/node/esm/index.d.ts",
-      "import": "./build/node/esm/index.js",
-      "require": "./build/node/cjs/index.js",
+      "require": {
+        "types": "./build/node/cjs/index.d.ts",
+        "default": "./build/node/cjs/index.js"
+      },
+      "import": {
+        "types": "./build/node/esm/index.d.ts",
+        "default": "./build/node/esm/index.js"
+      },
       "node": "./build/node/cjs/index.js",
       "browser": "./build/web/esm/webIndex.js"
     },
     "./file": {
-      "types": "./build/node/esm/src/file/index.d.ts",
-      "import": "./build/node/esm/src/file/index.js",
-      "require": "./build/node/cjs/src/file/index.js",
-      "node": "./build/node/cjs/src/file/index.js"
+      "require": {
+        "types": "./build/node/cjs/src/file/index.d.ts",
+        "default": "./build/node/cjs/src/file/index.js"
+      },
+      "import": {
+        "types": "./build/node/esm/src/file/index.d.ts",
+        "default": "./build/node/esm/src/file/index.js"
+      }
     },
     "./stream": {
-      "types": "./build/node/esm/src/stream/index.d.ts",
-      "import": "./build/node/esm/src/stream/index.js",
-      "require": "./build/node/cjs/src/stream/index.js",
-      "node": "./build/node/cjs/src/stream/index.js"
+      "require": {
+        "types": "./build/node/cjs/src/stream/index.d.ts",
+        "default": "./build/node/cjs/src/stream/index.js"
+      },
+      "import": {
+        "types": "./build/node/esm/src/stream/index.d.ts",
+        "default": "./build/node/esm/src/stream/index.js"
+      }
     },
     "./node": {
-      "types": "./build/node/esm/index.d.ts",
-      "import": "./build/node/esm/index.js",
-      "require": "./build/node/cjs/index.js",
-      "node": "./build/node/cjs/index.js"
+      "require": {
+        "types": "./build/web/cjs/index.d.ts",
+        "default": "./build/web/cjs/index.js"
+      },
+      "import": {
+        "types": "./build/web/esm/index.d.ts",
+        "default": "./build/web/esm/index.js"
+      }
     },
     "./web": {
-      "types": "./build/web/esm/webIndex.d.ts",
-      "import": "./build/web/esm/webIndex.js",
-      "require": "./build/web/cjs/webIndex.js",
-      "default": "./build/web/esm/webIndex.js"
+      "require": {
+        "types": "./build/web/cjs/webIndex.d.ts",
+        "default": "./build/web/cjs/webIndex.js"
+      },
+      "import": {
+        "types": "./build/web/esm/webIndex.d.ts",
+        "default": "./build/web/esm/webIndex.js"
+      }
     },
     "./bundle": {
       "types": "./build/web/esm/index.d.ts",
@@ -48,17 +69,18 @@
       "default": "./build/*.js"
     }
   },
-  "types": "./build/node/cjs/index.d.ts",
   "files": [
     "build/**/*.js",
     "build/**/*.js.map",
     "build/**/*.d.ts"
   ],
   "scripts": {
-    "build": "rm -rf ./build && concurrently \"tsc -p tsconfig.json && resolve-tspaths -p tsconfig.json\" \"tsc -p esm.tsconfig.json && resolve-tspaths -p esm.tsconfig.json\"  \"tsc -p web.tsconfig.json && resolve-tspaths -p web.tsconfig.json\" \"tsc -p web-cjs.tsconfig.json && resolve-tspaths -p web-cjs.tsconfig.json\" && webpack",
+    "build": "rm -rf ./build && concurrently \"tsc -p tsconfig.json && resolve-tspaths -p tsconfig.json && sh ./fix-pkg.sh node/esm module \" \"tsc -p cjs.tsconfig.json && resolve-tspaths -p cjs.tsconfig.json && sh ./fix-pkg.sh node/cjs commonjs \"  \"tsc -p web.tsconfig.json && resolve-tspaths -p web.tsconfig.json && sh ./fix-pkg.sh web/esm module \" \"tsc -p web-cjs.tsconfig.json && resolve-tspaths -p web-cjs.tsconfig.json && sh ./fix-pkg.sh web/cjs commonjs\" && webpack",
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
     "lint:fix": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx --fix",
     "test": "jest --coverage",
+    "watch": "tsc --watch -p tsconfig.json",
+    "webpack:analyze": "webpack --profile --json /tmp/wp.json && webpack-bundle-analyzer /tmp/wp.json",
     "husky-install": "(node -e \"if (!require('fs').existsSync(__dirname + '/.git')) {process.exit(1)}\" && husky install || true)",
     "ensure-build": "(node -e \"if (!require('fs').existsSync(__dirname + '/build')) {process.exit(1)}\" || yarn run build)",
     "prepack": "yarn run ensure-build",
@@ -102,6 +124,7 @@
     "tsutils": "~3.21.0",
     "typescript": "^4.9.3",
     "webpack": "^5.75.0",
+    "webpack-bundle-analyzer": "^4.8.0",
     "webpack-cli": "^5.0.0"
   },
   "dependencies": {

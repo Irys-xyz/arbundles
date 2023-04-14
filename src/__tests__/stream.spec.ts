@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import path from "path";
-import { bundleAndSignData, createData, ArweaveSigner } from "../../index";
-import processStream from "../../src/stream";
+import { bundleAndSignData, createData, ArweaveSigner } from "../../index.js";
+import processStream from "../../src/stream/index.js";
 import { Readable } from "stream";
 
 const wallet0 = JSON.parse(
