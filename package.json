@@ -1,6 +1,6 @@
 {
   "name": "arbundles",
-  "version": "0.9.0-a3",
+  "version": "0.9.0-rc1",
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
@@ -103,6 +103,8 @@
     "crypto-browserify": "^3.12.0",
     "eslint": "^8.31.0",
     "eslint-config-prettier": "~8.3.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jest": "~24.3.6",
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^7.0.0",
