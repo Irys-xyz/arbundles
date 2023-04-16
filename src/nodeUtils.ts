@@ -2,7 +2,7 @@ import { createPublicKey } from "crypto";
 import { default as nodeDriver } from "arweave/node/lib/crypto/node-driver.js";
 import type { JWKInterface } from "./interface-jwk.js";
 // import CryptoInterface from "arweave/node/lib/crypto/crypto-interface.js";
-export { stringToBuffer, concatBuffers } from "arweave/node/lib/utils";
+export { stringToBuffer, concatBuffers } from "arweave/node/lib/utils.js";
 export { default as Transaction } from "arweave/node/lib/transaction.js";
 export { deepHash } from "./deepHash.js";
 // import type { Hash } from "crypto";
