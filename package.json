@@ -8,6 +8,17 @@
   "module": "build/node/esm/index.js",
   "browser": "build/web/esm/webIndex.js",
   "exports": {
+    ".": {
+      "browser": "./build/web/esm/webIndex.js",
+      "require": {
+        "types": "./build/node/cjs/index.d.ts",
+        "default": "./build/node/cjs/index.js"
+      },
+      "import": {
+        "types": "./build/node/esm/index.d.ts",
+        "default": "./build/node/esm/index.js"
+      }
+    },
     "./file": {
       "require": {
         "types": "./build/node/cjs/src/file/index.d.ts",
@@ -51,17 +62,6 @@
     "./bundle": {
       "types": "./build/web/esm/index.d.ts",
       "default": "./build/web/bundle.js"
-    },
-    ".": {
-      "browser": "./build/web/esm/webIndex.js",
-      "require": {
-        "types": "./build/node/cjs/index.d.ts",
-        "default": "./build/node/cjs/index.js"
-      },
-      "import": {
-        "types": "./build/node/esm/index.d.ts",
-        "default": "./build/node/esm/index.js"
-      }
     },
     "./*": {
       "types": "./*.d.ts",
