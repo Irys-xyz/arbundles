@@ -1,4 +1,4 @@
-import { SolanaSigner, createData, DataItemCreateOptions } from "../../index.js";
+import { SolanaSigner, createData, DataItemCreateOptions } from "../../index";
 import base58 from 'bs58';
 
 describe("Solana signing tests", function () {

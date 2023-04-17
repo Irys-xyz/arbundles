@@ -1,15 +1,15 @@
 import { PassThrough, Transform } from "stream";
 import type { Readable } from "stream";
-import { byteArrayToLong } from "../utils.js";
+import { byteArrayToLong } from "../utils";
 import base64url from "base64url";
-import { indexToType } from "../signing/constants.js";
-import type { DataItemCreateOptions } from "../index.js";
-import { createData, MIN_BINARY_SIZE } from "../index.js";
-import { SIG_CONFIG } from "../constants.js";
+import { indexToType } from "../signing/constants";
+import type { DataItemCreateOptions } from "../index";
+import { createData, MIN_BINARY_SIZE } from "../index";
+import { SIG_CONFIG } from "../constants";
 import { stringToBuffer } from "$/utils";
-import { deepHash } from "../deepHash.js";
-import type { Signer } from "../signing/index.js";
-import { deserializeTags } from "../tags.js";
+import { deepHash } from "../deepHash";
+import type { Signer } from "../signing/index";
+import { deserializeTags } from "../tags";
 import { createHash } from "crypto";
 
 export default async function processStream(stream: Readable): Promise<Record<string, any>[]> {

@@ -1,6 +1,6 @@
-import Rsa4096Pss from "../keys/Rsa4096Pss.js";
-import type { JWKInterface } from "../../interface-jwk.js";
-import { jwkTopem } from "arweave/node/lib/crypto/pem.js";
+import Rsa4096Pss from "../keys/Rsa4096Pss";
+import type { JWKInterface } from "../../interface-jwk";
+import { jwkTopem } from "arweave/node/lib/crypto/pem";
 import base64url from "base64url";
 import { getCryptoDriver } from "$/utils";
 

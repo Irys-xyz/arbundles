@@ -1,8 +1,8 @@
 import { Wallet } from "ethers";
-import { verifyTypedData } from "ethers/lib/utils.js";
-import { SignatureConfig, SIG_CONFIG } from "../../constants.js";
-import keccak256 from "../keccak256.js";
-import EthereumSigner from "./ethereumSigner.js";
+import { verifyTypedData } from "ethers/lib/utils";
+import { SignatureConfig, SIG_CONFIG } from "../../constants";
+import keccak256 from "../keccak256";
+import EthereumSigner from "./ethereumSigner";
 
 export default class TypedEthereumSigner extends EthereumSigner {
   readonly ownerLength: number = SIG_CONFIG[SignatureConfig.TYPEDETHEREUM].pubLength;

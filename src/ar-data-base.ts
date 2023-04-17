@@ -1,4 +1,4 @@
-import type DataItem from "./DataItem.js";
+import type DataItem from "./DataItem";
 import { deepHash, stringToBuffer } from "$/utils";
 /**
  * Options for creation of a DataItem

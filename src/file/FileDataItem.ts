@@ -1,17 +1,17 @@
 import base64url from "base64url";
 import { createReadStream, promises, read as FSRead, write as FSWrite } from "fs";
 import type { PathLike } from "fs";
-import { byteArrayToLong } from "../utils.js";
-import type { BundleItem } from "../BundleItem.js";
-import { deepHash } from "../index.js";
+import { byteArrayToLong } from "../utils";
+import type { BundleItem } from "../BundleItem";
+import { deepHash } from "../index";
 import { getCryptoDriver, stringToBuffer } from "$/utils";
-import type { Signer } from "../signing/index.js";
-import { indexToType } from "../signing/index.js";
+import type { Signer } from "../signing/index";
+import { indexToType } from "../signing/index";
 import type { AxiosResponse } from "axios";
 import axios from "axios";
-import { SIG_CONFIG } from "../constants.js";
+import { SIG_CONFIG } from "../constants";
 import { promisify } from "util";
-import { deserializeTags } from "../tags.js";
+import { deserializeTags } from "../tags";
 
 const read = promisify(FSRead);
 const write = promisify(FSWrite);

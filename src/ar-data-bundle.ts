@@ -1,9 +1,9 @@
-import getSignatureData from "./ar-data-base.js";
-import { longTo32ByteArray } from "./utils.js";
-import type DataItem from "./DataItem.js";
+import getSignatureData from "./ar-data-base";
+import { longTo32ByteArray } from "./utils";
+import type DataItem from "./DataItem";
 import Arweave from "arweave";
-import Bundle from "./Bundle.js";
-import type { Signer } from "./signing/Signer.js";
+import Bundle from "./Bundle";
+import type { Signer } from "./signing/Signer";
 
 /**
  * Unbundles a transaction into an Array of DataItems.

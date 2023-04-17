@@ -8,17 +8,6 @@
   "module": "build/node/esm/index.js",
   "browser": "build/web/esm/webIndex.js",
   "exports": {
-    ".": {
-      "browser": "./build/web/esm/webIndex.js",
-      "require": {
-        "types": "./build/node/cjs/index.d.ts",
-        "default": "./build/node/cjs/index.js"
-      },
-      "import": {
-        "types": "./build/node/esm/index.d.ts",
-        "default": "./build/node/esm/index.js"
-      }
-    },
     "./file": {
       "require": {
         "types": "./build/node/cjs/src/file/index.d.ts",
@@ -63,9 +52,20 @@
       "types": "./build/web/esm/index.d.ts",
       "default": "./build/web/bundle.js"
     },
+    ".": {
+      "browser": "./build/web/esm/webIndex.js",
+      "require": {
+        "types": "./build/node/cjs/index.d.ts",
+        "default": "./build/node/cjs/index.js"
+      },
+      "import": {
+        "types": "./build/node/esm/index.d.ts",
+        "default": "./build/node/esm/index.js"
+      }
+    },
     "./*": {
-      "types": "./build/*.d.ts",
-      "default": "./build/*.js"
+      "types": "./*.d.ts",
+      "default": "./*.js"
     }
   },
   "files": [
@@ -74,7 +74,7 @@
     "build/**/*.d.ts"
   ],
   "scripts": {
-    "build": "rm -rf ./build && concurrently \"tsc -p tsconfig.json && resolve-tspaths -p tsconfig.json && sh ./fix-pkg.sh node/esm module \" \"tsc -p cjs.tsconfig.json && resolve-tspaths -p cjs.tsconfig.json && sh ./fix-pkg.sh node/cjs commonjs \"  \"tsc -p web.tsconfig.json && resolve-tspaths -p web.tsconfig.json && sh ./fix-pkg.sh web/esm module \" \"tsc -p web-cjs.tsconfig.json && resolve-tspaths -p web-cjs.tsconfig.json && sh ./fix-pkg.sh web/cjs commonjs\" && webpack",
+    "build": "rm -rf ./build && concurrently \"tsc -p tsconfig.json && resolve-tspaths -p tsconfig.json && sh ./fix-pkg.sh node/esm module && yarn tsc-esm-fix --tsconfig tsconfig.json \" \"tsc -p cjs.tsconfig.json && resolve-tspaths -p cjs.tsconfig.json && sh ./fix-pkg.sh node/cjs commonjs \"  \"tsc -p web.tsconfig.json && resolve-tspaths -p web.tsconfig.json && sh ./fix-pkg.sh web/esm module && yarn tsc-esm-fix --tsconfig web.tsconfig.json \" \"tsc -p web-cjs.tsconfig.json && resolve-tspaths -p web-cjs.tsconfig.json && sh ./fix-pkg.sh web/cjs commonjs\" && webpack",
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
     "lint:fix": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx --fix",
     "test": "jest --coverage",
@@ -121,6 +121,7 @@
     "ts-jest": "^29.0.5",
     "ts-loader": "^9.4.1",
     "ts-node": "^10.8.1",
+    "tsc-esm-fix": "^2.20.12",
     "tslib": "^2.4.0",
     "tsutils": "~3.21.0",
     "typescript": "^4.9.3",

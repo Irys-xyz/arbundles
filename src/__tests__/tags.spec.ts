@@ -1,4 +1,4 @@
-import { deserializeTags, serializeTags } from "../tags.js";
+import { deserializeTags, serializeTags } from "../tags";
 
 import { Type } from "avsc";
 import { randomBytes, randomInt } from "crypto";

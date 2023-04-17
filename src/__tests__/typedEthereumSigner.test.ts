@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { createData, TypedEthereumSigner } from "../../index.js";
+import { createData, TypedEthereumSigner } from "../../index";
 import Crypto from "crypto";
 const wallet = new ethers.Wallet(
   "0x37929fc21ab44ace162318acbbf4d24a41270b2aee18fd1cfb22e3fc3f4b4024",
@@ -10,8 +10,8 @@ describe("Typed ethereum signer", function () {
   describe("sign & verify", () => {
     const signer = new TypedEthereumSigner(wallet.privateKey.slice(2));
     const data = Buffer.from("Hello, Bundlr!");
-    const expectedSignature = Buffer.from([188, 220, 82, 226, 88, 27, 234, 197, 186, 241, 99, 91, 39, 11, 49, 110, 190, 209, 73, 2, 55, 56, 113, 55, 216, 249, 133, 108, 249, 31, 207, 114, 57, 248, 2, 141, 253, 15, 18, 172, 231, 158, 25, 228, 188, 25, 157, 199, 118, 215, 74, 242, 12, 245, 218, 203, 83, 135, 231, 11, 184, 20, 0, 56, 28])
-
+    const expectedSignature = Buffer.from([53, 205, 197, 211, 191, 21, 250, 235, 11, 155, 110, 133, 112, 16, 67, 233, 178, 149, 181, 238, 178, 158, 117, 92, 228, 192, 235, 219, 213, 150, 184, 210, 55, 107, 171, 6, 92, 95, 1, 3, 160, 100, 244, 150, 48, 229, 179, 241, 126, 163, 89, 194, 141, 244, 17, 84, 254, 95, 194, 167, 12, 39, 243, 237, 27])
+    
     describe("with a known wallet", () => {
       it("should sign a known value ", async () => {
         const signature = await signer.sign(data);

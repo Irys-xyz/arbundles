@@ -1,14 +1,14 @@
-import { byteArrayToLong } from "./utils.js";
+import { byteArrayToLong } from "./utils";
 import base64url from "base64url";
 import { Buffer } from "buffer";
-import { sign } from "./ar-data-bundle.js";
-import type { BundleItem } from "./BundleItem.js";
-import type { Signer } from "./signing/index.js";
-import { indexToType } from "./signing/index.js";
-import getSignatureData from "./ar-data-base.js";
-import { SIG_CONFIG, SignatureConfig } from "./constants.js";
+import { sign } from "./ar-data-bundle";
+import type { BundleItem } from "./BundleItem";
+import type { Signer } from "./signing/index";
+import { indexToType } from "./signing/index";
+import getSignatureData from "./ar-data-base";
+import { SIG_CONFIG, SignatureConfig } from "./constants";
 import { getCryptoDriver } from "$/utils";
-import { deserializeTags } from "./tags.js";
+import { deserializeTags } from "./tags";
 import { createHash } from "crypto";
 
 export const MIN_BINARY_SIZE = 80;

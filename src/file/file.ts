@@ -1,13 +1,13 @@
 import { createReadStream, promises, read as FSRead } from "fs";
 import { promisify } from "util";
-import { byteArrayToLong } from "../utils.js";
+import { byteArrayToLong } from "../utils";
 import base64url from "base64url";
 import type { FileHandle } from "fs/promises";
-import type { Signer } from "../signing/index.js";
-import type { DataItemCreateOptions } from "../index.js";
-import { streamSigner } from "../stream/index.js";
+import type { Signer } from "../signing/index";
+import type { DataItemCreateOptions } from "../index";
+import { streamSigner } from "../stream/index";
 import type { Readable } from "stream";
-import { deserializeTags } from "../tags.js";
+import { deserializeTags } from "../tags";
 
 type File = string | FileHandle;
 const read = promisify(FSRead);

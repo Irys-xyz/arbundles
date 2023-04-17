@@ -1,5 +1,5 @@
-import type { Signer } from "./Signer.js";
-import Curve25519 from "./keys/curve25519.js";
+import type { Signer } from "./Signer";
+import Curve25519 from "./keys/curve25519";
 
 import {
   ArweaveSigner,
@@ -8,7 +8,7 @@ import {
   InjectedAptosSigner,
   MultiSignatureAptosSigner,
   TypedEthereumSigner,
-} from "./chains/index.js";
+} from "./chains/index";
 
 export type IndexToType = Record<
   number,

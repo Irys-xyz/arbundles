@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import type { DataItemCreateOptions } from "./ar-data-base.js";
+import type { DataItemCreateOptions } from "./ar-data-base";
 
 import base64url from "base64url";
-import { longTo8ByteArray, shortTo2ByteArray } from "./utils.js";
-import DataItem from "./DataItem.js";
-import { serializeTags } from "./tags.js";
-import type { Signer } from "./signing/index.js";
+import { longTo8ByteArray, shortTo2ByteArray } from "./utils";
+import DataItem from "./DataItem";
+import { serializeTags } from "./tags";
+import type { Signer } from "./signing/index";
 
 /**
  * This will create a single DataItem in binary format (Uint8Array)

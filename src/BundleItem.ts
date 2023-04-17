@@ -1,4 +1,4 @@
-import type { Signer } from "./signing/index.js";
+import type { Signer } from "./signing/index";
 import type { Buffer } from "buffer";
 
 type ResolvesTo<T> = T | Promise<T> | ((...args: any[]) => Promise<T>);

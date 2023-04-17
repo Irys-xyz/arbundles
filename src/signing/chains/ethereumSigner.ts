@@ -1,6 +1,6 @@
-import Secp256k1 from "../keys/secp256k1.js";
+import Secp256k1 from "../keys/secp256k1";
 import secp256k1 from "secp256k1";
-import { arrayify, hashMessage } from "ethers/lib/utils.js";
+import { arrayify, hashMessage } from "ethers/lib/utils";
 import base64url from "base64url";
 import { ethers } from "ethers";
 

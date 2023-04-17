@@ -1,6 +1,6 @@
-import type { Signer } from "../Signer.js";
+import type { Signer } from "../Signer";
 import base64url from "base64url";
-import { SIG_CONFIG } from "../../constants.js";
+import { SIG_CONFIG } from "../../constants";
 import { sign, verify } from "@noble/ed25519";
 
 export default class Curve25519 implements Signer {

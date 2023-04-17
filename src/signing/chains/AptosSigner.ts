@@ -1,4 +1,4 @@
-import Curve25519 from "../keys/curve25519.js";
+import Curve25519 from "../keys/curve25519";
 
 export default class AptosSigner extends Curve25519 {
   constructor(privKey: string, pubKey: string) {

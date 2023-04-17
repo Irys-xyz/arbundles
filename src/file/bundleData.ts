@@ -1,8 +1,8 @@
 import { file } from "tmp-promise";
-import { longTo32ByteArray } from "../utils.js";
-import type { Signer } from "../signing/index.js";
-import FileBundle from "./FileBundle.js";
-import type FileDataItem from "./FileDataItem.js";
+import { longTo32ByteArray } from "../utils";
+import type { Signer } from "../signing/index";
+import FileBundle from "./FileBundle";
+import type FileDataItem from "./FileDataItem";
 import { createWriteStream } from "fs";
 
 export async function bundleAndSignData(dataItems: FileDataItem[], signer: Signer, dir?: string): Promise<FileBundle> {

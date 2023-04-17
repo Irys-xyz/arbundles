@@ -1,6 +1,6 @@
-import type { BundleItem } from "./BundleItem.js";
+import type { BundleItem } from "./BundleItem";
 import type Arweave from "arweave";
-import type { JWKInterface } from "./interface-jwk.js";
+import type { JWKInterface } from "./interface-jwk";
 import type { CreateTransactionInterface, Transaction } from "$/utils";
 
 type ResolvesTo<T> = T | Promise<T> | ((...args: any[]) => Promise<T>);

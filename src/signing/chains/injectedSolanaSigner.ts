@@ -1,6 +1,6 @@
-import type { Signer } from "../index.js";
+import type { Signer } from "../index";
 import base64url from "base64url";
-import { SIG_CONFIG } from "../../constants.js";
+import { SIG_CONFIG } from "../../constants";
 import type { MessageSignerWalletAdapter } from "@solana/wallet-adapter-base";
 import { verify } from "@noble/ed25519";
 

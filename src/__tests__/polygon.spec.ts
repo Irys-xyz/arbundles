@@ -1,4 +1,4 @@
-import { createData, PolygonSigner, DataItemCreateOptions } from "../../index.js";
+import { createData, PolygonSigner, DataItemCreateOptions } from "../../index";
 
 describe("Polygon signing tests", function () {
   it("should sign and verify", async function () {

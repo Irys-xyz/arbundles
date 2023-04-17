@@ -1,9 +1,9 @@
 import base64url from "base64url";
-import { byteArrayToLong } from "./utils.js";
-import DataItem from "./DataItem.js";
+import { byteArrayToLong } from "./utils";
+import DataItem from "./DataItem";
 import type Arweave from "arweave";
-import type { BundleInterface } from "./BundleInterface.js";
-import type { JWKInterface } from "./interface-jwk.js";
+import type { BundleInterface } from "./BundleInterface";
+import type { JWKInterface } from "./interface-jwk";
 import { createHash } from "crypto";
 import type { CreateTransactionInterface, Transaction } from "$/utils";
 
