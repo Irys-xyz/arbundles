@@ -69,9 +69,7 @@
     }
   },
   "files": [
-    "build/**/*.js",
-    "build/**/*.js.map",
-    "build/**/*.d.ts"
+    "./build/**/*"
   ],
   "scripts": {
     "build": "rm -rf ./build && concurrently \"tsc -p tsconfig.json && resolve-tspaths -p tsconfig.json && sh ./fix-pkg.sh node/esm module && yarn tsc-esm-fix --tsconfig tsconfig.json \" \"tsc -p cjs.tsconfig.json && resolve-tspaths -p cjs.tsconfig.json && sh ./fix-pkg.sh node/cjs commonjs \"  \"tsc -p web.tsconfig.json && resolve-tspaths -p web.tsconfig.json && sh ./fix-pkg.sh web/esm module && yarn tsc-esm-fix --tsconfig web.tsconfig.json \" \"tsc -p web-cjs.tsconfig.json && resolve-tspaths -p web-cjs.tsconfig.json && sh ./fix-pkg.sh web/cjs commonjs\" && webpack",
