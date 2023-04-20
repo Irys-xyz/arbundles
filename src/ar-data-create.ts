@@ -5,7 +5,7 @@ import base64url from "base64url";
 import { longTo8ByteArray, shortTo2ByteArray } from "./utils";
 import DataItem from "./DataItem";
 import { serializeTags } from "./tags";
-import type { Signer } from "./signing";
+import type { Signer } from "./signing/index";
 
 /**
  * This will create a single DataItem in binary format (Uint8Array)

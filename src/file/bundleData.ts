@@ -1,13 +1,13 @@
 import { file } from "tmp-promise";
-import * as fs from "fs";
 import { longTo32ByteArray } from "../utils";
-import type { Signer } from "../signing";
+import type { Signer } from "../signing/index";
 import FileBundle from "./FileBundle";
 import type FileDataItem from "./FileDataItem";
+import { createWriteStream } from "fs";
 
 export async function bundleAndSignData(dataItems: FileDataItem[], signer: Signer, dir?: string): Promise<FileBundle> {
   const headerFile = await file({ dir });
-  const headerStream = fs.createWriteStream(headerFile.path);
+  const headerStream = createWriteStream(headerFile.path);
   const files = new Array(dataItems.length);
 
   headerStream.write(longTo32ByteArray(dataItems.length));

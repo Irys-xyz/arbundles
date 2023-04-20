@@ -7,9 +7,9 @@ import type { Signer } from "./signing/index";
 import { indexToType } from "./signing/index";
 import getSignatureData from "./ar-data-base";
 import { SIG_CONFIG, SignatureConfig } from "./constants";
-import * as crypto from "crypto";
-import { Arweave } from "$/utils";
+import { getCryptoDriver } from "$/utils";
 import { deserializeTags } from "./tags";
+import { createHash } from "crypto";
 
 export const MIN_BINARY_SIZE = 80;
 
@@ -46,7 +46,7 @@ export class DataItem implements BundleItem {
   }
 
   get rawId(): Buffer {
-    return crypto.createHash("sha256").update(this.rawSignature).digest();
+    return createHash("sha256").update(this.rawSignature).digest();
   }
 
   set rawId(id: Buffer) {
@@ -167,7 +167,7 @@ export class DataItem implements BundleItem {
 
   public async setSignature(signature: Buffer): Promise<void> {
     this.binary.set(signature, 2);
-    this._id = Buffer.from(await Arweave.crypto.hash(signature));
+    this._id = Buffer.from(await getCryptoDriver().hash(signature));
   }
 
   public isSigned(): boolean {

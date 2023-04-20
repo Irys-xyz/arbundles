@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es2019",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "nodenext",
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
@@ -21,9 +21,17 @@
     "strictNullChecks": false,
     "baseUrl": "./src",
     "rootDir": ".",
-    "outDir": "./build/node/cjs",
+    "outDir": "./build/node/esm",
     "paths": {
       "$/utils": ["nodeUtils.ts"]
+    }
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    "esm": false,
+    "transpileOnly": true,
+    "compilerOptions": {
+      "module": "CommonJS"
     }
   },
   "include": ["src/**/*","index.ts", "webIndex.ts"],

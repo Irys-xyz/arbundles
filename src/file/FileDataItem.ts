@@ -1,21 +1,20 @@
 import base64url from "base64url";
-import * as fs from "fs";
+import { createReadStream, promises, read as FSRead, write as FSWrite } from "fs";
 import type { PathLike } from "fs";
 import { byteArrayToLong } from "../utils";
 import type { BundleItem } from "../BundleItem";
-import { deepHash } from "..";
-import { stringToBuffer } from "$/utils";
-import { Arweave } from "$/utils";
-import type { Signer } from "../signing";
-import { indexToType } from "../signing";
+import { deepHash } from "../index";
+import { getCryptoDriver, stringToBuffer } from "$/utils";
+import type { Signer } from "../signing/index";
+import { indexToType } from "../signing/index";
 import type { AxiosResponse } from "axios";
 import axios from "axios";
 import { SIG_CONFIG } from "../constants";
 import { promisify } from "util";
 import { deserializeTags } from "../tags";
 
-const read = promisify(fs.read);
-const write = promisify(fs.write);
+const read = promisify(FSRead);
+const write = promisify(FSWrite);
 
 export class FileDataItem implements BundleItem {
   public readonly filename: PathLike;
@@ -59,7 +58,7 @@ export class FileDataItem implements BundleItem {
   }
 
   static async verify(filename: PathLike): Promise<boolean> {
-    const handle = await fs.promises.open(filename, "r");
+    const handle = await promises.open(filename, "r");
     const item = new FileDataItem(filename);
     const sigType = await item.signatureType();
     const tagsStart = await item.getTagsStart();
@@ -91,7 +90,7 @@ export class FileDataItem implements BundleItem {
       await item.rawTarget(),
       await item.rawAnchor(),
       await item.rawTags(),
-      fs.createReadStream(filename, {
+      createReadStream(filename, {
         start: await item.dataStart(),
       }),
     ]);
@@ -115,18 +114,18 @@ export class FileDataItem implements BundleItem {
   }
 
   async size(): Promise<number> {
-    return await fs.promises.stat(this.filename).then((r) => r.size);
+    return await promises.stat(this.filename).then((r) => r.size);
   }
 
   async signatureType(): Promise<number> {
-    const handle = await fs.promises.open(this.filename, "r");
+    const handle = await promises.open(this.filename, "r");
     const buffer = await read(handle.fd, Buffer.allocUnsafe(2), 0, 2, 0).then((r) => r.buffer);
     await handle.close();
     return byteArrayToLong(buffer);
   }
 
   async rawSignature(): Promise<Buffer> {
-    const handle = await fs.promises.open(this.filename, "r");
+    const handle = await promises.open(this.filename, "r");
     const length = await this.signatureLength();
 
     const buffer = await read(handle.fd, Buffer.alloc(length), 0, length, 2).then((r) => r.buffer);
@@ -139,7 +138,7 @@ export class FileDataItem implements BundleItem {
   }
 
   async rawOwner(): Promise<Buffer> {
-    const handle = await fs.promises.open(this.filename, "r");
+    const handle = await promises.open(this.filename, "r");
     const length = await this.ownerLength();
     const buffer = await read(handle.fd, Buffer.allocUnsafe(length), 0, length, 2 + (await this.signatureLength())).then((r) => r.buffer);
     await handle.close();
@@ -151,7 +150,7 @@ export class FileDataItem implements BundleItem {
   }
 
   async rawTarget(): Promise<Buffer> {
-    const handle = await fs.promises.open(this.filename, "r");
+    const handle = await promises.open(this.filename, "r");
     const targetStart = await this.getTargetStart();
     const targetPresentBuffer = await read(handle.fd, Buffer.allocUnsafe(1), 0, 1, targetStart).then((r) => r.buffer);
     const targetPresent = targetPresentBuffer[0] === 1;
@@ -175,7 +174,7 @@ export class FileDataItem implements BundleItem {
   async rawAnchor(): Promise<Buffer> {
     const [anchorPresent, anchorStart] = await this.anchorStart();
     if (anchorPresent) {
-      const handle = await fs.promises.open(this.filename, "r");
+      const handle = await promises.open(this.filename, "r");
       const anchorBuffer = await read(handle.fd, Buffer.allocUnsafe(32), 0, 32, anchorStart + 1).then((r) => r.buffer);
       await handle.close();
       return anchorBuffer;
@@ -188,7 +187,7 @@ export class FileDataItem implements BundleItem {
   }
 
   async rawTags(): Promise<Buffer> {
-    const handle = await fs.promises.open(this.filename, "r");
+    const handle = await promises.open(this.filename, "r");
     const tagsStart = await this.getTagsStart();
     const numberOfTagsBuffer = await read(handle.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart).then((r) => r.buffer);
     const numberOfTags = byteArrayToLong(numberOfTagsBuffer);
@@ -220,7 +219,7 @@ export class FileDataItem implements BundleItem {
     if (dataSize === 0) {
       return Buffer.allocUnsafe(0);
     }
-    const handle = await fs.promises.open(this.filename, "r");
+    const handle = await promises.open(this.filename, "r");
 
     const dataBuffer = await read(handle.fd, Buffer.allocUnsafe(dataSize), 0, dataSize, dataStart).then((r) => r.buffer);
     await handle.close();
@@ -242,12 +241,12 @@ export class FileDataItem implements BundleItem {
       await this.rawTarget(),
       await this.rawAnchor(),
       await this.rawTags(),
-      fs.createReadStream(this.filename, { start: dataStart }),
+      createReadStream(this.filename, { start: dataStart }),
     ]);
 
     const signatureBytes = await signer.sign(signatureData);
-    const idBytes = await Arweave.crypto.hash(signatureBytes);
-    const handle = await fs.promises.open(this.filename, "r+");
+    const idBytes = await getCryptoDriver().hash(signatureBytes);
+    const handle = await promises.open(this.filename, "r+");
     await write(handle.fd, signatureBytes, 0, await this.signatureLength(), 2);
 
     this.rawId = Buffer.from(idBytes);
@@ -265,7 +264,7 @@ export class FileDataItem implements BundleItem {
     };
 
     if (!this.isSigned()) throw new Error("You must sign before sending to bundler");
-    const response = await axios.post(`${bundler}/tx`, fs.createReadStream(this.filename), {
+    const response = await axios.post(`${bundler}/tx`, createReadStream(this.filename), {
       headers,
       timeout: 100000,
       maxBodyLength: Infinity,
@@ -285,7 +284,7 @@ export class FileDataItem implements BundleItem {
   }
 
   public async dataStart(): Promise<number> {
-    const handle = await fs.promises.open(this.filename, "r");
+    const handle = await promises.open(this.filename, "r");
     const tagsStart = await this.getTagsStart();
     const numberOfTagsBytesBuffer = await read(handle.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart + 8).then((r) => r.buffer);
     const numberOfTagsBytes = byteArrayToLong(numberOfTagsBytesBuffer);
@@ -295,7 +294,7 @@ export class FileDataItem implements BundleItem {
 
   private async anchorStart(): Promise<[boolean, number]> {
     const targetStart = await this.getTargetStart();
-    const handle = await fs.promises.open(this.filename, "r");
+    const handle = await promises.open(this.filename, "r");
     const targetPresentBuffer = await read(handle.fd, Buffer.allocUnsafe(1), 0, 1, targetStart).then((r) => r.buffer);
     const targetPresent = targetPresentBuffer[0] === 1;
     const anchorStart = targetStart + (targetPresent ? 33 : 1);

@@ -1,5 +1,5 @@
 import { verify } from "@noble/ed25519";
-import type { Signer } from "..";
+import type { Signer } from "../index";
 import { SignatureConfig, SIG_CONFIG } from "../../constants";
 
 export default class InjectedAptosSigner implements Signer {

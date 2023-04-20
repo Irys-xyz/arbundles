@@ -1,56 +1,84 @@
 {
   "name": "arbundles",
-  "version": "0.8.0",
+  "version": "0.9.0-rc6",
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
   "main": "build/node/cjs/index.js",
   "module": "build/node/esm/index.js",
   "browser": "build/web/esm/webIndex.js",
+  "types": "build/node/esm/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./build/node/esm/index.d.ts",
-      "import": "./build/node/esm/index.js",
-      "require": "./build/node/cjs/index.js",
-      "node": "./build/node/cjs/src/index.js"
-    },
     "./file": {
-      "types": "./build/node/esm/src/file/index.d.ts",
-      "import": "./build/node/esm/src/ile/index.js",
-      "require": "./build/node/cjs/src/file/index.js",
-      "node": "./build/node/cjs/src/file/index.js"
+      "require": {
+        "types": "./build/node/cjs/src/file/index.d.ts",
+        "default": "./build/node/cjs/src/file/index.js"
+      },
+      "import": {
+        "types": "./build/node/esm/src/file/index.d.ts",
+        "default": "./build/node/esm/src/file/index.js"
+      }
     },
     "./stream": {
-      "types": "./build/node/esm/src/stream/index.d.ts",
-      "import": "./build/node/esm/src/stream/index.js",
-      "require": "./build/node/cjs/src/stream/index.js",
-      "node": "./build/node/cjs/src/stream/index.js"
+      "require": {
+        "types": "./build/node/cjs/src/stream/index.d.ts",
+        "default": "./build/node/cjs/src/stream/index.js"
+      },
+      "import": {
+        "types": "./build/node/esm/src/stream/index.d.ts",
+        "default": "./build/node/esm/src/stream/index.js"
+      }
+    },
+    "./node": {
+      "require": {
+        "types": "./build/node/cjs/index.d.ts",
+        "default": "./build/node/cjs/index.js"
+      },
+      "import": {
+        "types": "./build/node/esm/index.d.ts",
+        "default": "./build/node/esm/index.js"
+      }
     },
     "./web": {
-      "types": "./build/web/esm/webIndex.d.ts",
-      "import": "./build/web/esm/webIndex.js",
-      "default": "./build/web/esm/webIndex.js"
+      "require": {
+        "types": "./build/web/cjs/webIndex.d.ts",
+        "default": "./build/web/cjs/webIndex.js"
+      },
+      "import": {
+        "types": "./build/web/esm/webIndex.d.ts",
+        "default": "./build/web/esm/webIndex.js"
+      }
     },
     "./bundle": {
       "types": "./build/web/esm/index.d.ts",
       "default": "./build/web/bundle.js"
     },
+    ".": {
+      "browser": "./build/web/esm/webIndex.js",
+      "require": {
+        "types": "./build/node/cjs/index.d.ts",
+        "default": "./build/node/cjs/index.js"
+      },
+      "import": {
+        "types": "./build/node/esm/index.d.ts",
+        "default": "./build/node/esm/index.js"
+      }
+    },
     "./*": {
-      "default": "./build/*.js",
-      "types": "./build/*.d.ts"
+      "types": "./*.d.ts",
+      "default": "./*.js"
     }
   },
-  "types": "./build/node/cjs/index.d.ts",
   "files": [
-    "build/**/*.js",
-    "build/**/*.js.map",
-    "build/**/*.d.ts"
+    "./build/**/*"
   ],
   "scripts": {
-    "build": "rm -rf ./build && (tsc -p tsconfig.json && resolve-tspaths -p tsconfig.json) &  (tsc -p esm.tsconfig.json && resolve-tspaths -p esm.tsconfig.json) & (tsc -p web.tsconfig.json && resolve-tspaths -p web.tsconfig.json && webpack)",
+    "build": "rm -rf ./build && concurrently \"tsc -p tsconfig.json && resolve-tspaths -p tsconfig.json && sh ./fix-pkg.sh node/esm module && yarn tsc-esm-fix --tsconfig tsconfig.json \" \"tsc -p cjs.tsconfig.json && resolve-tspaths -p cjs.tsconfig.json && sh ./fix-pkg.sh node/cjs commonjs \"  \"tsc -p web.tsconfig.json && resolve-tspaths -p web.tsconfig.json && sh ./fix-pkg.sh web/esm module && yarn tsc-esm-fix --tsconfig web.tsconfig.json \" \"tsc -p web-cjs.tsconfig.json && resolve-tspaths -p web-cjs.tsconfig.json && sh ./fix-pkg.sh web/cjs commonjs\" && webpack",
     "lint": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx",
     "lint:fix": "eslint ./src -c ./.eslintrc.json --ext .ts,.tsx --fix",
     "test": "jest --coverage",
+    "watch": "tsc --watch -p tsconfig.json",
+    "webpack:analyze": "webpack --profile --json /tmp/wp.json && webpack-bundle-analyzer /tmp/wp.json",
     "husky-install": "(node -e \"if (!require('fs').existsSync(__dirname + '/.git')) {process.exit(1)}\" && husky install || true)",
     "ensure-build": "(node -e \"if (!require('fs').existsSync(__dirname + '/build')) {process.exit(1)}\" || yarn run build)",
     "prepack": "yarn run ensure-build",
@@ -69,9 +97,12 @@
     "assert": "^2.0.0",
     "avsc": "https://github.com/Bundlr-Network/avsc#csp-fixes",
     "browserify-zlib": "^0.2.0",
+    "concurrently": "^8.0.1",
     "crypto-browserify": "^3.12.0",
     "eslint": "^8.31.0",
     "eslint-config-prettier": "~8.3.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jest": "~24.3.6",
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^7.0.0",
@@ -89,10 +120,12 @@
     "ts-jest": "^29.0.5",
     "ts-loader": "^9.4.1",
     "ts-node": "^10.8.1",
+    "tsc-esm-fix": "^2.20.12",
     "tslib": "^2.4.0",
     "tsutils": "~3.21.0",
     "typescript": "^4.9.3",
     "webpack": "^5.75.0",
+    "webpack-bundle-analyzer": "^4.8.0",
     "webpack-cli": "^5.0.0"
   },
   "dependencies": {

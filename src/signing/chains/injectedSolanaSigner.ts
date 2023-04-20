@@ -1,4 +1,4 @@
-import type { Signer } from "..";
+import type { Signer } from "../index";
 import base64url from "base64url";
 import { SIG_CONFIG } from "../../constants";
 import type { MessageSignerWalletAdapter } from "@solana/wallet-adapter-base";
