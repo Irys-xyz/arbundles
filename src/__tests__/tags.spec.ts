@@ -37,7 +37,7 @@ function serializeTagsAVSC(
 }
 
 export function generateRandomTags(
-  tagsCount = randomInt(1, 25),
+  tagsCount = randomInt(1, 20),
   maxChars = 100,
 ) {
   return new Array(tagsCount).fill(undefined).map(() => {

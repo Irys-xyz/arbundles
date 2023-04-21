@@ -38,7 +38,7 @@ export class AVSCTap {
 
   public toBuffer(): Buffer {
     const buffer = Buffer.alloc(this.pos);
-    if (this.pos > this.buf.length) throw new Error(`Too many tag bytes`);
+    if (this.pos > this.buf.length) throw new Error(`Too many tag bytes (${this.pos} > ${this.buf.length})`);
     this.buf.copy(buffer, 0, 0, this.pos);
     return buffer;
   }
