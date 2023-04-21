@@ -26,7 +26,8 @@ export class AVSCTap {
       for (i = 0; i < n; i++) {
         // for this use case, assume tags/strings.
         const tag = tags[i];
-        if (!tag.name || !tag.value) throw new Error(`Invalid tag format for ${tag}, expected {name:string, value: string}`);
+        if (tag.name === undefined || tag.value === undefined)
+          throw new Error(`Invalid tag format for ${tag}, expected {name:string, value: string}`);
         this.writeString(tag.name);
         this.writeString(tag.value);
         // this.itemsType._write(tap, val[i]);
