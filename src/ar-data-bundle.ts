@@ -1,9 +1,9 @@
 import getSignatureData from "./ar-data-base";
 import { longTo32ByteArray } from "./utils";
 import type DataItem from "./DataItem";
-import Arweave from "arweave";
 import Bundle from "./Bundle";
 import type { Signer } from "./signing/Signer";
+import { getCryptoDriver } from "$/utils";
 
 /**
  * Unbundles a transaction into an Array of DataItems.
@@ -67,7 +67,7 @@ export async function getSignatureAndId(item: DataItem, signer: Signer): Promise
   const signatureData = await getSignatureData(item);
 
   const signatureBytes = await signer.sign(signatureData);
-  const idBytes = await Arweave.crypto.hash(signatureBytes);
+  const idBytes = await getCryptoDriver().hash(signatureBytes);
 
   return { signature: Buffer.from(signatureBytes), id: Buffer.from(idBytes) };
 }
