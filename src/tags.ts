@@ -1,4 +1,4 @@
-import { MAX_TAG_BYTES } from "../index";
+import { MAX_TAG_BYTES } from "./DataItem";
 
 export interface Tag {
   name: string;
