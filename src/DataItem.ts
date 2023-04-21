@@ -12,6 +12,7 @@ import { deserializeTags } from "./tags";
 import { createHash } from "crypto";
 
 export const MIN_BINARY_SIZE = 80;
+export const MAX_TAG_BYTES = 4096;
 
 export class DataItem implements BundleItem {
   private readonly binary: Buffer;
@@ -215,7 +216,7 @@ export class DataItem implements BundleItem {
     const numberOfTagBytesArray = buffer.subarray(tagsStart + 8, tagsStart + 16);
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
 
-    if (numberOfTagBytes > 4096) return false;
+    if (numberOfTagBytes > MAX_TAG_BYTES) return false;
 
     if (numberOfTags > 0) {
       try {

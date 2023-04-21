@@ -3,7 +3,7 @@ import { createReadStream, promises, read as FSRead, write as FSWrite } from "fs
 import type { PathLike } from "fs";
 import { byteArrayToLong } from "../utils";
 import type { BundleItem } from "../BundleItem";
-import { deepHash } from "../index";
+import { deepHash, MAX_TAG_BYTES } from "../index";
 import { getCryptoDriver, stringToBuffer } from "$/utils";
 import type { Signer } from "../signing/index";
 import { indexToType } from "../signing/index";
@@ -65,7 +65,7 @@ export class FileDataItem implements BundleItem {
 
     const numberOfTags = await read(handle.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart).then((r) => byteArrayToLong(r.buffer));
     const numberOfTagsBytes = await read(handle.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart + 8).then((r) => byteArrayToLong(r.buffer));
-    if (numberOfTagsBytes > 4096) {
+    if (numberOfTagsBytes > MAX_TAG_BYTES) {
       await handle.close();
       return false;
     }
@@ -197,7 +197,7 @@ export class FileDataItem implements BundleItem {
     }
     const numberOfTagsBytesBuffer = await read(handle.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart + 8).then((r) => r.buffer);
     const numberOfTagsBytes = byteArrayToLong(numberOfTagsBytesBuffer);
-    if (numberOfTagsBytes > 4096) {
+    if (numberOfTagsBytes > MAX_TAG_BYTES) {
       await handle.close();
       throw new Error("Tags too large");
     }
