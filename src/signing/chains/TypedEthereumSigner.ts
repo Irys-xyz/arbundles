@@ -1,5 +1,4 @@
-import { Wallet } from "ethers";
-import { verifyTypedData } from "ethers/lib/utils";
+import { Wallet, verifyTypedData } from "@ethersproject/wallet";
 import { SignatureConfig, SIG_CONFIG } from "../../constants";
 import keccak256 from "../keccak256";
 import EthereumSigner from "./ethereumSigner";
