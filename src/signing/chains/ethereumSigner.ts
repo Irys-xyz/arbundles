@@ -11,6 +11,7 @@ export default class EthereumSigner extends Secp256k1 {
   }
 
   constructor(key: string) {
+    if (key.startsWith("0x")) key = key.slice(2);
     const b = Buffer.from(key, "hex");
     const pub = secp256k1.publicKeyCreate(b, false);
     super(key, Buffer.from(pub));
