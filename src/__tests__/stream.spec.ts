@@ -4,9 +4,7 @@ import { bundleAndSignData, createData, ArweaveSigner } from "../../index";
 import processStream from "../../src/stream/index";
 import { Readable } from "stream";
 
-const wallet0 = JSON.parse(
-  readFileSync(path.join(__dirname, "test_key0.json")).toString(),
-);
+const wallet0 = JSON.parse(readFileSync(path.join(__dirname, "test_key0.json")).toString());
 
 describe("stream tests", function () {
   it("test", async function () {
