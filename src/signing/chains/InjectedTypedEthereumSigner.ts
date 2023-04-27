@@ -1,5 +1,5 @@
 import { SignatureConfig, SIG_CONFIG } from "../../constants";
-import { verifyTypedData } from "ethers/lib/utils";
+import { verifyTypedData } from "@ethersproject/wallet";
 import InjectedEthereumSigner from "./injectedEthereumSigner";
 import { domain, types } from "./TypedEthereumSigner";
 

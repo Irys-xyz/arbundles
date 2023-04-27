@@ -1,6 +1,6 @@
+import { Wallet } from "@ethersproject/wallet";
 import { createData, TypedEthereumSigner } from "../../index";
 import Crypto from "crypto";
-import { Wallet } from "@ethersproject/wallet";
 const wallet = new Wallet("0x37929fc21ab44ace162318acbbf4d24a41270b2aee18fd1cfb22e3fc3f4b4024");
 const randWallet = Wallet.createRandom();
 
