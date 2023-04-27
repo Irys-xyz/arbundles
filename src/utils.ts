@@ -1,54 +1,29 @@
-export function longTo8ByteArray(long: number): Uint8Array {
-  // we want to represent the input as a 8-bytes array
-  const byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
-
+export function longToNByteArray(N: number, long: number): Uint8Array {
+  const byteArray = new Uint8Array(N);
+  if (long < 0) throw new Error("Array is unsigned, cannot represent -ve numbers");
+  if (long > 2 ** (N * 8) - 1) throw new Error(`Number ${long} is too large for an array of ${N} bytes`);
   for (let index = 0; index < byteArray.length; index++) {
     const byte = long & 0xff;
     byteArray[index] = byte;
     long = (long - byte) / 256;
   }
-
-  return Uint8Array.from(byteArray);
-}
-
-export function shortTo2ByteArray(long: number): Uint8Array {
-  if (long > (2 ^ (32 - 1))) throw new Error("Short too long");
-  // we want to represent the input as a 8-bytes array
-  const byteArray = [0, 0];
-
-  for (let index = 0; index < byteArray.length; index++) {
-    const byte = long & 0xff;
-    byteArray[index] = byte;
-    long = (long - byte) / 256;
-  }
-
-  return Uint8Array.from(byteArray);
-}
-
-export function longTo16ByteArray(long: number): number[] {
-  // we want to represent the input as a 8-bytes array
-  const byteArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-  for (let index = 0; index < byteArray.length; index++) {
-    const byte = long & 0xff;
-    byteArray[index] = byte;
-    long = (long - byte) / 256;
-  }
-
   return byteArray;
 }
 
+export function longTo8ByteArray(long: number): Uint8Array {
+  return longToNByteArray(8, long);
+}
+
+export function shortTo2ByteArray(short: number): Uint8Array {
+  return longToNByteArray(2, short);
+}
+
+export function longTo16ByteArray(long: number): Uint8Array {
+  return longToNByteArray(16, long);
+}
+
 export function longTo32ByteArray(long: number): Uint8Array {
-  // we want to represent the input as a 8-bytes array
-  const byteArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-  for (let index = 0; index < byteArray.length; index++) {
-    const byte = long & 0xff;
-    byteArray[index] = byte;
-    long = (long - byte) / 256;
-  }
-
-  return Uint8Array.from(byteArray);
+  return longToNByteArray(32, long);
 }
 
 export function byteArrayToLong(byteArray: Uint8Array): number {

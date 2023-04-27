@@ -9,6 +9,7 @@
         }
     },
     "exclude": [
-        "./src/nodeUtils.ts"
+        "./src/nodeUtils.ts",
+        "src/__tests__/**"
     ]
 }

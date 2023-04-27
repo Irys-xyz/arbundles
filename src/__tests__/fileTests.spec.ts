@@ -12,9 +12,7 @@ import * as fs from "fs";
 //   logging: false,
 // });
 
-const wallet0 = JSON.parse(
-  readFileSync(path.join(__dirname, "test_key0.json")).toString(),
-);
+const wallet0 = JSON.parse(readFileSync(path.join(__dirname, "test_key0.json")).toString());
 
 describe("file tests", function () {
   it("should verify ts file", async function () {
@@ -38,9 +36,7 @@ describe("file tests", function () {
     expect(await data.isValid()).toBe(true);
     expect(await data.signatureType()).toEqual(1);
     expect(await data.owner()).toEqual(wallet0.n);
-    expect(await data.rawAnchor().then((r) => r.toString())).toEqual(
-      "fgggggggggggggggggggggggggllllll",
-    );
+    expect(await data.rawAnchor().then((r) => r.toString())).toEqual("fgggggggggggggggggggggggggllllll");
     expect(await data.tags()).toEqual([]);
     expect(await data.target()).toEqual("");
     expect((await data.rawData()).toString()).toEqual("tasty");
@@ -56,11 +52,7 @@ describe("file tests", function () {
       },
     ];
     const data = "hello";
-    const d = [
-      await createData(data, signer, { tags }),
-      await createData(data, signer, { tags }),
-      await createData(data, signer, { tags }),
-    ];
+    const d = [await createData(data, signer, { tags }), await createData(data, signer, { tags }), await createData(data, signer, { tags })];
     const bundle = await bundleAndSignData(d, signer);
 
     const first = await bundle.get(0);

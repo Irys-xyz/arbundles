@@ -1,14 +1,13 @@
-import { SolanaSigner, createData, DataItemCreateOptions } from "../../index";
-import base58 from 'bs58';
+import { SolanaSigner, createData } from "../../index";
+import type { DataItemCreateOptions } from "../ar-data-base";
+import base58 from "bs58";
 
 describe("Solana signing tests", function () {
-  it('should sign and verify', async function () {
+  it("should sign and verify", async function () {
     const _d: DataItemCreateOptions = {
       target: "OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs",
       anchor: "Math.apt'#]gng(36).substring(30)",
-      tags: [
-        { name: "Content-Type", value: "image/png" }
-      ]
+      tags: [{ name: "Content-Type", value: "image/png" }],
     };
 
     const signer = new SolanaSigner("rUC3u5oz8W1Y2b8b2tq1K5AUWnXMiVV5o9Fx29yTJepFqFPfYPdwjainQhUvxfNuuhMJAGoawA3qYWzo8QhC5pj");
