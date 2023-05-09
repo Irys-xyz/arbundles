@@ -138,9 +138,33 @@ const longTags = {
   ]),
 };
 
+const invalidTags = [
+  "",
+  { name: undefined },
+  { value: undefined },
+  { name: undefined, value: undefined },
+  { name: Buffer.from("test"), value: { test: true } },
+];
+
 const testTags = { rustTags, warpTags, shortTags, longTags };
 
 describe("Tag tests", function () {
+  test("encode decode empty tags", () => {
+    const tags = [{ name: "", value: "" }];
+    const avscEnc = serializeTagsAVSC(tags);
+    const enc = serializeTags(tags);
+    expect(avscEnc).toEqual(enc);
+  });
+
+  describe("reject invalid tags", () => {
+    test.each(invalidTags)("tag %s", (tag) => {
+      // @ts-expect-error test cases
+      expect(() => serializeTagsAVSC([tag])).toThrow();
+      // @ts-expect-error test cases
+      expect(() => serializeTags([tag])).toThrow();
+    });
+  });
+
   describe("should encode the sample tags correctly", function () {
     test.each(Object.keys(testTags))("%s", (key) => {
       const { enc, dec } = testTags[key];
@@ -150,6 +174,7 @@ describe("Tag tests", function () {
       expect(sec2).toEqual(enc);
     });
   });
+
   describe("should decode the sample tags correctly", function () {
     test.each(Object.keys(testTags))("%s", (key) => {
       const { enc, dec } = testTags[key];
@@ -157,10 +182,12 @@ describe("Tag tests", function () {
       expect(tagsParser.fromBuffer(enc)).toEqual(dec);
     });
   });
+
   it("Should correctly decode the different encoding of warpTags", function () {
     expect(deserializeTags(warpTags.weirdEnc)).toEqual(warpTags.dec);
     expect(tagsParser.fromBuffer(warpTags.weirdEnc)).toEqual(warpTags.dec);
   });
+
   it("should correctly encode/decode random tags", function () {
     const randomTags = generateRandomTags();
     const serializedTags = serializeTags(randomTags);
