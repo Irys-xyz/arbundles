@@ -7,7 +7,8 @@ import type { Signer } from "../signing/index";
 import type { DataItemCreateOptions } from "../index";
 import { streamSigner } from "../stream/index";
 import type { Readable } from "stream";
-import { deserializeTags, Tag } from "../tags";
+import type { Tag } from "../tags";
+import { deserializeTags } from "../tags";
 
 type File = string | FileHandle;
 const read = promisify(FSRead);
