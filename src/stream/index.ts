@@ -29,7 +29,7 @@ export default async function processStream(stream: Readable): Promise<Record<st
 
   let offsetSum = 32 + headersLength;
 
-  const items = [];
+  const items: Record<string, any>[] = [];
 
   for (const [length, id] of headers) {
     bytes = await readBytes(reader, bytes, MIN_BINARY_SIZE);

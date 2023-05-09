@@ -41,7 +41,7 @@ export class Bundle implements BundleInterface {
   }
 
   public getSizes(): number[] {
-    const ids = [];
+    const ids: number[] = [];
     for (let i = HEADER_START; i < HEADER_START + 64 * this.length; i += 64) {
       ids.push(byteArrayToLong(this.binary.subarray(i, i + 32)));
     }
@@ -50,7 +50,7 @@ export class Bundle implements BundleInterface {
   }
 
   public getIds(): string[] {
-    const ids = [];
+    const ids: string[] = [];
     for (let i = HEADER_START; i < HEADER_START + 64 * this.length; i += 64) {
       const bundleId = this.binary.subarray(i + 32, i + 64);
       if (bundleId.length === 0) {

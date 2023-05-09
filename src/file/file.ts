@@ -7,7 +7,7 @@ import type { Signer } from "../signing/index";
 import type { DataItemCreateOptions } from "../index";
 import { streamSigner } from "../stream/index";
 import type { Readable } from "stream";
-import { deserializeTags } from "../tags";
+import { deserializeTags, Tag } from "../tags";
 
 type File = string | FileHandle;
 const read = promisify(FSRead);
@@ -37,7 +37,7 @@ export async function fileToJson(filename: string): Promise<Transaction> {
 
   const numberOfTags = byteArrayToLong(await read(fd, Buffer.alloc(8), tagsStart, 8, 0).then((value) => value.buffer));
 
-  let tags = [];
+  let tags: Tag[] = [];
   if (numberOfTags > 0) {
     const numberOfTagBytesArray = await read(fd, Buffer.alloc(8), tagsStart + 8, 8, 0).then((value) => value.buffer);
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
@@ -96,7 +96,7 @@ export async function* getHeaders(file: string): AsyncGenerator<DataItemHeader> 
 
 export async function getId(file: File, options?: { offset: number }): Promise<Buffer> {
   const fd = await fileToFd(file);
-  const offset = options.offset ?? 0;
+  const offset = options?.offset ?? 0;
 
   const buffer = await read(fd.fd, Buffer.allocUnsafe(512), offset, 512, null).then((r) => r.buffer);
   await fd.close();
@@ -105,7 +105,7 @@ export async function getId(file: File, options?: { offset: number }): Promise<B
 
 export async function getSignature(file: File, options?: { offset: number }): Promise<Buffer> {
   const fd = await fileToFd(file);
-  const offset = options.offset ?? 0;
+  const offset = options?.offset ?? 0;
 
   const buffer = await read(fd.fd, Buffer.allocUnsafe(512), offset, 512, null).then((r) => r.buffer);
   await fd.close();
@@ -114,7 +114,7 @@ export async function getSignature(file: File, options?: { offset: number }): Pr
 
 export async function getOwner(file: File, options?: { offset: number }): Promise<string> {
   const fd = await fileToFd(file);
-  const offset = options.offset ?? 0;
+  const offset = options?.offset ?? 0;
 
   const buffer = await read(fd.fd, Buffer.allocUnsafe(512), offset + 512, 512, null).then((r) => r.buffer);
   await fd.close();
@@ -124,7 +124,7 @@ export async function getOwner(file: File, options?: { offset: number }): Promis
 
 export async function getTarget(file: File, options?: { offset: number }): Promise<string | undefined> {
   const fd = await fileToFd(file);
-  const offset = options.offset ?? 0;
+  const offset = options?.offset ?? 0;
 
   const targetStart = offset + 1024;
   const targetPresent = await read(fd.fd, Buffer.allocUnsafe(1), targetStart, 1, null).then((value) => value.buffer[0] == 1);
@@ -140,7 +140,7 @@ export async function getTarget(file: File, options?: { offset: number }): Promi
 
 export async function getAnchor(file: File, options?: { offset: number }): Promise<string | undefined> {
   const fd = await fileToFd(file);
-  const offset = options.offset ?? 0;
+  const offset = options?.offset ?? 0;
 
   const targetPresent = await read(fd.fd, Buffer.allocUnsafe(1), 1024, 1, null).then((value) => value.buffer[0] == 1);
 
