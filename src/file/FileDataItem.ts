@@ -38,6 +38,7 @@ export class FileDataItem implements BundleItem {
   private _id?: Buffer;
 
   get id(): string {
+    if (!this._id) throw new Error("FileDataItem - ID is undefined");
     return base64url.encode(this._id);
   }
 

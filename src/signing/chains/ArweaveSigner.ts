@@ -13,6 +13,7 @@ export default class ArweaveSigner extends Rsa4096Pss {
   }
 
   get publicKey(): Buffer {
+    if (!this.pk) throw new Error("ArweaveSigner - pk is undefined");
     return base64url.toBuffer(this.pk);
   }
 
