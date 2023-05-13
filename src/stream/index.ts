@@ -181,7 +181,7 @@ export async function streamSigner(s1: Readable, s2: Readable, signer: Signer, o
 }
 
 async function readBytes(reader: AsyncGenerator<Buffer>, buffer: Uint8Array, length: number): Promise<Uint8Array> {
-  if (buffer.byteLength > length) return buffer;
+  if (buffer.byteLength >= length) return buffer;
 
   const { done, value } = await reader.next();
 
