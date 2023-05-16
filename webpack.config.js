@@ -6,19 +6,18 @@ module.exports = {
   entry: ["./build/web/esm/webIndex.js"],
   devtool: "source-map",
   mode: "production",
-  module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        use: "ts-loader",
-        exclude: [
-          /node_modules/,
-          path.resolve(__dirname, "file/"),
-          path.resolve(__dirname, "esm/"),
-        ],
-      },
-    ],
-  },
+  // module: {
+  //   rules: [
+  //     {
+  //       test: /\.ts$/,
+  //       use: { loader: "ts-loader", options: { configFile: "web.tsconfig.json" } },
+  //       exclude: [
+  //         /node_modules/,
+  //         path.resolve(__dirname, "build/"),
+  //       ],
+  //     },
+  //   ],
+  // },
   // optimization: {
   //     minimize: false,
   //     mangleExports: false,
@@ -29,18 +28,17 @@ module.exports = {
       process: "process/browser",
       crypto: "crypto-browserify",
       stream: "stream-browserify",
-      "$/deepHash": "arweave/web/lib/deepHash"
+      "$/utils": path.resolve(
+        __dirname,
+        "./src/webUtils.ts"
+      ),
     },
     fallback: {
       crypto: require.resolve("crypto-browserify"),
       stream: require.resolve("stream-browserify"),
       events: require.resolve("events/"),
       buffer: require.resolve("buffer/"),
-      // "assert": require.resolve('assert/'),
       process: require.resolve("process/browser"),
-      util: require.resolve("util"),
-      // "zlib": require.resolve('browserify-zlib'),
-      // "path": require.resolve('path-browserify')
     },
   },
   plugins: [

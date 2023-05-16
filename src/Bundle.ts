@@ -1,12 +1,11 @@
 import base64url from "base64url";
 import { byteArrayToLong } from "./utils";
 import DataItem from "./DataItem";
-import Transaction from "arweave/node/lib/transaction";
-import Arweave from "arweave";
-import { BundleInterface } from "./BundleInterface";
-import { JWKInterface } from "./interface-jwk";
+import type Arweave from "arweave";
+import type { BundleInterface } from "./BundleInterface";
+import type { JWKInterface } from "./interface-jwk";
 import { createHash } from "crypto";
-import { CreateTransactionInterface } from "arweave/node/common";
+import type { CreateTransactionInterface, Transaction } from "$/utils";
 
 const HEADER_START = 32;
 
@@ -53,7 +52,11 @@ export class Bundle implements BundleInterface {
   public getIds(): string[] {
     const ids = [];
     for (let i = HEADER_START; i < HEADER_START + 64 * this.length; i += 64) {
-      ids.push(base64url.encode(this.binary.subarray(i + 32, i + 64)));
+      const bundleId = this.binary.subarray(i + 32, i + 64);
+      if (bundleId.length === 0) {
+        throw new Error("Invalid bundle, id specified in headers doesn't exist");
+      }
+      ids.push(base64url.encode(bundleId));
     }
 
     return ids;
@@ -73,10 +76,7 @@ export class Bundle implements BundleInterface {
     arweave: Arweave,
     jwk: JWKInterface,
   ): Promise<Transaction> {
-    const tx = await arweave.createTransaction(
-      { data: this.binary, ...attributes },
-      jwk,
-    );
+    const tx = await arweave.createTransaction({ data: this.binary, ...attributes }, jwk);
     tx.addTag("Bundle-Format", "binary");
     tx.addTag("Bundle-Version", "2.0.0");
     return tx;
@@ -85,9 +85,7 @@ export class Bundle implements BundleInterface {
   public async verify(): Promise<boolean> {
     for (const item of this.items) {
       const valid = await item.isValid();
-      const expected = base64url(
-        createHash("sha256").update(item.rawSignature).digest(),
-      );
+      const expected = base64url(createHash("sha256").update(item.rawSignature).digest());
       if (!(valid && item.id === expected)) {
         return false;
       }
@@ -119,32 +117,21 @@ export class Bundle implements BundleInterface {
    */
   private getByIndex(index: number): DataItem {
     let offset = 0;
-
-    const headerStart = 32 + 64 * index;
-    const dataItemSize = byteArrayToLong(
-      this.binary.subarray(headerStart, headerStart + 32),
-    );
-
+    const bundleStart = this.getBundleStart();
     let counter = 0;
+    let _offset, _id;
     for (let i = HEADER_START; i < HEADER_START + 64 * this.length; i += 64) {
-      if (counter == index) {
+      _offset = byteArrayToLong(this.binary.subarray(i, i + 32));
+      if (counter++ === index) {
+        _id = this.binary.subarray(i + 32, i + 64);
         break;
       }
-
-      const _offset = byteArrayToLong(this.binary.subarray(i, i + 32));
       offset += _offset;
-
-      counter++;
     }
-
-    const bundleStart = this.getBundleStart();
     const dataItemStart = bundleStart + offset;
-    const slice = this.binary.subarray(
-      dataItemStart,
-      dataItemStart + dataItemSize + 200,
-    );
+    const slice = this.binary.subarray(dataItemStart, dataItemStart + _offset);
     const item = new DataItem(slice);
-    item.rawId = this.binary.slice(32 + 64 * index, 64 + 64 * index);
+    item.rawId = _id;
     return item;
   }
 
@@ -158,9 +145,7 @@ export class Bundle implements BundleInterface {
 
     const bundleStart = this.getBundleStart();
     const dataItemStart = bundleStart + offset.startOffset;
-    return new DataItem(
-      this.binary.subarray(dataItemStart, dataItemStart + offset.size),
-    );
+    return new DataItem(this.binary.subarray(dataItemStart, dataItemStart + offset.size));
   }
 
   private getDataItemCount(): number {
@@ -180,12 +165,11 @@ export class Bundle implements BundleInterface {
     for (let i = HEADER_START; i < HEADER_START + 64 * this.length; i += 64) {
       const _offset = byteArrayToLong(this.binary.subarray(i, i + 32));
       const _id = this.binary.subarray(i + 32, i + 64);
-
+      if (_id.length === 0) {
+        throw new Error("Invalid bundle, id specified in headers doesn't exist");
+      }
       const dataItemStart = bundleStart + offset;
-      const bytes = this.binary.subarray(
-        dataItemStart,
-        dataItemStart + _offset,
-      );
+      const bytes = this.binary.subarray(dataItemStart, dataItemStart + _offset);
 
       offset += _offset;
 

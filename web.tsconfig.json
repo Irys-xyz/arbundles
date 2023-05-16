@@ -1,11 +1,15 @@
 {
-    "extends": "./esm.tsconfig.json",
+    "extends": "./tsconfig.json",
     "compilerOptions": {
         "outDir": "./build/web/esm",
         "paths": {
-            "$/deepHash": [
-                "node_modules/arweave/web/lib/deepHash"
+            "$/utils": [
+                "webUtils.ts"
             ]
         }
-    }
+    },
+    "exclude": [
+        "./src/nodeUtils.ts",
+        "src/__tests__/**"
+    ]
 }

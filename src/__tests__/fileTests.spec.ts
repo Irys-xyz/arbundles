@@ -1,27 +1,33 @@
 import * as fs from "fs";
-import { EthereumSigner } from "../../src/signing";
-import { serializeTags } from "../../src/tags";
-import { byteArrayToLong, longTo8ByteArray } from "../../src/utils";
+import { EthereumSigner } from "../signing";
+import { serializeTags } from "../tags";
+import { byteArrayToLong, longTo8ByteArray } from "../utils";
 import { promisify } from "util";
-import FileDataItem from "file/FileDataItem";
-import { createData } from "file/createData";
+import FileDataItem from "../file/FileDataItem";
+import { createData } from "../file/createData";
 import base64url from "base64url";
 
 const testTagsVariations = [
   { description: "no", tags: [] },
   { description: "one", tags: [{ name: "tag1", value: "value1" }] },
-  { description: "two", tags: [{ name: "tag1", value: "value1" }, { name: "tag2", value: "value2" }] },
+  {
+    description: "two",
+    tags: [
+      { name: "tag1", value: "value1" },
+      { name: "tag2", value: "value2" },
+    ],
+  },
   { description: "not defined", tags: undefined },
 ];
 
 const testAnchorVariations = [
   { description: "no", anchor: undefined },
-  { description: "a valid", anchor: "thisSentenceIs32BytesLongTrustMe" },
+  { description: "a valid", anchor: "thisSentenceIsDefinitely32Bytes!" },
 ];
 
-const testTargetVariations: { description: string, target: undefined | string; }[] = [
+const testTargetVariations: { description: string; target: undefined | string }[] = [
   { description: "no", target: undefined },
-  { description: "a valid", target: "thisSentenceIsDefinitely32Bytes!" },
+  { description: "a valid", target: base64url.encode("thisSentenceIsDefinitely32Bytes!") },
 ];
 
 const testDataVariations = [
@@ -49,7 +55,6 @@ describe("DataItem", () => {
                 await handle.close();
               }
             });
-
 
             describe("given we want to get the data", () => {
               it("should return the data", async () => {
@@ -112,27 +117,21 @@ describe("DataItem", () => {
             });
             describe("given we use signature()", () => {
               it("should return the signature data", async () => {
-                expect(Buffer.from((await dataItem.signature()))).toBeDefined();
+                expect(Buffer.from(await dataItem.signature())).toBeDefined();
               });
             });
 
             describe("given we call data()", () => {
               it("should return the data as base64url", async () => {
-                expect(await dataItem.data()).toEqual(base64url.encode(Buffer.from(data)))
+                expect(await dataItem.data()).toEqual(base64url.encode(Buffer.from(data)));
               });
             });
 
             describe("given we use getStartOfData()", () => {
               it("should return the start of data", async () => {
                 const tagsStart = await dataItem.getTagsStart();
-                const handle = (await fs.promises.open(dataItem.filename, "r"));
-                const numberOfTagsBytesBuffer = await promisify(fs.read)(
-                  handle.fd,
-                  Buffer.allocUnsafe(8),
-                  0,
-                  8,
-                  tagsStart + 8,
-                ).then((r) => r.buffer);
+                const handle = await fs.promises.open(dataItem.filename, "r");
+                const numberOfTagsBytesBuffer = await promisify(fs.read)(handle.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart + 8).then((r) => r.buffer);
                 const numberOfTagBytes = byteArrayToLong(numberOfTagsBytesBuffer);
                 expect(await dataItem.dataStart()).toEqual(tagsStart + 16 + numberOfTagBytes);
                 await handle.close();
@@ -169,17 +168,17 @@ describe("DataItem", () => {
             });
             describe("given we access rawTarget", () => {
               it("should return the raw target", async () => {
-                expect(await dataItem.rawTarget()).toEqual(Buffer.from(target ?? ""));
+                expect(await dataItem.rawTarget()).toEqual(base64url.toBuffer(target ?? ""));
               });
             });
 
             describe("given we access rawTags", () => {
               describe("and the format is valid", () => {
                 it("should return the raw tags", async () => {
-                  expect(await dataItem.rawTags()).toEqual(serializeTags(tags ?? []));
+                  expect(await dataItem.rawTags()).toEqual(serializeTags(tags ?? []) ?? []);
                 });
               });
-              
+
               describe("and the format is invalid (too many numberOfTagsBytes)", () => {
                 it("should return false", async () => {
                   await dataItem.sign(signer);
@@ -192,7 +191,7 @@ describe("DataItem", () => {
                   fs.writeSync(handle, fakeTagLength, 0, 8, tagStart + 8);
                   fs.closeSync(handle);
                   await expect(async () => await dataItem.rawTags()).rejects.toThrowError("Tags too large");
-                }); 
+                });
               });
             });
 
@@ -202,7 +201,7 @@ describe("DataItem", () => {
                 expect(dataItem.rawId).toBeDefined();
               });
               it("should throw if the id is not set", () => {
-                expect(dataItem.rawId).toThrowError("ID is not set");
+                expect(() => dataItem.rawId).toThrowError(new Error("ID is not set"));
               });
             });
 
@@ -239,7 +238,6 @@ describe("DataItem", () => {
     });
   });
 });
-
 
 describe("static methods", () => {
   const signer = new EthereumSigner("8da4ef21b864d2cc526dbdb2a120bd2874c36c9d0a1fb7f8c63d7f7a8b41de8f");

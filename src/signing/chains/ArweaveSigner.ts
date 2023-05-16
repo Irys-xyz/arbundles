@@ -1,8 +1,8 @@
 import Rsa4096Pss from "../keys/Rsa4096Pss";
-import { JWKInterface } from "../../interface-jwk";
+import type { JWKInterface } from "../../interface-jwk";
 import { jwkTopem } from "arweave/node/lib/crypto/pem";
 import base64url from "base64url";
-import Arweave from "arweave";
+import { getCryptoDriver } from "$/utils";
 
 export default class ArweaveSigner extends Rsa4096Pss {
   protected jwk: JWKInterface;
@@ -17,14 +17,10 @@ export default class ArweaveSigner extends Rsa4096Pss {
   }
 
   sign(message: Uint8Array): Uint8Array {
-    return Arweave.crypto.sign(this.jwk, message) as any;
+    return getCryptoDriver().sign(this.jwk, message) as any;
   }
 
-  static async verify(
-    pk: string,
-    message: Uint8Array,
-    signature: Uint8Array,
-  ): Promise<boolean> {
-    return await Arweave.crypto.verify(pk, message, signature);
+  static async verify(pk: string, message: Uint8Array, signature: Uint8Array): Promise<boolean> {
+    return await getCryptoDriver().verify(pk, message, signature);
   }
 }

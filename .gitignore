@@ -28,7 +28,6 @@ coverage
 .DS_Store
 
 package-lock.json
-src/__tests__/test.ts
 
 # build dirs
 build
@@ -42,4 +41,3 @@ output
 
 
 test
-!src/__tests__/setup.jest.js
