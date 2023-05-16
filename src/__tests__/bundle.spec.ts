@@ -1,6 +1,6 @@
 import { createData } from "../ar-data-create";
-import Bundle from "../Bundle";
-import DataItem from "../DataItem";
+import type Bundle from "../Bundle";
+import type DataItem from "../DataItem";
 import { EthereumSigner } from "../signing";
 import { bundleAndSignData, longTo32ByteArray, sign } from "../../index";
 
@@ -162,7 +162,7 @@ describe.each(testDataVariations)("given we have $description dataItems", ({ num
       it("should return the data item", () => {
         for (let i = 0; i < dataItems.length; ++i) {
           console.log(dataItems[i].id);
-          // @ts-expect-error
+          // @ts-expect-error private property access
           const bundleDataItem = bundle.getById(dataItems[i].id);
           const orgDataItem = dataItems[i];
           expect(bundleDataItem).toEqual(orgDataItem);

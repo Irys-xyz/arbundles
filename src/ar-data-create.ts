@@ -4,7 +4,8 @@ import type { DataItemCreateOptions } from "./ar-data-base";
 import base64url from "base64url";
 import { longTo8ByteArray, shortTo2ByteArray } from "./utils";
 import DataItem from "./DataItem";
-import { serializeTags, Tag } from "./tags";
+import type { Tag } from "./tags";
+import { serializeTags } from "./tags";
 import type { Signer } from "./signing/index";
 
 /**
