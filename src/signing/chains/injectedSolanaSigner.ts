@@ -14,6 +14,7 @@ export default class InjectedSolanaSigner implements Signer {
 
   constructor(provider) {
     this.provider = provider;
+    if (!this.provider.publicKey) throw new Error("InjectedSolanaSigner - provider.publicKey is undefined");
     this._publicKey = this.provider.publicKey.toBuffer();
   }
 

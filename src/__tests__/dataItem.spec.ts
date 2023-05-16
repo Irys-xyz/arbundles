@@ -2,7 +2,7 @@ import base64url from "base64url";
 import { createData } from "../ar-data-create";
 import DataItem from "../DataItem";
 import { EthereumSigner } from "../signing";
-import { serializeTags } from "../tags";
+import { serializeTags, Tag } from "../tags";
 import { byteArrayToLong } from "../utils";
 
 const testTagsVariations = [
@@ -110,9 +110,9 @@ describe("DataItem", () => {
 
             describe("given we use getStartOfData()", () => {
               it("should return the start of data", async () => {
-                //@ts-expect-error
+                // @ts-expect-error
                 const tagsStart = dataItem.getTagsStart();
-                //@ts-expect-error
+                // @ts-expect-error
                 const numberOfTagBytesArray = dataItem.binary.subarray(tagsStart + 8, tagsStart + 16);
                 const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
                 expect(dataItem.getStartOfData()).toEqual(tagsStart + 16 + numberOfTagBytes);
@@ -132,13 +132,13 @@ describe("DataItem", () => {
                   if (dataItem.rawData.length > 0) {
                     dataItem.rawData[0] = dataItem.rawData[0] + 1;
                   } else {
-                    //@ts-expect-error
+                    // @ts-expect-error
                     const newBuffer = Buffer.alloc(dataItem.binary.length + 1);
-                    //@ts-expect-error
+                    // @ts-expect-error
                     dataItem.binary.copy(newBuffer);
-                    //@ts-expect-error
+                    // @ts-expect-error
                     newBuffer[dataItem.binary.length] = 1;
-                    //@ts-expect-error
+                    // @ts-expect-error
                     dataItem.binary = newBuffer;
                   }
                   expect(await dataItem.isValid()).toEqual(false);
@@ -165,7 +165,7 @@ describe("DataItem", () => {
 
             describe("given we access rawTags", () => {
               it("should return the raw tags", async () => {
-                expect(dataItem.rawTags).toEqual((tags?.length ?? 0) > 0 ? serializeTags(tags) : /* null */ Buffer.alloc(0));
+                expect(dataItem.rawTags).toEqual((tags?.length ?? 0) > 0 ? serializeTags(tags as Tag[]) : /* null */ Buffer.alloc(0));
               });
             });
 

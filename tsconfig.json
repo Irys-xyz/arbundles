@@ -19,7 +19,7 @@
     "resolveJsonModule": true,
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "baseUrl": "./src",
     "rootDir": ".",
     "outDir": "./build/node/esm",

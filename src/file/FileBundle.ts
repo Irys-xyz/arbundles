@@ -31,7 +31,7 @@ export class FileBundle implements BundleInterface {
   }
 
   static async fromDir(dir: string): Promise<FileBundle> {
-    const txs = [];
+    const txs: string[] = [];
     for (const p of await promises.readdir(dir)) {
       const fullPath = resolve(dir, p);
       // if it's an item (not a dir,not the header file, actually exists in FS) add to txs array

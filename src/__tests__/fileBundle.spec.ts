@@ -30,7 +30,7 @@ const testDataVariations = [
   { description: "eight", numDataItems: 8 },
 ];
 
-const paths = [];
+const paths: string[] = [];
 
 afterAll(async () => {
   for (const path of paths) {

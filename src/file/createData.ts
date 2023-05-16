@@ -22,7 +22,8 @@ export async function createData(
 
   const _target = opts?.target ? base64url.toBuffer(opts.target) : null;
   const _anchor = opts?.anchor ? Buffer.from(opts.anchor) : null;
-  const _tags = (opts?.tags?.length ?? 0) > 0 ? await serializeTags(opts.tags) : null;
+  // @ts-expect-error undefined opts.tags already has a guard
+  const _tags = (opts?.tags?.length ?? 0) > 0 ? serializeTags(opts.tags) : null;
 
   stream.write(shortTo2ByteArray(signer.signatureType));
   // Signature

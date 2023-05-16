@@ -26,7 +26,7 @@ export class AVSCTap {
       for (i = 0; i < n; i++) {
         // for this use case, assume tags/strings.
         const tag = tags[i];
-        if (tag?.name === undefined || tag?.value === undefined)
+        if (typeof tag?.name !== "string" || typeof tag?.value !== "string")
           throw new Error(`Invalid tag format for ${tag}, expected {name:string, value: string}`);
         this.writeString(tag.name);
         this.writeString(tag.value);
@@ -159,7 +159,7 @@ export class AVSCTap {
 
   public readTags(): Tag[] {
     // var items = this.itemsType;
-    const val = [];
+    const val: Tag[] = [];
     let n;
     while ((n = this.readLong())) {
       if (n < 0) {
@@ -175,13 +175,14 @@ export class AVSCTap {
     return val;
   }
 
-  protected readString(): string | undefined {
+  protected readString(): string {
     const len = this.readLong();
     const pos = this.pos;
     const buf = this.buf;
     this.pos += len;
     if (this.pos > buf.length) {
-      return undefined;
+      // return undefined;
+      throw new Error("TAP Position out of range");
     }
     return this.buf.slice(pos, pos + len).toString();
   }
