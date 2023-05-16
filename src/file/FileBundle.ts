@@ -15,6 +15,7 @@ import { pipeline } from "stream/promises";
 
 import { createTransactionAsync, uploadTransactionAsync } from "arweave-stream-tx";
 import type { CreateTransactionInterface, Transaction } from "$/utils";
+import { resolve } from "path";
 // import { Readable } from 'stream';
 // import { createTransactionAsync } from 'arweave-stream';
 // import { pipeline } from 'stream/promises';
@@ -30,7 +31,20 @@ export class FileBundle implements BundleInterface {
   }
 
   static async fromDir(dir: string): Promise<FileBundle> {
-    const txs = await promises.readdir(dir).then((r) => r.filter(async (f) => !(await promises.stat(f).then((s) => s.isDirectory()))));
+    const txs: string[] = [];
+    for (const p of await promises.readdir(dir)) {
+      const fullPath = resolve(dir, p);
+      // if it's an item (not a dir,not the header file, actually exists in FS) add to txs array
+      if (
+        p !== "header" &&
+        (await promises
+          .stat(fullPath)
+          .then((e) => !e.isDirectory())
+          .catch((_) => false))
+      )
+        txs.push(fullPath);
+    }
+
     return new FileBundle(dir + "/header", txs);
   }
 
@@ -95,8 +109,8 @@ export class FileBundle implements BundleInterface {
 
   async signAndSubmit(arweave: Arweave, jwk: JWKInterface, tags: { name: string; value: string }[] = []): Promise<Transaction> {
     const tx = await this.toTransaction({}, arweave, jwk);
-    tx.addTag("Bundle-Format", "binary");
-    tx.addTag("Bundle-Version", "2.0.0");
+    // tx.addTag("Bundle-Format", "binary");
+    // tx.addTag("Bundle-Version", "2.0.0");
     for (const { name, value } of tags) {
       tx.addTag(name, value);
     }
@@ -107,7 +121,8 @@ export class FileBundle implements BundleInterface {
 
     const stream2 = MultiStream.obj(streams2);
 
-    await pipeline(stream2, uploadTransactionAsync(tx, arweave, true));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await pipeline(stream2, uploadTransactionAsync(tx, arweave, true) as any);
 
     return tx;
   }

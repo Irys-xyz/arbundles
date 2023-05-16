@@ -117,27 +117,21 @@ export class Bundle implements BundleInterface {
    */
   private getByIndex(index: number): DataItem {
     let offset = 0;
-
-    const headerStart = 32 + 64 * index;
-    const dataItemSize = byteArrayToLong(this.binary.subarray(headerStart, headerStart + 32));
-
+    const bundleStart = this.getBundleStart();
     let counter = 0;
+    let _offset, _id;
     for (let i = HEADER_START; i < HEADER_START + 64 * this.length; i += 64) {
-      if (counter == index) {
+      _offset = byteArrayToLong(this.binary.subarray(i, i + 32));
+      if (counter++ === index) {
+        _id = this.binary.subarray(i + 32, i + 64);
         break;
       }
-
-      const _offset = byteArrayToLong(this.binary.subarray(i, i + 32));
       offset += _offset;
-
-      counter++;
     }
-
-    const bundleStart = this.getBundleStart();
     const dataItemStart = bundleStart + offset;
-    const slice = this.binary.subarray(dataItemStart, dataItemStart + dataItemSize + 200);
+    const slice = this.binary.subarray(dataItemStart, dataItemStart + _offset);
     const item = new DataItem(slice);
-    item.rawId = this.binary.slice(32 + 64 * index, 64 + 64 * index);
+    item.rawId = _id;
     return item;
   }
 

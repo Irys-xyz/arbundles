@@ -19,7 +19,8 @@ const write = promisify(FSWrite);
 export class FileDataItem implements BundleItem {
   public readonly filename: PathLike;
   async signatureLength(): Promise<number> {
-    const length = SIG_CONFIG[await this.signatureType()]?.sigLength;
+    const type = await this.signatureType();
+    const length = SIG_CONFIG[type]?.sigLength;
     if (!length) throw new Error("Signature type not supported");
     return length;
   }
@@ -55,7 +56,8 @@ export class FileDataItem implements BundleItem {
   }
 
   static isDataItem(obj: any): boolean {
-    return obj.filename && typeof obj.filename === "string";
+    // return obj?.filename ? typeof obj.filename === "string" : false;
+    return obj instanceof FileDataItem;
   }
 
   static async verify(filename: PathLike): Promise<boolean> {

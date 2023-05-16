@@ -26,7 +26,8 @@ interface Transaction {
 const fileToFd = async (f: File): Promise<FileHandle> => (typeof f === "string" ? await promises.open(f, "r") : f);
 
 export async function fileToJson(filename: string): Promise<Transaction> {
-  const fd = await promises.open(filename, "r").then((handle) => handle.fd);
+  const handle = await promises.open(filename, "r");
+  const fd = handle.fd;
 
   let tagsStart = 512 + 512 + 2;
 
@@ -54,6 +55,7 @@ export async function fileToJson(filename: string): Promise<Transaction> {
   const fee = 0;
   const signature = "";
 
+  await handle.close();
   return {
     id,
     owner,
@@ -82,6 +84,7 @@ export async function getHeaderAt(file: File, index: number): Promise<DataItemHe
   const fd = await fileToFd(file);
 
   const headerBuffer = await read(fd.fd, Buffer.alloc(64), 0, 64, 32 + 64 * index).then((v) => v.buffer);
+  await fd.close();
   return {
     offset: byteArrayToLong(headerBuffer.subarray(0, 32)),
     id: base64url.encode(headerBuffer.subarray(32, 64)),
@@ -130,6 +133,7 @@ export async function getTarget(file: File, options?: { offset: number }): Promi
   const targetStart = offset + 1024;
   const targetPresent = await read(fd.fd, Buffer.allocUnsafe(1), targetStart, 1, null).then((value) => value.buffer[0] == 1);
   if (!targetPresent) {
+    await fd.close();
     return undefined;
   }
 
@@ -152,6 +156,7 @@ export async function getAnchor(file: File, options?: { offset: number }): Promi
 
   const anchorPresent = await read(fd.fd, Buffer.allocUnsafe(1), anchorStart, 1, null).then((value) => value.buffer[0] == 1);
   if (!anchorPresent) {
+    await fd.close();
     return undefined;
   }
 
@@ -176,6 +181,7 @@ export async function getTags(file: File, options?: { offset: number }): Promise
   const numberOfTags = byteArrayToLong(await read(fd.fd, Buffer.allocUnsafe(8), 0, 8, tagsStart).then((value) => value.buffer));
 
   if (numberOfTags == 0) {
+    await fd.close();
     return [];
   }
 
@@ -191,3 +197,7 @@ export async function getTags(file: File, options?: { offset: number }): Promise
 export async function signedFileStream(path: string, signer: Signer, opts?: DataItemCreateOptions): Promise<Readable> {
   return streamSigner(createReadStream(path), createReadStream(path), signer, opts);
 }
+
+export const fileExportForTesting = {
+  fileToFd,
+};

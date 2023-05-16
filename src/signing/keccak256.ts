@@ -92,3 +92,13 @@ if (typeof window !== "undefined") {
 }
 
 export default keccak256;
+
+export const exportForTesting = {
+  intToBuffer,
+  intToHex,
+  isHexPrefixed,
+  stripHexPrefix,
+  padToEven,
+  isHexString,
+  toBuffer,
+};

@@ -15,7 +15,7 @@ export default class Secp256k1 implements Signer {
   }
 
   public get publicKey(): Buffer {
-    return Buffer.alloc(0);
+    throw new Error("You must implement `publicKey`");
   }
 
   public get key(): Uint8Array {

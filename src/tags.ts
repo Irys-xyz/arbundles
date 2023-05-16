@@ -189,6 +189,9 @@ export class AVSCTap {
 }
 
 export function serializeTags(tags: Tag[]): Buffer {
+  if (tags?.length === 0) {
+    return Buffer.allocUnsafe(0);
+  }
   const tap = new AVSCTap();
   tap.writeTags(tags);
   return tap.toBuffer();

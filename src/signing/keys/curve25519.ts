@@ -15,7 +15,7 @@ export default class Curve25519 implements Signer {
   constructor(protected _key: string, public pk: string) {}
 
   public get key(): Uint8Array {
-    return new Uint8Array(0);
+    throw new Error("You must implement `key`");
   }
 
   sign(message: Uint8Array): Promise<Uint8Array> {

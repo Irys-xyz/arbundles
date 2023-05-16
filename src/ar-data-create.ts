@@ -4,6 +4,7 @@ import type { DataItemCreateOptions } from "./ar-data-base";
 import base64url from "base64url";
 import { longTo8ByteArray, shortTo2ByteArray } from "./utils";
 import DataItem from "./DataItem";
+import type { Tag } from "./tags";
 import { serializeTags } from "./tags";
 import type { Signer } from "./signing/index";
 
@@ -23,8 +24,7 @@ export function createData(data: string | Uint8Array, signer: Signer, opts?: Dat
   const target_length = 1 + (_target?.byteLength ?? 0);
   const _anchor = opts?.anchor ? Buffer.from(opts.anchor) : null;
   const anchor_length = 1 + (_anchor?.byteLength ?? 0);
-  // @ts-expect-error opts.tags has a null guard
-  const _tags = (opts?.tags?.length ?? 0) > 0 ? serializeTags(opts.tags) : null;
+  const _tags = (opts?.tags?.length ?? 0) > 0 ? serializeTags(opts?.tags as Tag[]) : null;
   const tags_length = 16 + (_tags ? _tags.byteLength : 0);
   const _data = typeof data === "string" ? Buffer.from(data) : Buffer.from(data);
   const data_length = _data.byteLength;
