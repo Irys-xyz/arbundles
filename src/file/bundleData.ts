@@ -18,7 +18,7 @@ export async function bundleAndSignData(dataItems: FileDataItem[], signer: Signe
     }
 
     files[index] = dataItem.filename;
-    headerStream.write(Buffer.concat([longTo32ByteArray(await dataItem.size()), dataItem.rawId]));
+    headerStream.write(Buffer.concat([Buffer.from(longTo32ByteArray(await dataItem.size())), dataItem.rawId]));
   }
 
   await new Promise((resolve) => headerStream.end(resolve));

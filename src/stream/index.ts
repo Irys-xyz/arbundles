@@ -187,7 +187,7 @@ async function readBytes(reader: AsyncGenerator<Buffer>, buffer: Uint8Array, len
 
   if (done && !value) throw new Error("Invalid buffer");
 
-  return readBytes(reader, Buffer.concat([buffer, value]), length);
+  return readBytes(reader, Buffer.concat([Buffer.from(buffer), Buffer.from(value)]), length);
 }
 
 async function* getReader(s: Readable): AsyncGenerator<Buffer> {
