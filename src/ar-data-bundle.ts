@@ -51,7 +51,7 @@ export async function bundleAndSignData(dataItems: DataItem[], signer: Signer): 
     return Buffer.concat(a);
   });
 
-  const buffer = Buffer.concat([Buffer.from(longTo32ByteArray(dataItems.length)), headers, binaries]);
+  const buffer = Buffer.concat([Buffer.from(longTo32ByteArray(dataItems.length)), Buffer.from(headers), binaries]);
 
   return new Bundle(buffer);
 }
