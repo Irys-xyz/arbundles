@@ -28,7 +28,6 @@ coverage
 .DS_Store
 
 package-lock.json
-src/__tests__/test.ts
 
 # build dirs
 build
@@ -40,18 +39,5 @@ output
 .devcontainer/devcontainer.json
 .devcontainer/Dockerfile
 
-src/**/*.js
-src/**/*.js.map
-src/**/*.d.ts
-stream/**/*.js
-stream/**/*.js.map
-stream/**/*.d.ts
-file/**/*.js
-file/**/*.js.map
-file/**/*.d.ts
-index.js
-index.d.ts
-index.js.map
-test
 
-package/
+test

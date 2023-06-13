@@ -1,10 +1,12 @@
-import { DataItemCreateOptions } from "./ar-data-base";
-import assert from "assert";
+/* eslint-disable @typescript-eslint/naming-convention */
+import type { DataItemCreateOptions } from "./ar-data-base";
+
 import base64url from "base64url";
 import { longTo8ByteArray, shortTo2ByteArray } from "./utils";
 import DataItem from "./DataItem";
-import { serializeTags } from "./parser";
-import { Signer } from "./signing";
+import type { Tag } from "./tags";
+import { serializeTags } from "./tags";
+import type { Signer } from "./signing/index";
 
 /**
  * This will create a single DataItem in binary format (Uint8Array)
@@ -13,11 +15,7 @@ import { Signer } from "./signing";
  * @param opts - Options involved in creating data items
  * @param signer
  */
-export function createData(
-  data: string | Uint8Array,
-  signer: Signer,
-  opts?: DataItemCreateOptions,
-): DataItem {
+export function createData(data: string | Uint8Array, signer: Signer, opts?: DataItemCreateOptions): DataItem {
   // TODO: Add asserts
   // Parse all values to a buffer and
   const _owner = signer.publicKey;
@@ -26,21 +24,13 @@ export function createData(
   const target_length = 1 + (_target?.byteLength ?? 0);
   const _anchor = opts?.anchor ? Buffer.from(opts.anchor) : null;
   const anchor_length = 1 + (_anchor?.byteLength ?? 0);
-  const _tags = (opts?.tags?.length ?? 0) > 0 ? serializeTags(opts.tags) : null;
+  const _tags = (opts?.tags?.length ?? 0) > 0 ? serializeTags(opts?.tags as Tag[]) : null;
   const tags_length = 16 + (_tags ? _tags.byteLength : 0);
-  const _data =
-    typeof data === "string" ? Buffer.from(data) : Buffer.from(data);
+  const _data = typeof data === "string" ? Buffer.from(data) : Buffer.from(data);
   const data_length = _data.byteLength;
 
   // See [https://github.com/joshbenaron/arweave-standards/blob/ans104/ans/ANS-104.md#13-dataitem-format]
-  const length =
-    2 +
-    signer.signatureLength +
-    signer.ownerLength +
-    target_length +
-    anchor_length +
-    tags_length +
-    data_length;
+  const length = 2 + signer.signatureLength + signer.ownerLength + target_length + anchor_length + tags_length + data_length;
   // Create array with set length
   const bytes = Buffer.alloc(length);
 
@@ -51,12 +41,8 @@ export function createData(
   // bytes.set(EMPTY_ARRAY, 32);
   // Push bytes for `owner`
 
-  assert(
-    _owner.byteLength == signer.ownerLength,
-    new Error(
-      `Owner must be ${signer.ownerLength} bytes, but was incorrectly ${_owner.byteLength}`,
-    ),
-  );
+  if (_owner.byteLength !== signer.ownerLength)
+    throw new Error(`Owner must be ${signer.ownerLength} bytes, but was incorrectly ${_owner.byteLength}`);
   bytes.set(_owner, 2 + signer.signatureLength);
 
   const position = 2 + signer.signatureLength + signer.ownerLength;
@@ -64,12 +50,7 @@ export function createData(
   // 64 + OWNER_LENGTH
   bytes[position] = _target ? 1 : 0;
   if (_target) {
-    assert(
-      _target.byteLength == 32,
-      new Error(
-        "Target must be 32 bytes but was incorrectly ${_target.byteLength}",
-      ),
-    );
+    if (_target.byteLength !== 32) throw new Error(`Target must be 32 bytes but was incorrectly ${_target.byteLength}`);
     bytes.set(_target, position + 1);
   }
 
@@ -80,7 +61,7 @@ export function createData(
   bytes[anchor_start] = _anchor ? 1 : 0;
   if (_anchor) {
     tags_start += _anchor.byteLength;
-    assert(_anchor.byteLength == 32, new Error("Anchor must be 32 bytes"));
+    if (_anchor.byteLength !== 32) throw new Error("Anchor must be 32 bytes");
     bytes.set(_anchor, anchor_start + 1);
   }
 

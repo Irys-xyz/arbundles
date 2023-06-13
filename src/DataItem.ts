@@ -1,19 +1,20 @@
 import { byteArrayToLong } from "./utils";
-import { tagsParser } from "./parser";
 import base64url from "base64url";
 import { Buffer } from "buffer";
 import { sign } from "./ar-data-bundle";
-import { BundleItem } from "./BundleItem";
-import { indexToType, Signer } from "./signing/index";
-import { getSignatureData } from "./ar-data-base";
-import axios, { AxiosResponse } from "axios";
+import type { BundleItem } from "./BundleItem";
+import type { Signer } from "./signing/index";
+import { indexToType } from "./signing/index";
+import getSignatureData from "./ar-data-base";
 import { SIG_CONFIG, SignatureConfig } from "./constants";
-import * as crypto from "crypto";
-import Arweave from "arweave";
+import { getCryptoDriver } from "$/utils";
+import { deserializeTags } from "./tags";
+import { createHash } from "crypto";
 
 export const MIN_BINARY_SIZE = 80;
+export const MAX_TAG_BYTES = 4096;
 
-export default class DataItem implements BundleItem {
+export class DataItem implements BundleItem {
   private readonly binary: Buffer;
   private _id: Buffer;
 
@@ -26,33 +27,11 @@ export default class DataItem implements BundleItem {
   }
 
   get signatureType(): SignatureConfig {
-    const signatureTypeVal: number = byteArrayToLong(
-      this.binary.subarray(0, 2),
-    );
-
-    switch (signatureTypeVal) {
-      case 1: {
-        return SignatureConfig.ARWEAVE;
-      }
-      case 2: {
-        return SignatureConfig.ED25519;
-      }
-      case 3: {
-        return SignatureConfig.ETHEREUM;
-      }
-      case 4: {
-        return SignatureConfig.SOLANA;
-      }
-      case 5: {
-        return SignatureConfig.INJECTEDAPTOS;
-      }
-      case 6: {
-        return SignatureConfig.MULTIAPTOS;
-      }
-      default: {
-        throw new Error("Unknown signature type: " + signatureTypeVal);
-      }
+    const signatureTypeVal: number = byteArrayToLong(this.binary.subarray(0, 2));
+    if (SignatureConfig?.[signatureTypeVal] !== undefined) {
+      return signatureTypeVal;
     }
+    throw new Error("Unknown signature type: " + signatureTypeVal);
   }
 
   async isValid(): Promise<boolean> {
@@ -68,7 +47,7 @@ export default class DataItem implements BundleItem {
   }
 
   get rawId(): Buffer {
-    return crypto.createHash("sha256").update(this.rawSignature).digest();
+    return createHash("sha256").update(this.rawSignature).digest();
   }
 
   set rawId(id: Buffer) {
@@ -83,15 +62,18 @@ export default class DataItem implements BundleItem {
     return base64url.encode(this.rawSignature);
   }
 
-  get signatureLength(): number {
-    return SIG_CONFIG[this.signatureType].sigLength;
+  set rawOwner(pubkey: Buffer) {
+    if (pubkey.byteLength != this.ownerLength)
+      throw new Error(`Expected raw owner (pubkey) to be ${this.ownerLength} bytes, got ${pubkey.byteLength} bytes.`);
+    this.binary.set(pubkey, 2 + this.signatureLength);
   }
 
   get rawOwner(): Buffer {
-    return this.binary.subarray(
-      2 + this.signatureLength,
-      2 + this.signatureLength + this.ownerLength,
-    );
+    return this.binary.subarray(2 + this.signatureLength, 2 + this.signatureLength + this.ownerLength);
+  }
+
+  get signatureLength(): number {
+    return SIG_CONFIG[this.signatureType].sigLength;
   }
 
   get owner(): string {
@@ -105,9 +87,7 @@ export default class DataItem implements BundleItem {
   get rawTarget(): Buffer {
     const targetStart = this.getTargetStart();
     const isPresent = this.binary[targetStart] == 1;
-    return isPresent
-      ? this.binary.subarray(targetStart + 1, targetStart + 33)
-      : Buffer.alloc(0);
+    return isPresent ? this.binary.subarray(targetStart + 1, targetStart + 33) : Buffer.alloc(0);
   }
 
   get target(): string {
@@ -118,9 +98,7 @@ export default class DataItem implements BundleItem {
     const anchorStart = this.getAnchorStart();
     const isPresent = this.binary[anchorStart] == 1;
 
-    return isPresent
-      ? this.binary.subarray(anchorStart + 1, anchorStart + 33)
-      : Buffer.alloc(0);
+    return isPresent ? this.binary.subarray(anchorStart + 1, anchorStart + 33) : Buffer.alloc(0);
   }
 
   get anchor(): string {
@@ -129,30 +107,20 @@ export default class DataItem implements BundleItem {
 
   get rawTags(): Buffer {
     const tagsStart = this.getTagsStart();
-    const tagsSize = byteArrayToLong(
-      this.binary.subarray(tagsStart + 8, tagsStart + 16),
-    );
+    const tagsSize = byteArrayToLong(this.binary.subarray(tagsStart + 8, tagsStart + 16));
     return this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize);
   }
 
   get tags(): { name: string; value: string }[] {
     const tagsStart = this.getTagsStart();
-    const tagsCount = byteArrayToLong(
-      this.binary.subarray(tagsStart, tagsStart + 8),
-    );
+    const tagsCount = byteArrayToLong(this.binary.subarray(tagsStart, tagsStart + 8));
     if (tagsCount == 0) {
       return [];
     }
 
-    const tagsSize = byteArrayToLong(
-      this.binary.subarray(tagsStart + 8, tagsStart + 16),
-    );
+    const tagsSize = byteArrayToLong(this.binary.subarray(tagsStart + 8, tagsStart + 16));
 
-    return tagsParser.fromBuffer(
-      Buffer.from(
-        this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize),
-      ),
-    );
+    return deserializeTags(Buffer.from(this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize)));
   }
 
   get tagsB64Url(): { name: string; value: string }[] {
@@ -166,10 +134,7 @@ export default class DataItem implements BundleItem {
   getStartOfData(): number {
     const tagsStart = this.getTagsStart();
 
-    const numberOfTagBytesArray = this.binary.subarray(
-      tagsStart + 8,
-      tagsStart + 16,
-    );
+    const numberOfTagBytesArray = this.binary.subarray(tagsStart + 8, tagsStart + 16);
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
     return tagsStart + 16 + numberOfTagBytes;
   }
@@ -177,10 +142,7 @@ export default class DataItem implements BundleItem {
   get rawData(): Buffer {
     const tagsStart = this.getTagsStart();
 
-    const numberOfTagBytesArray = this.binary.subarray(
-      tagsStart + 8,
-      tagsStart + 16,
-    );
+    const numberOfTagBytesArray = this.binary.subarray(tagsStart + 8, tagsStart + 16);
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
     const dataStart = tagsStart + 16 + numberOfTagBytes;
 
@@ -206,7 +168,7 @@ export default class DataItem implements BundleItem {
 
   public async setSignature(signature: Buffer): Promise<void> {
     this.binary.set(signature, 2);
-    this._id = Buffer.from(await Arweave.crypto.hash(signature));
+    this._id = Buffer.from(await getCryptoDriver().hash(signature));
   }
 
   public isSigned(): boolean {
@@ -216,6 +178,7 @@ export default class DataItem implements BundleItem {
   /**
    * Returns a JSON representation of a DataItem
    */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   public toJSON(): {
     owner: string;
     data: string;
@@ -236,30 +199,6 @@ export default class DataItem implements BundleItem {
   }
 
   /**
-   * @deprecated Since version 0.3.0. Will be deleted in version 0.4.0. Use @bundlr-network/client package instead to interact with Bundlr
-   */
-  public async sendToBundler(bundler: string): Promise<AxiosResponse> {
-    const headers = {
-      "Content-Type": "application/octet-stream",
-    };
-
-    if (!this.isSigned())
-      throw new Error("You must sign before sending to bundler");
-    const response = await axios.post(`${bundler}/tx`, this.getRaw(), {
-      headers,
-      timeout: 100000,
-      maxBodyLength: Infinity,
-      validateStatus: (status) =>
-        (status > 200 && status < 300) || status !== 402,
-    });
-
-    if (response.status === 402)
-      throw new Error("Not enough funds to send data");
-
-    return response;
-  }
-
-  /**
    * Verifies a `Buffer` and checks it fits the format of a DataItem
    *
    * A binary is valid iff:
@@ -273,23 +212,16 @@ export default class DataItem implements BundleItem {
     const sigType = item.signatureType;
     const tagsStart = item.getTagsStart();
 
-    const numberOfTags = byteArrayToLong(
-      buffer.subarray(tagsStart, tagsStart + 8),
-    );
-    const numberOfTagBytesArray = buffer.subarray(
-      tagsStart + 8,
-      tagsStart + 16,
-    );
+    const numberOfTags = byteArrayToLong(buffer.subarray(tagsStart, tagsStart + 8));
+    const numberOfTagBytesArray = buffer.subarray(tagsStart + 8, tagsStart + 16);
     const numberOfTagBytes = byteArrayToLong(numberOfTagBytesArray);
 
-    if (numberOfTagBytes > 4096) return false;
+    if (numberOfTagBytes > MAX_TAG_BYTES) return false;
 
     if (numberOfTags > 0) {
       try {
-        const tags: { name: string; value: string }[] = tagsParser.fromBuffer(
-          Buffer.from(
-            buffer.subarray(tagsStart + 16, tagsStart + 16 + numberOfTagBytes),
-          ),
+        const tags: { name: string; value: string }[] = deserializeTags(
+          Buffer.from(buffer.subarray(tagsStart + 16, tagsStart + 16 + numberOfTagBytes)),
         );
 
         if (tags.length !== numberOfTags) {
@@ -348,3 +280,4 @@ export default class DataItem implements BundleItem {
     return anchorStart;
   }
 }
+export default DataItem;

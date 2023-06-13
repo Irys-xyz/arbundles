@@ -1,8 +1,8 @@
-import { Signer } from "../Signer";
-import { constants, createPublicKey, createSign } from "crypto";
-import Arweave from "arweave";
+import type { Signer } from "../Signer";
+import { getCryptoDriver } from "$/utils";
 import base64url from "base64url";
 import { SIG_CONFIG } from "../../constants";
+import { constants, createSign } from "crypto";
 
 export default class Rsa4096Pss implements Signer {
   readonly signatureType: number = 1;
@@ -15,16 +15,7 @@ export default class Rsa4096Pss implements Signer {
 
   constructor(private _key: string, public pk?: string) {
     if (!pk) {
-      this.pk = createPublicKey({
-        key: _key,
-        type: "pkcs1",
-        format: "pem",
-      })
-        .export({
-          format: "pem",
-          type: "pkcs1",
-        })
-        .toString();
+      this.pk = getCryptoDriver().getPublicKey(JSON.parse(_key));
     }
   }
 
@@ -35,15 +26,7 @@ export default class Rsa4096Pss implements Signer {
     });
   }
 
-  static async verify(
-    pk: string | Buffer,
-    message: Uint8Array,
-    signature: Uint8Array,
-  ): Promise<boolean> {
-    return await Arweave.crypto.verify(
-      Buffer.isBuffer(pk) ? base64url.encode(pk) : pk,
-      message,
-      signature,
-    );
+  static async verify(pk: string | Buffer, message: Uint8Array, signature: Uint8Array): Promise<boolean> {
+    return await getCryptoDriver().verify(Buffer.isBuffer(pk) ? base64url.encode(pk) : pk, message, signature);
   }
 }

@@ -1,6 +1,5 @@
-import PolygonSigner from "../signing/chains/PolygonSigner";
-import { DataItemCreateOptions } from "../ar-data-base";
-import { createData } from "..";
+import { createData, PolygonSigner } from "../../index";
+import type { DataItemCreateOptions } from "../ar-data-base";
 
 describe("Polygon signing tests", function () {
   it("should sign and verify", async function () {
@@ -10,9 +9,7 @@ describe("Polygon signing tests", function () {
       tags: [{ name: "Content-Type", value: "image/png" }],
     };
 
-    const signer = new PolygonSigner(
-      "a62a05de6cd346c85cbdf5281532c38fff972558fd02e2cc1d447e435de10f18",
-    );
+    const signer = new PolygonSigner("a62a05de6cd346c85cbdf5281532c38fff972558fd02e2cc1d447e435de10f18");
 
     const d = createData("hello", signer, _d);
     await d.sign(signer);

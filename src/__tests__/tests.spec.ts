@@ -1,17 +1,10 @@
 import { readFileSync } from "fs";
 import path from "path";
 import { Buffer } from "buffer";
-import { DataItemCreateOptions } from "../ar-data-base";
 import * as fs from "fs";
-import ArweaveSigner from "../signing/chains/ArweaveSigner";
-import { createData } from "../ar-data-create";
-import DataItem from "../DataItem";
-import { bundleAndSignData } from "../ar-data-bundle";
-import SolanaSigner from "../signing/chains/SolanaSigner";
-
-const wallet0 = JSON.parse(
-  readFileSync(path.join(__dirname, "test_key0.json")).toString(),
-);
+import type { DataItemCreateOptions } from "../../index";
+import { SolanaSigner, bundleAndSignData, DataItem, createData, ArweaveSigner } from "../../index";
+const wallet0 = JSON.parse(readFileSync(path.join(__dirname, "test_key0.json")).toString());
 
 describe("Creating and indexing a data item", function () {
   it("should create with all and get", async function () {
@@ -125,9 +118,7 @@ describe("Creating and indexing a data item", function () {
 
   it("Test Bundle", async function () {
     const signer = new ArweaveSigner(wallet0);
-    const solSigner = new SolanaSigner(
-      "rUC3u5oz8W1Y2b8b2tq1K5AUWnXMiVV5o9Fx29yTJepFqFPfYPdwjainQhUvxfNuuhMJAGoawA3qYWzo8QhC5pj",
-    );
+    const solSigner = new SolanaSigner("rUC3u5oz8W1Y2b8b2tq1K5AUWnXMiVV5o9Fx29yTJepFqFPfYPdwjainQhUvxfNuuhMJAGoawA3qYWzo8QhC5pj");
     const _dataItems = [
       createData("tasty", signer, {
         target: "pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A",
@@ -141,19 +132,14 @@ describe("Creating and indexing a data item", function () {
       }),
     ];
 
-    const bundle = await bundleAndSignData(
-      [_dataItems[0], _dataItems[0]],
-      signer,
-    );
+    const bundle = await bundleAndSignData([_dataItems[0], _dataItems[0]], signer);
     const dataItems = bundle.items;
 
     expect(bundle.length).toEqual(2);
     expect(dataItems.length).toEqual(2);
     expect(Buffer.from(dataItems[0].rawData).toString()).toBe("tasty");
     expect(dataItems[0].owner).toBe(wallet0.n);
-    expect(Buffer.from(dataItems[0].target).toString()).toBe(
-      "pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A",
-    );
+    expect(Buffer.from(dataItems[0].target).toString()).toBe("pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A");
     expect(dataItems[0].anchor).toEqual("Math.randomgng(36).substring(30)");
     expect(dataItems[0].tags).toEqual([{ name: "x", value: "y" }]);
     expect(await DataItem.verify(dataItems[0].getRaw())).toEqual(true);
@@ -161,10 +147,7 @@ describe("Creating and indexing a data item", function () {
 
   it("Test bugs", async function () {
     const signer = new ArweaveSigner(wallet0);
-    const bundle = await bundleAndSignData(
-      [createData("1894", signer), createData("4242", signer)],
-      signer,
-    );
+    const bundle = await bundleAndSignData([createData("1894", signer), createData("4242", signer)], signer);
 
     expect(bundle.get(1).rawData).toEqual(Buffer.from("4242"));
   });
@@ -180,10 +163,7 @@ describe("Creating and indexing a data item", function () {
 
     const tags = [{ name: "gdf", value: "gfgdf" }];
 
-    const items = [
-      createData("1984", signer, { tags }),
-      createData("4242", signer),
-    ];
+    const items = [createData("1984", signer, { tags }), createData("4242", signer)];
     const bundle = await bundleAndSignData(items, signer);
 
     expect(await bundle.verify()).toEqual(true);

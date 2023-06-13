@@ -1,14 +1,14 @@
 // import MyAlgoConnect from "@randlabs/myalgo-connect";
 // import * as algosdk from "algosdk";
 // import { Signer } from "..";
-// import { SignatureConfig, SIG_CONFIG } from "../../constants";
+// import { SignatureConfig, SIG_CONFIG } from "../../../constants";
 // import * as ed25519 from "noble-ed25519";
 
 // export default class InjectedAlgorandSigner implements Signer {
 
 //   private signer: MyAlgoConnect;
 //   public publicKey: Buffer;
-  
+
 //   readonly ownerLength: number = SIG_CONFIG[SignatureConfig.ED25519].pubLength;
 //   readonly signatureLength: number = SIG_CONFIG[SignatureConfig.ED25519].sigLength;
 //   readonly signatureType: number = 2;

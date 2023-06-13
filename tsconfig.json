@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es2019",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "skipLibCheck": false,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "nodenext",
+    "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "declaration": true,
@@ -16,10 +16,25 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "resolveJsonModule": true,
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "strictNullChecks": false
+    "strictNullChecks": true,
+    "baseUrl": "./src",
+    "rootDir": ".",
+    "outDir": "./build/node/esm",
+    "paths": {
+      "$/utils": ["nodeUtils.ts"]
+    }
   },
-  "include": ["src/**/*", "file/**/*", "stream/**/*", "index.ts"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    "esm": false,
+    "transpileOnly": true,
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  },
+  "include": ["src/**/*","index.ts", "webIndex.ts"],
   "exclude": ["src/__tests__/**"]
 }

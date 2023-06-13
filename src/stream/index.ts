@@ -1,18 +1,18 @@
-import { PassThrough, Readable, Transform } from "stream";
-import { byteArrayToLong } from "../src/utils";
+import { PassThrough, Transform } from "stream";
+import type { Readable } from "stream";
+import { byteArrayToLong } from "../utils";
 import base64url from "base64url";
-import { indexToType } from "../src/signing/constants";
-import { createData, DataItemCreateOptions, MIN_BINARY_SIZE } from "../src/index";
-import { SIG_CONFIG } from "../src/constants";
-import { tagsParser } from "../src/parser";
-import * as crypto from "crypto";
-import { stringToBuffer } from "arweave/node/lib/utils";
-import { deepHash } from "../src/deepHash";
-import { Signer } from "../src/signing";
+import { indexToType } from "../signing/constants";
+import type { DataItemCreateOptions } from "../index";
+import { createData, MIN_BINARY_SIZE } from "../index";
+import { SIG_CONFIG } from "../constants";
+import { stringToBuffer } from "$/utils";
+import { deepHash } from "../deepHash";
+import type { Signer } from "../signing/index";
+import { deserializeTags } from "../tags";
+import { createHash } from "crypto";
 
-export default async function processStream(
-  stream: Readable,
-): Promise<Record<string, any>[]> {
+export default async function processStream(stream: Readable): Promise<Record<string, any>[]> {
   const reader = getReader(stream);
   let bytes: Uint8Array = (await reader.next()).value;
   bytes = await readBytes(reader, bytes, 32);
@@ -22,17 +22,14 @@ export default async function processStream(
   bytes = await readBytes(reader, bytes, headersLength);
   const headers: [number, string][] = new Array(itemCount);
   for (let i = 0; i < headersLength; i += 64) {
-    headers[i / 64] = [
-      byteArrayToLong(bytes.subarray(i, i + 32)),
-      base64url(Buffer.from(bytes.subarray(i + 32, i + 64))),
-    ];
+    headers[i / 64] = [byteArrayToLong(bytes.subarray(i, i + 32)), base64url(Buffer.from(bytes.subarray(i + 32, i + 64)))];
   }
 
   bytes = bytes.subarray(headersLength);
 
   let offsetSum = 32 + headersLength;
 
-  const items = [];
+  const items: Record<string, any>[] = [];
 
   for (const [length, id] of headers) {
     bytes = await readBytes(reader, bytes, MIN_BINARY_SIZE);
@@ -58,18 +55,14 @@ export default async function processStream(
     bytes = await readBytes(reader, bytes, 1);
     const targetPresent = bytes[0] === 1;
     if (targetPresent) bytes = await readBytes(reader, bytes, 33);
-    const target = targetPresent
-      ? bytes.subarray(1, 33)
-      : Buffer.allocUnsafe(0);
+    const target = targetPresent ? bytes.subarray(1, 33) : Buffer.allocUnsafe(0);
     bytes = bytes.subarray(targetPresent ? 33 : 1);
 
     // Get anchor
     bytes = await readBytes(reader, bytes, 1);
     const anchorPresent = bytes[0] === 1;
     if (anchorPresent) bytes = await readBytes(reader, bytes, 33);
-    const anchor = anchorPresent
-      ? bytes.subarray(1, 33)
-      : Buffer.allocUnsafe(0);
+    const anchor = anchorPresent ? bytes.subarray(1, 33) : Buffer.allocUnsafe(0);
     bytes = bytes.subarray(anchorPresent ? 33 : 1);
 
     // Get tags
@@ -83,15 +76,12 @@ export default async function processStream(
 
     bytes = await readBytes(reader, bytes, tagsBytesLength);
     const tagsBytes = bytes.subarray(0, tagsBytesLength);
-    const tags =
-      tagsLength !== 0 && tagsBytesLength !== 0
-        ? tagsParser.fromBuffer(Buffer.from(tagsBytes))
-        : [];
+    const tags = tagsLength !== 0 && tagsBytesLength !== 0 ? deserializeTags(Buffer.from(tagsBytes)) : [];
     if (tags.length !== tagsLength) throw new Error("Tags lengths don't match");
     bytes = bytes.subarray(tagsBytesLength);
 
     const transform = new Transform();
-    transform._transform = function (chunk, _, done) {
+    transform._transform = function (chunk, _, done): void {
       this.push(chunk);
       done();
     };
@@ -109,14 +99,7 @@ export default async function processStream(
     ]);
 
     // Get offset of data start and length of data
-    const dataOffset =
-      2 +
-      sigLength +
-      pubLength +
-      (targetPresent ? 33 : 1) +
-      (anchorPresent ? 33 : 1) +
-      16 +
-      tagsBytesLength;
+    const dataOffset = 2 + sigLength + pubLength + (targetPresent ? 33 : 1) + (anchorPresent ? 33 : 1) + 16 + tagsBytesLength;
     const dataSize = length - dataOffset;
 
     if (bytes.byteLength > dataSize) {
@@ -128,17 +111,12 @@ export default async function processStream(
       while (dataSize > skipped) {
         bytes = (await reader.next()).value;
         if (!bytes) {
-          throw new Error(
-            `Not enough data bytes  expected: ${dataSize} received: ${skipped}`,
-          );
+          throw new Error(`Not enough data bytes  expected: ${dataSize} received: ${skipped}`);
         }
 
         skipped += bytes.byteLength;
 
-        if (skipped > dataSize)
-          transform.write(
-            bytes.subarray(0, bytes.byteLength - (skipped - dataSize)),
-          );
+        if (skipped > dataSize) transform.write(bytes.subarray(0, bytes.byteLength - (skipped - dataSize)));
         else transform.write(bytes);
       }
       bytes = bytes.subarray(bytes.byteLength - (skipped - dataSize));
@@ -147,15 +125,11 @@ export default async function processStream(
     transform.end();
 
     // Check id
-    if (
-      id !== base64url(crypto.createHash("sha256").update(signature).digest())
-    )
-      throw new Error("ID doesn't match signature");
+    if (id !== base64url(createHash("sha256").update(signature).digest())) throw new Error("ID doesn't match signature");
 
     const Signer = indexToType[signatureType];
 
-    if (!(await Signer.verify(owner, (await signatureData) as any, signature)))
-      throw new Error("Invalid signature");
+    if (!(await Signer.verify(owner, (await signatureData) as any, signature))) throw new Error("Invalid signature");
 
     items.push({
       id,
@@ -175,9 +149,6 @@ export default async function processStream(
   return items;
 }
 
-
-
-
 /**
  * Signs a stream (requires two instances/read passes)
  * @param s1 Stream to sign - same as s2
@@ -187,7 +158,6 @@ export default async function processStream(
  */
 
 export async function streamSigner(s1: Readable, s2: Readable, signer: Signer, opts?: DataItemCreateOptions): Promise<PassThrough> {
-
   const header = createData("", signer, opts);
   const output = new PassThrough();
 
@@ -199,7 +169,7 @@ export async function streamSigner(s1: Readable, s2: Readable, signer: Signer, o
     header.rawTarget,
     header.rawAnchor,
     header.rawTags,
-    s1
+    s1,
   ];
 
   const hash = await deepHash(parts);
@@ -210,18 +180,14 @@ export async function streamSigner(s1: Readable, s2: Readable, signer: Signer, o
   return s2.pipe(output);
 }
 
-async function readBytes(
-  reader: AsyncGenerator<Buffer>,
-  buffer: Uint8Array,
-  length: number,
-): Promise<Uint8Array> {
-  if (buffer.byteLength > length) return buffer;
+async function readBytes(reader: AsyncGenerator<Buffer>, buffer: Uint8Array, length: number): Promise<Uint8Array> {
+  if (buffer.byteLength >= length) return buffer;
 
   const { done, value } = await reader.next();
 
   if (done && !value) throw new Error("Invalid buffer");
 
-  return readBytes(reader, Buffer.concat([buffer, value]), length);
+  return readBytes(reader, Buffer.concat([Buffer.from(buffer), Buffer.from(value)]), length);
 }
 
 async function* getReader(s: Readable): AsyncGenerator<Buffer> {
@@ -229,3 +195,8 @@ async function* getReader(s: Readable): AsyncGenerator<Buffer> {
     yield chunk;
   }
 }
+
+export const streamExportForTesting = {
+  readBytes,
+  getReader,
+};

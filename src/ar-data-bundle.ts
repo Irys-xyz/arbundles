@@ -1,9 +1,9 @@
-import { getSignatureData } from "./ar-data-base";
+import getSignatureData from "./ar-data-base";
 import { longTo32ByteArray } from "./utils";
-import DataItem from "./DataItem";
-import Arweave from "arweave";
+import type DataItem from "./DataItem";
 import Bundle from "./Bundle";
-import { Signer } from "./signing/Signer";
+import type { Signer } from "./signing/Signer";
+import { getCryptoDriver } from "$/utils";
 
 /**
  * Unbundles a transaction into an Array of DataItems.
@@ -29,10 +29,7 @@ export function unbundleData(txData: Buffer): Bundle {
  * @param dataItems
  * @param signer
  */
-export async function bundleAndSignData(
-  dataItems: DataItem[],
-  signer: Signer,
-): Promise<Bundle> {
+export async function bundleAndSignData(dataItems: DataItem[], signer: Signer): Promise<Bundle> {
   const headers = new Uint8Array(64 * dataItems.length);
 
   const binaries = await Promise.all(
@@ -54,11 +51,7 @@ export async function bundleAndSignData(
     return Buffer.concat(a);
   });
 
-  const buffer = Buffer.concat([
-    longTo32ByteArray(dataItems.length),
-    headers,
-    binaries,
-  ]);
+  const buffer = Buffer.concat([Buffer.from(longTo32ByteArray(dataItems.length)), Buffer.from(headers), binaries]);
 
   return new Bundle(buffer);
 }
@@ -70,14 +63,11 @@ export async function bundleAndSignData(
  * @param signer
  * @returns signings - signature and id in byte-arrays
  */
-export async function getSignatureAndId(
-  item: DataItem,
-  signer: Signer,
-): Promise<{ signature: Buffer; id: Buffer }> {
+export async function getSignatureAndId(item: DataItem, signer: Signer): Promise<{ signature: Buffer; id: Buffer }> {
   const signatureData = await getSignatureData(item);
 
   const signatureBytes = await signer.sign(signatureData);
-  const idBytes = await Arweave.crypto.hash(signatureBytes);
+  const idBytes = await getCryptoDriver().hash(signatureBytes);
 
   return { signature: Buffer.from(signatureBytes), id: Buffer.from(idBytes) };
 }
