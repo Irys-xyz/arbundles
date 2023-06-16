@@ -13,3 +13,4 @@ export { default as InjectedAptosSigner } from "./InjectedAptosSigner";
 export { default as MultiSignatureAptosSigner } from "./multiSignatureAptos";
 export { default as TypedEthereumSigner } from "./TypedEthereumSigner";
 export { default as InjectedTypedEthereumSigner } from "./InjectedTypedEthereumSigner";
+export { default as ArconnectSigner } from "./arconnectSigner";

@@ -9,6 +9,7 @@ export { deepHash } from "./deepHash";
 // export { default as Arweave } from "arweave/node";
 // export const sha384 = (): Hash => createHash("sha384");
 export type { CreateTransactionInterface } from "arweave/node/common";
+export { default as Arweave } from "arweave/node";
 
 // hack as ESM won't unpack .default CJS imports, so we do so dynamically
 // eslint-disable-next-line @typescript-eslint/dot-notation
