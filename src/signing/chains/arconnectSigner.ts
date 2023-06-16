@@ -1,17 +1,18 @@
-import { Signer } from "..";
+import type { Signer } from "..";
 import { SignatureConfig, SIG_CONFIG } from "../../constants";
 import Arweave from "arweave";
 import base64url from "base64url";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type * as _ from "arconnect";
 
 export default class InjectedArweaveSigner implements Signer {
-  private signer: any;
+  private signer: Window["arweaveWallet"];
   public publicKey: Buffer;
   readonly ownerLength: number = SIG_CONFIG[SignatureConfig.ARWEAVE].pubLength;
-  readonly signatureLength: number =
-    SIG_CONFIG[SignatureConfig.ARWEAVE].sigLength;
+  readonly signatureLength: number = SIG_CONFIG[SignatureConfig.ARWEAVE].sigLength;
   readonly signatureType: SignatureConfig = SignatureConfig.ARWEAVE;
 
-  constructor(windowArweaveWallet: any) {
+  constructor(windowArweaveWallet: Window["arweaveWallet"]) {
     this.signer = windowArweaveWallet;
   }
 
@@ -27,22 +28,15 @@ export default class InjectedArweaveSigner implements Signer {
 
     const algorithm = {
       name: "RSA-PSS",
-      saltLength: 0
+      saltLength: 0,
     };
 
-    const signature = await this.signer.signature(
-      message,
-      algorithm
-    );
+    const signature = await this.signer.signature(message, algorithm);
     const buf = new Uint8Array(Object.values(signature));
     return buf;
   }
 
-  static async verify(
-    pk: string,
-    message: Uint8Array,
-    signature: Uint8Array,
-  ): Promise<boolean> {
+  static async verify(pk: string, message: Uint8Array, signature: Uint8Array): Promise<boolean> {
     return await Arweave.crypto.verify(pk, message, signature);
   }
 }
