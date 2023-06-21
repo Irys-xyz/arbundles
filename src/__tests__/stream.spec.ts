@@ -1,6 +1,6 @@
 import { createReadStream, readFileSync, unlinkSync, writeFileSync } from "fs";
 import path from "path";
-import processStream, { streamSigner, streamExportForTesting } from "../../src/stream/index";
+import { processStream, streamSigner, streamExportForTesting } from "../../index";
 import { Readable } from "stream";
 import type { DataItemCreateOptions } from "../../index";
 import { DataItem } from "../../index";
