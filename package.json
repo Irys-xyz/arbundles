@@ -4,6 +4,7 @@
   "description": "Arweave bundling library",
   "author": "Josh Benaron <joshbenaron@gmail.com>",
   "license": "Apache-2.0",
+  "repository": "https://github.com/Bundlr-Network/arbundles",
   "main": "build/node/cjs/index.js",
   "module": "build/node/esm/index.js",
   "browser": "build/web/esm/webIndex.js",
