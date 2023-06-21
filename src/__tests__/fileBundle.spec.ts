@@ -3,7 +3,7 @@ import { createData } from "../ar-data-create";
 import { FileDataItem } from "../file";
 import type { FileBundle } from "../file/FileBundle";
 import Bundle from "../file/FileBundle";
-import { EthereumSigner } from "../../src/signing";
+import { EthereumSigner } from "../../index";
 import { bundleAndSignData } from "../file";
 import base64url from "base64url";
 import type Transactions from "arweave/node/transactions";

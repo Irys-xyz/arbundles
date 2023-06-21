@@ -12,7 +12,7 @@ import type { Signer } from "../signing/index";
 import { deserializeTags } from "../tags";
 import { createHash } from "crypto";
 
-export default async function processStream(stream: Readable): Promise<Record<string, any>[]> {
+export async function processStream(stream: Readable): Promise<Record<string, any>[]> {
   const reader = getReader(stream);
   let bytes: Uint8Array = (await reader.next()).value;
   bytes = await readBytes(reader, bytes, 32);
@@ -195,6 +195,8 @@ async function* getReader(s: Readable): AsyncGenerator<Buffer> {
     yield chunk;
   }
 }
+
+export default processStream;
 
 export const streamExportForTesting = {
   readBytes,
