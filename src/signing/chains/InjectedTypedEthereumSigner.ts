@@ -10,7 +10,7 @@ export default class InjectedTypedEthereumSigner extends InjectedEthereumSigner 
   private address: string;
 
   async ready(): Promise<void> {
-    this.address = await this.signer.getAddress();
+    this.address = (await this.signer.getAddress()).toLowerCase();
     this.publicKey = Buffer.from(this.address); // pk *is* address
   }
 
@@ -24,8 +24,8 @@ export default class InjectedTypedEthereumSigner extends InjectedEthereumSigner 
   }
 
   static verify(pk: string | Buffer, message: Uint8Array, signature: Uint8Array): boolean {
-    const address = pk;
+    const address = pk.toString();
     const addr = verifyTypedData(domain, types, { address, "Transaction hash": message }, signature);
-    return address === addr;
+    return address.toLowerCase() === addr.toLowerCase();
   }
 }
