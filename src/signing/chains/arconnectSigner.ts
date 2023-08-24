@@ -28,7 +28,7 @@ export default class InjectedArweaveSigner implements Signer {
 
     const algorithm = {
       name: "RSA-PSS",
-      saltLength: 0,
+      saltLength: 32,
     };
 
     const signature = await this.signer.signature(message, algorithm);
