@@ -10,7 +10,7 @@ export default class InjectedTypedEthereumSigner extends InjectedEthereumSigner 
   private address: string;
 
   async ready(): Promise<void> {
-    this.address = (await this.signer.getAddress()).toLowerCase();
+    this.address = (await this.signer.getAddress()).toString().toLowerCase();
     this.publicKey = Buffer.from(this.address); // pk *is* address
   }
 
