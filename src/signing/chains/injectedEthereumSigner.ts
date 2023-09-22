@@ -1,20 +1,27 @@
-import type { Web3Provider, JsonRpcSigner } from "@ethersproject/providers";
 import { hashMessage } from "@ethersproject/hash";
 import { recoverPublicKey } from "@ethersproject/signing-key";
 import type { Signer } from "../index";
 import { SignatureConfig, SIG_CONFIG } from "../../constants";
+import type { Bytes } from "@ethersproject/bytes";
 import { arrayify } from "@ethersproject/bytes";
 import { computeAddress } from "@ethersproject/transactions";
 import { verifyMessage } from "@ethersproject/wallet";
+export interface InjectedEthereumSignerMinimalSigner {
+  signMessage(message: string | Bytes): Promise<string>;
+}
+export interface InjectedEthereumSignerMinimalProvider {
+  getSigner(): InjectedEthereumSignerMinimalSigner;
+}
 
-export default class InjectedEthereumSigner implements Signer {
-  protected signer: JsonRpcSigner;
+export class InjectedEthereumSigner implements Signer {
+  // protected signer: JsonRpcSigner;
+  protected signer: InjectedEthereumSignerMinimalSigner;
   public publicKey: Buffer;
   readonly ownerLength: number = SIG_CONFIG[SignatureConfig.ETHEREUM].pubLength;
   readonly signatureLength: number = SIG_CONFIG[SignatureConfig.ETHEREUM].sigLength;
   readonly signatureType: SignatureConfig = SignatureConfig.ETHEREUM;
 
-  constructor(provider: Web3Provider) {
+  constructor(provider: InjectedEthereumSignerMinimalProvider) {
     this.signer = provider.getSigner();
   }
 
@@ -39,3 +46,4 @@ export default class InjectedEthereumSigner implements Signer {
     return verifyMessage(message, signature) === address;
   }
 }
+export default InjectedEthereumSigner;
