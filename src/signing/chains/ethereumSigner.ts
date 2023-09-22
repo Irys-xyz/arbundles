@@ -1,5 +1,5 @@
 import Secp256k1 from "../keys/secp256k1";
-import { ecdsaVerify, publicKeyCreate } from "secp256k1";
+import secp256k1 from "secp256k1";
 import base64url from "base64url";
 import { arrayify } from "@ethersproject/bytes";
 import { Wallet } from "@ethersproject/wallet";
@@ -13,7 +13,7 @@ export default class EthereumSigner extends Secp256k1 {
   constructor(key: string) {
     if (key.startsWith("0x")) key = key.slice(2);
     const b = Buffer.from(key, "hex");
-    const pub = publicKeyCreate(b, false);
+    const pub = secp256k1.publicKeyCreate(b, false);
     super(key, Buffer.from(pub));
   }
 
@@ -27,7 +27,7 @@ export default class EthereumSigner extends Secp256k1 {
   static async verify(pk: string | Buffer, message: Uint8Array, signature: Uint8Array): Promise<boolean> {
     // const address = ethers.utils.computeAddress(pk);
     // return ethers.utils.verifyMessage(message, signature) === address;
-    return ecdsaVerify(
+    return secp256k1.ecdsaVerify(
       signature.length === 65 ? signature.slice(0, -1) : signature,
       arrayify(hashMessage(message)),
       typeof pk === "string" ? base64url.toBuffer(pk) : pk,
