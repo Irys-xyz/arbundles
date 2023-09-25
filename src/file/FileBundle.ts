@@ -3,7 +3,7 @@ import FileDataItem from "./FileDataItem";
 import type { PathLike } from "fs";
 import { createReadStream, promises } from "fs";
 import { byteArrayToLong } from "../utils";
-import type Arweave from "arweave";
+import type Arweave from "@irys/arweave";
 import { read as FSRead } from "fs";
 import MultiStream from "multistream";
 // import { pipeline } from 'stream/promises';
@@ -13,7 +13,6 @@ import { promisify } from "util";
 import base64url from "base64url";
 import { pipeline } from "stream/promises";
 
-import { createTransactionAsync, uploadTransactionAsync } from "arweave-stream-tx";
 import type { CreateTransactionInterface, Transaction } from "$/utils";
 import { resolve } from "path";
 // import { Readable } from 'stream';
@@ -100,7 +99,7 @@ export class FileBundle implements BundleInterface {
 
     const stream = MultiStream.obj(streams);
 
-    const tx = await pipeline(stream, createTransactionAsync(attributes, arweave, jwk));
+    const tx = await pipeline(stream, arweave.stream.createTransactionAsync(attributes, jwk));
     tx.addTag("Bundle-Format", "binary");
     tx.addTag("Bundle-Version", "2.0.0");
 
@@ -122,7 +121,7 @@ export class FileBundle implements BundleInterface {
     const stream2 = MultiStream.obj(streams2);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await pipeline(stream2, uploadTransactionAsync(tx, arweave, true) as any);
+    await pipeline(stream2, arweave.stream.uploadTransactionAsync(tx, true) as any);
 
     return tx;
   }

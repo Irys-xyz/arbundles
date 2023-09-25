@@ -1,10 +1,10 @@
 import type { JWKInterface } from "./interface-jwk";
-export type { default as Transaction } from "arweave/web/lib/transaction";
-export type { CreateTransactionInterface } from "arweave/web/common";
-import webDriver from "arweave/web/lib/crypto/webcrypto-driver";
-export { stringToBuffer, concatBuffers } from "arweave/web/lib/utils";
+export type { default as Transaction } from "@irys/arweave/common/lib/transaction";
+export type { CreateTransactionInterface } from "@irys/arweave/common/arweave";
+import webDriver from "@irys/arweave/web/webcrypto-driver";
+export { stringToBuffer, concatBuffers } from "@irys/arweave/common/lib/utils";
 export { deepHash } from "./deepHash";
-export { default as Arweave } from "arweave/web";
+export { Arweave } from "@irys/arweave/web/arweave";
 // import { sha384 as SHA384 } from "sha";
 // export { default as Arweave } from "arweave/web";
 // import type { Hash } from "crypto";

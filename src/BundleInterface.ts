@@ -1,5 +1,5 @@
 import type { BundleItem } from "./BundleItem";
-import type Arweave from "arweave";
+import type Arweave from "@irys/arweave";
 import type { JWKInterface } from "./interface-jwk";
 import type { CreateTransactionInterface, Transaction } from "$/utils";
 

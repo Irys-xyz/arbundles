@@ -1,7 +1,7 @@
 import base64url from "base64url";
 import { byteArrayToLong } from "./utils";
 import DataItem from "./DataItem";
-import type Arweave from "arweave";
+import type Arweave from "@irys/arweave";
 import type { BundleInterface } from "./BundleInterface";
 import type { JWKInterface } from "./interface-jwk";
 import { createHash } from "crypto";

@@ -1,5 +1,5 @@
 import Rsa4096Pss from "../Rsa4096Pss";
-import { jwkTopem } from "arweave/node/lib/crypto/pem";
+import { jwkTopem } from "@irys/arweave/common/lib/crypto/pem";
 import testKey from "../../../__tests__/test_key0.json";
 
 const privateKey = jwkTopem(testKey);
