@@ -1,14 +1,29 @@
 import { SignatureConfig, SIG_CONFIG } from "../../constants";
 import { verifyTypedData } from "@ethersproject/wallet";
-import InjectedEthereumSigner from "./injectedEthereumSigner";
 import { domain, types } from "./TypedEthereumSigner";
+import type { TypedDataDomain, TypedDataField } from "@ethersproject/abstract-signer";
+import type { Signer } from "../index";
 
-export default class InjectedTypedEthereumSigner extends InjectedEthereumSigner {
+export interface InjectedTypedEthereumSignerMinimalSigner {
+  getAddress: () => Promise<string>;
+  _signTypedData(domain: TypedDataDomain, types: Record<string, TypedDataField[]>, value: Record<string, any>): Promise<string>;
+}
+
+export interface InjectedTypedEthereumSignerMinimalProvider {
+  getSigner(): InjectedTypedEthereumSignerMinimalSigner;
+}
+
+export class InjectedTypedEthereumSigner implements Signer {
   readonly ownerLength: number = SIG_CONFIG[SignatureConfig.TYPEDETHEREUM].pubLength;
   readonly signatureLength: number = SIG_CONFIG[SignatureConfig.TYPEDETHEREUM].sigLength;
   readonly signatureType: SignatureConfig = SignatureConfig.TYPEDETHEREUM;
   private address: string;
+  protected signer: InjectedTypedEthereumSignerMinimalSigner;
+  public publicKey: Buffer;
 
+  constructor(provider: InjectedTypedEthereumSignerMinimalProvider) {
+    this.signer = provider.getSigner();
+  }
   async ready(): Promise<void> {
     this.address = (await this.signer.getAddress()).toString().toLowerCase();
     this.publicKey = Buffer.from(this.address); // pk *is* address
@@ -29,3 +44,4 @@ export default class InjectedTypedEthereumSigner extends InjectedEthereumSigner 
     return address.toLowerCase() === addr.toLowerCase();
   }
 }
+export default InjectedTypedEthereumSigner;
