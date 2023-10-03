@@ -651,10 +651,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@irys/arweave@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@irys/arweave/-/arweave-0.0.1.tgz#3b8ca0dd6eb5ef5edd8abb67dd673f28f3f473f4"
-  integrity sha512-yzM3g2hEa0f33aRQJZi8OFjSUu80gxj1VGHYDBNCnRTKyBB5YqJG5xBr0sh8Uh5Q6ROJYtlVMBDtrdDn+3sjUQ==
+"@irys/arweave@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@irys/arweave/-/arweave-0.0.2.tgz#c0e73eb8c15e323342d33ea92701d4036fd22ae3"
+  integrity sha512-ddE5h4qXbl0xfGlxrtBIwzflaxZUDlDs43TuT0u1OMfyobHul4AA1VEX72Rpzw2bOh4vzoytSqA1jCM7x9YtHg==
   dependencies:
     asn1.js "^5.4.1"
     async-retry "^1.3.3"

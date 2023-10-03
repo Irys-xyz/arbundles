@@ -287,7 +287,7 @@ describe.each(testDataVariations)("given we have $description FileDataItems", ({
               getTransactionAnchor: jest.fn().mockReturnValue("testAnchor"),
               getPrice: jest.fn().mockReturnValue(123),
             } as any as Transactions,
-          } as any as Arweave;
+          } as any as typeof Arweave;
 
           const jwkInterfaceMock = {
             k: "k",
@@ -297,6 +297,7 @@ describe.each(testDataVariations)("given we have $description FileDataItems", ({
           } as any as JWKInterface;
 
           beforeEach(async () => {
+            // @ts-expect-error types
             tx = await bundle.signAndSubmit(arweaveMock, jwkInterfaceMock, tags);
           });
           it("should return a transaction", () => {
@@ -319,9 +320,16 @@ describe.each(testDataVariations)("given we have $description FileDataItems", ({
             expect(tx.data_size).toBe((await bundle.getRaw()).length.toString());
           });
           it("should call the api", () => {
+            // @ts-expect-error types
             expect(arweaveMock.api.post).toHaveBeenCalled();
+
+            // @ts-expect-error types
             expect(arweaveMock.transactions.sign).toHaveBeenCalled();
+
+            // @ts-expect-error types
             expect(arweaveMock.transactions.getTransactionAnchor).toHaveBeenCalled();
+
+            // @ts-expect-error types
             expect(arweaveMock.transactions.getPrice).toHaveBeenCalled();
           });
           it("should set the correct tags", () => {

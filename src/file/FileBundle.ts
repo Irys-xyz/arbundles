@@ -3,7 +3,7 @@ import FileDataItem from "./FileDataItem";
 import type { PathLike } from "fs";
 import { createReadStream, promises } from "fs";
 import { byteArrayToLong } from "../utils";
-import type Arweave from "@irys/arweave";
+import type NodeArweave from "@irys/arweave/node";
 import { read as FSRead } from "fs";
 import MultiStream from "multistream";
 // import { pipeline } from 'stream/promises';
@@ -94,7 +94,7 @@ export class FileBundle implements BundleInterface {
     return buff;
   }
 
-  async toTransaction(attributes: Partial<Omit<CreateTransactionInterface, "data">>, arweave: Arweave, jwk: JWKInterface): Promise<Transaction> {
+  async toTransaction(attributes: Partial<Omit<CreateTransactionInterface, "data">>, arweave: NodeArweave, jwk: JWKInterface): Promise<Transaction> {
     const streams = [createReadStream(this.headerFile), ...this.txs.map((t) => createReadStream(t))];
 
     const stream = MultiStream.obj(streams);
@@ -106,7 +106,7 @@ export class FileBundle implements BundleInterface {
     return tx;
   }
 
-  async signAndSubmit(arweave: Arweave, jwk: JWKInterface, tags: { name: string; value: string }[] = []): Promise<Transaction> {
+  async signAndSubmit(arweave: NodeArweave, jwk: JWKInterface, tags: { name: string; value: string }[] = []): Promise<Transaction> {
     const tx = await this.toTransaction({}, arweave, jwk);
     // tx.addTag("Bundle-Format", "binary");
     // tx.addTag("Bundle-Version", "2.0.0");
