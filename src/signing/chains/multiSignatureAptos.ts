@@ -54,7 +54,7 @@ export default class MultiSignatureAptosSigner implements Signer {
     const signature = Buffer.alloc(this.signatureLength);
     let sigPos = 0;
     for (let i = 0; i < 32; i++) {
-      if (bitmap.includes(i)) {
+      if (bits.includes(i)) {
         signature.set(signatures[sigPos++], i * 64);
       }
     }
