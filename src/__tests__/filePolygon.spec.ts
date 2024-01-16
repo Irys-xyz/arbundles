@@ -1,6 +1,7 @@
 import { PolygonSigner, createData } from "../../index";
 import type { DataItemCreateOptions } from "../ar-data-base";
 import { createData as createFileData } from "../../src/file/index";
+import base64url from "base64url";
 
 describe("Polygon signing tests", function () {
   it("should sign and verify using non file", async function () {
@@ -48,7 +49,7 @@ describe("Polygon signing tests", function () {
     expect((await d.rawOwner()).toString("hex")).toEqual(signer.pk);
     expect(await d.signatureType()).toEqual(3);
     expect(await d.target()).toEqual("OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs");
-    expect(await d.anchor()).toEqual("Math.apt'#]gng(36).substring(30)");
+    expect(await d.anchor()).toEqual(base64url.encode("Math.apt'#]gng(36).substring(30)"));
     expect(await d.tags()).toEqual([{ name: "Content-Type", value: "image/png" }]);
     expect(Buffer.compare(Buffer.from("hello"), await d.rawData())).toEqual(0);
   });

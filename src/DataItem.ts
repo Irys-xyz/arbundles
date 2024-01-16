@@ -10,6 +10,7 @@ import { SIG_CONFIG, SignatureConfig } from "./constants";
 import { getCryptoDriver } from "$/utils";
 import { deserializeTags } from "./tags";
 import { createHash } from "crypto";
+import type { Base64URLString } from "./types";
 
 export const MIN_BINARY_SIZE = 80;
 export const MAX_TAG_BYTES = 4096;
@@ -38,7 +39,7 @@ export class DataItem implements BundleItem {
     return DataItem.verify(this.binary);
   }
 
-  get id(): string {
+  get id(): Base64URLString {
     return base64url.encode(this.rawId);
   }
 
@@ -58,7 +59,7 @@ export class DataItem implements BundleItem {
     return this.binary.subarray(2, 2 + this.signatureLength);
   }
 
-  get signature(): string {
+  get signature(): Base64URLString {
     return base64url.encode(this.rawSignature);
   }
 
@@ -76,7 +77,7 @@ export class DataItem implements BundleItem {
     return SIG_CONFIG[this.signatureType].sigLength;
   }
 
-  get owner(): string {
+  get owner(): Base64URLString {
     return base64url.encode(this.rawOwner);
   }
 
@@ -90,7 +91,7 @@ export class DataItem implements BundleItem {
     return isPresent ? this.binary.subarray(targetStart + 1, targetStart + 33) : Buffer.alloc(0);
   }
 
-  get target(): string {
+  get target(): Base64URLString {
     return base64url.encode(this.rawTarget);
   }
 
@@ -101,8 +102,8 @@ export class DataItem implements BundleItem {
     return isPresent ? this.binary.subarray(anchorStart + 1, anchorStart + 33) : Buffer.alloc(0);
   }
 
-  get anchor(): string {
-    return this.rawAnchor.toString();
+  get anchor(): Base64URLString {
+    return base64url.encode(this.rawAnchor); /* .toString(); */
   }
 
   get rawTags(): Buffer {
@@ -123,7 +124,7 @@ export class DataItem implements BundleItem {
     return deserializeTags(Buffer.from(this.binary.subarray(tagsStart + 16, tagsStart + 16 + tagsSize)));
   }
 
-  get tagsB64Url(): { name: string; value: string }[] {
+  get tagsB64Url(): { name: Base64URLString; value: Base64URLString }[] {
     const _tags = this.tags;
     return _tags.map((t) => ({
       name: base64url.encode(t.name),
@@ -149,7 +150,7 @@ export class DataItem implements BundleItem {
     return this.binary.subarray(dataStart, this.binary.length);
   }
 
-  get data(): string {
+  get data(): Base64URLString {
     return base64url.encode(this.rawData);
   }
 
@@ -184,7 +185,7 @@ export class DataItem implements BundleItem {
     data: string;
     signature: string;
     target: string;
-    tags: { name: string; value: string }[];
+    tags: { name: Base64URLString; value: Base64URLString }[];
   } {
     return {
       signature: this.signature,

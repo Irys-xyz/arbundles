@@ -1,3 +1,4 @@
+import base64url from "base64url";
 import { SolanaSigner, createData } from "../../index";
 import type { DataItemCreateOptions } from "../ar-data-base";
 import base58 from "bs58";
@@ -18,7 +19,7 @@ describe("Solana signing tests", function () {
     expect(base58.encode(d.rawOwner)).toEqual(signer.pk);
     expect(d.signatureType).toEqual(2);
     expect(d.target).toEqual("OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs");
-    expect(d.anchor).toEqual("Math.apt'#]gng(36).substring(30)");
+    expect(d.anchor).toEqual(base64url.encode("Math.apt'#]gng(36).substring(30)"));
     expect(d.tags).toEqual([{ name: "Content-Type", value: "image/png" }]);
     expect(d.rawData.toString()).toEqual("hello");
   });

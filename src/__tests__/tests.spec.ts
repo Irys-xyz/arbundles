@@ -4,6 +4,7 @@ import { Buffer } from "buffer";
 import * as fs from "fs";
 import type { DataItemCreateOptions } from "../../index";
 import { SolanaSigner, bundleAndSignData, DataItem, createData, ArweaveSigner } from "../../index";
+import base64url from "base64url";
 const wallet0 = JSON.parse(readFileSync(path.join(__dirname, "test_key0.json")).toString());
 
 describe("Creating and indexing a data item", function () {
@@ -28,7 +29,7 @@ describe("Creating and indexing a data item", function () {
     expect(d.rawData.toString()).toEqual("hello");
     expect(d.owner).toBe(wallet0.n);
     expect(d.target).toBe("OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs");
-    expect(d.anchor).toEqual("Math.apt'#]gng(36).substring(30)");
+    expect(d.anchor).toEqual(base64url.encode("Math.apt'#]gng(36).substring(30)"));
     expect(d.tags).toEqual([{ name: "Content-Type", value: "image/png" }]);
     expect(await DataItem.verify(d.getRaw())).toEqual(true);
   }, 5000000);
@@ -51,7 +52,7 @@ describe("Creating and indexing a data item", function () {
     expect(Buffer.from(d.rawData).toString()).toBe("tasty");
     expect(d.owner).toBe(wallet0.n);
     expect(d.target).toBe("");
-    expect(d.anchor).toEqual("Math.apt'#]gng(36).substring(30)");
+    expect(d.anchor).toEqual(base64url.encode("Math.apt'#]gng(36).substring(30)"));
     expect(d.tags).toEqual([
       {
         name: "testname",
@@ -140,7 +141,7 @@ describe("Creating and indexing a data item", function () {
     expect(Buffer.from(dataItems[0].rawData).toString()).toBe("tasty");
     expect(dataItems[0].owner).toBe(wallet0.n);
     expect(Buffer.from(dataItems[0].target).toString()).toBe("pFwvlpz1x_nebBPxkK35NZm522XPnvUSveGf4Pz8y4A");
-    expect(dataItems[0].anchor).toEqual("Math.randomgng(36).substring(30)");
+    expect(dataItems[0].anchor).toEqual(base64url.encode("Math.randomgng(36).substring(30)"));
     expect(dataItems[0].tags).toEqual([{ name: "x", value: "y" }]);
     expect(await DataItem.verify(dataItems[0].getRaw())).toEqual(true);
   });
