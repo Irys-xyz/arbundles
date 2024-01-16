@@ -12,6 +12,7 @@ import axios from "axios";
 import { SIG_CONFIG } from "../constants";
 import { promisify } from "util";
 import { deserializeTags } from "../tags";
+import type { Base64URLString } from "../types";
 
 const read = promisify(FSRead);
 const write = promisify(FSWrite);
@@ -185,8 +186,8 @@ export class FileDataItem implements BundleItem {
     return Buffer.allocUnsafe(0);
   }
 
-  async anchor(): Promise<string> {
-    return (await this.rawAnchor()).toString();
+  async anchor(): Promise<Base64URLString> {
+    return base64url.encode(await this.rawAnchor());
   }
 
   async rawTags(): Promise<Buffer> {

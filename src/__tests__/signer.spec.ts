@@ -16,6 +16,7 @@ import base58 from "bs58";
 import arweaveTestKey from "./test_key0.json";
 import { createData as createFileData } from "../file";
 import { Wallet } from "@ethersproject/wallet";
+import base64url from "base64url";
 
 const multiAptoskeyPairs = [
   {
@@ -260,7 +261,7 @@ describe("Signers()", function () {
                   expect(encodedOwner).toEqual(publicKey);
                   expect(dataItem.signatureType).toEqual(signerTestVariation.signatureType);
                   expect(dataItem.target).toEqual(targetTestVariation.target ?? "");
-                  expect(dataItem.anchor).toEqual(anchorTestVariation.anchor ?? "");
+                  expect(dataItem.anchor).toEqual(base64url.encode(anchorTestVariation.anchor ?? ""));
                   expect(dataItem.tags).toEqual(tags ?? []);
                 });
 
@@ -346,7 +347,7 @@ describe("Signers()", function () {
                   expect(encodedOwner).toEqual(publicKey);
                   expect(await dataItem.signatureType()).toEqual(signerTestVariation.signatureType);
                   expect(await dataItem.target()).toEqual(targetTestVariation.target ?? "");
-                  expect(await dataItem.anchor()).toEqual(anchorTestVariation.anchor ?? "");
+                  expect(await dataItem.anchor()).toEqual(base64url.encode(anchorTestVariation.anchor ?? ""));
                   expect(await dataItem.tags()).toEqual(tags ?? []);
                 });
 

@@ -1,3 +1,4 @@
+import base64url from "base64url";
 import { createData, PolygonSigner } from "../../index";
 import type { DataItemCreateOptions } from "../ar-data-base";
 
@@ -18,7 +19,7 @@ describe("Polygon signing tests", function () {
     expect(d.rawOwner.toString("hex")).toEqual(signer.pk);
     expect(d.signatureType).toEqual(3);
     expect(d.target).toEqual("OXcT1sVRSA5eGwt2k6Yuz8-3e3g9WJi5uSE99CWqsBs");
-    expect(d.anchor).toEqual("Math.apt'#]gng(36).substring(30)");
+    expect(d.anchor).toEqual(base64url.encode("Math.apt'#]gng(36).substring(30)"));
     expect(d.tags).toEqual([{ name: "Content-Type", value: "image/png" }]);
     expect(d.rawData.toString()).toEqual("hello");
   });

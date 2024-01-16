@@ -89,7 +89,7 @@ describe("DataItem", () => {
             });
             describe("given we want to get the anchor", () => {
               it("should return the anchor", async () => {
-                expect(await dataItem.anchor()).toEqual(anchor ?? "");
+                expect(await dataItem.anchor()).toEqual(base64url.encode(anchor ?? ""));
               });
             });
             describe("given we want to get the target", () => {
