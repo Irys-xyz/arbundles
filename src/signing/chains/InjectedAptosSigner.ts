@@ -28,11 +28,12 @@ export default class InjectedAptosSigner implements Signer {
 
   async sign(message: Uint8Array): Promise<Uint8Array> {
     if (!this.provider.signMessage) throw new Error("Selected Wallet does not support message signing");
-    const signature = await this.provider.signMessage({
+    const signingResponse = await this.provider.signMessage({
       message: Buffer.from(message).toString("hex"),
       nonce: "bundlr",
     });
-    return Buffer.from(signature.signature, "hex");
+    const signature = signingResponse.signature;
+    return typeof signature === "string" ? Buffer.from(signature, "hex") : signature.toUnit8Array();
   }
 
   static async verify(pk: Buffer, message: Uint8Array, signature: Uint8Array): Promise<boolean> {
